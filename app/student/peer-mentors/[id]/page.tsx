@@ -1,0 +1,475 @@
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { LayoutWrapper } from "@/components/LayoutWrapper";
+import { Button } from "@/components/ui/button";
+import {
+  ArrowLeft,
+  Send,
+  GraduationCap,
+  MessageCircle,
+  Mic,
+  MicOff,
+  X,
+} from "lucide-react";
+import { doc, getDoc, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { useAuth } from "@/context/auth";
+
+interface PeerMentor {
+  uid: string;
+  fullName: string;
+  specialization?: string;
+  about?: string;
+  school?: string;
+  conversationsCount?: number;
+  isOnline?: boolean;
+  avatar?: string;
+}
+
+interface Message {
+  id: string;
+  text: string;
+  senderId: string;
+  senderName: string;
+  createdAt: Date;
+  audioUrl?: string;
+}
+
+// Demo data
+const demoPeerMentors: Record<string, PeerMentor> = {
+  "mentor-1": {
+    uid: "mentor-1",
+    fullName: "Esi Owusu",
+    specialization: "Academic Stress",
+    about: "3rd year Psychology student. Been through the struggle and here to help! I understand how overwhelming it can feel when assignments pile up and exams are around the corner. Let's talk through it together.",
+    school: "University of Ghana",
+    conversationsCount: 89,
+    isOnline: true,
+  },
+  "mentor-2": {
+    uid: "mentor-2",
+    fullName: "Yaw Mensah",
+    specialization: "First Year Transition",
+    about: "Final year Engineering student. I know how overwhelming first year can be - new environment, new people, new expectations. I've been there and I'm here to help you navigate it.",
+    school: "KNUST",
+    conversationsCount: 156,
+    isOnline: true,
+  },
+  "mentor-3": {
+    uid: "mentor-3",
+    fullName: "Adwoa Asare",
+    specialization: "Anxiety & Overthinking",
+    about: "Medical student who's learned to manage anxiety. Happy to share what works! Sometimes it helps to talk to someone who truly gets it.",
+    school: "UCC",
+    conversationsCount: 203,
+    isOnline: false,
+  },
+  "mentor-4": {
+    uid: "mentor-4",
+    fullName: "Kofi Darko",
+    specialization: "Relationships & Social Life",
+    about: "Sometimes you just need someone your age to talk to. No judgment, just a listening ear and maybe some advice from someone who's been through similar situations.",
+    school: "Ashesi University",
+    conversationsCount: 67,
+    isOnline: true,
+  },
+  "mentor-5": {
+    uid: "mentor-5",
+    fullName: "Akua Boateng",
+    specialization: "Study Tips & Motivation",
+    about: "Dean's list student sharing practical study strategies that actually work. I believe everyone has the potential to excel - sometimes you just need the right approach.",
+    school: "University of Ghana",
+    conversationsCount: 142,
+    isOnline: false,
+  },
+};
+
+export default function PeerMentorChatPage() {
+  const params = useParams();
+  const router = useRouter();
+  const { profile } = useAuth();
+  const mentorId = params.id as string;
+
+  const [mentor, setMentor] = useState<PeerMentor | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [inputText, setInputText] = useState("");
+  const [sending, setSending] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Voice recording
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const audioUrlMapRef = useRef<Map<string, string>>(new Map()); // Store audio URLs by message ID
+
+  // Load mentor
+  useEffect(() => {
+    async function loadMentor() {
+      try {
+        if (db && !mentorId.startsWith("mentor-")) {
+          const docSnap = await getDoc(doc(db, "users", mentorId));
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            setMentor({ 
+              uid: docSnap.id,
+              fullName: data.fullName,
+              specialization: data.application?.specialization || data.specialization,
+              about: data.application?.about || data.about,
+              school: data.student?.school || data.school,
+              conversationsCount: data.conversationsCount || 0,
+              isOnline: data.isOnline || false,
+              avatar: data.avatar || data.profilePicture || null,
+            } as PeerMentor);
+          }
+        } else {
+          setMentor(demoPeerMentors[mentorId] || null);
+        }
+      } catch (e) {
+        console.error(e);
+        setMentor(demoPeerMentors[mentorId] || null);
+      } finally {
+        setLoading(false);
+      }
+    }
+    void loadMentor();
+  }, [mentorId]);
+
+  // Load chat messages (real-time)
+  useEffect(() => {
+    if (!profile || !db) return;
+    
+    const chatId = [profile.uid, mentorId].sort().join("_");
+    const q = query(
+      collection(db, "directMessages", chatId, "messages"),
+      orderBy("createdAt", "asc")
+    );
+
+    const unsub = onSnapshot(q, (snap) => {
+      const msgs: Message[] = snap.docs.map((d) => {
+        const data = d.data();
+        const msgId = d.id;
+        // Preserve audio URL if we have it stored locally
+        const audioUrl = audioUrlMapRef.current.get(msgId);
+        return {
+          id: msgId,
+          ...data,
+          createdAt: data.createdAt?.toDate() || new Date(),
+          audioUrl: audioUrl || (data.hasAudio ? undefined : undefined), // Keep stored URL or check hasAudio
+        } as Message;
+      });
+      setMessages(msgs);
+    });
+
+    return () => unsub();
+  }, [profile, mentorId]);
+
+  // Auto-scroll
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      
+      // Get supported mime type
+      let mimeType = "audio/webm";
+      if (!MediaRecorder.isTypeSupported("audio/webm")) {
+        if (MediaRecorder.isTypeSupported("audio/mp4")) {
+          mimeType = "audio/mp4";
+        } else if (MediaRecorder.isTypeSupported("audio/ogg")) {
+          mimeType = "audio/ogg";
+        } else {
+          mimeType = ""; // Use default
+        }
+      }
+      
+      const options = mimeType ? { mimeType } : {};
+      const mediaRecorder = new MediaRecorder(stream, options);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+      
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          audioChunksRef.current.push(e.data);
+        }
+      };
+      
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(audioChunksRef.current, { type: mimeType || "audio/webm" });
+        setAudioBlob(blob);
+        stream.getTracks().forEach((t) => t.stop());
+      };
+      
+      mediaRecorder.onerror = (e) => {
+        console.error("MediaRecorder error:", e);
+        setIsRecording(false);
+        stream.getTracks().forEach((t) => t.stop());
+      };
+      
+      mediaRecorder.start(100); // Collect data every 100ms
+      setIsRecording(true);
+      setRecordingTime(0);
+      timerRef.current = setInterval(() => setRecordingTime((t) => t + 1), 1000);
+    } catch (e) {
+      console.error("Mic access denied:", e);
+      alert("Could not access microphone.\n\nPlease:\n1. Click the lock icon in your browser's address bar\n2. Allow microphone access\n3. Refresh the page and try again");
+    }
+  };
+
+  const stopRecording = () => {
+    mediaRecorderRef.current?.stop();
+    setIsRecording(false);
+    if (timerRef.current) clearInterval(timerRef.current);
+  };
+
+  const formatRecordingTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const sendMessage = async () => {
+    if (!inputText.trim() && !audioBlob) return;
+    if (!profile || !db) return;
+    setSending(true);
+    
+    try {
+      const chatId = [profile.uid, mentorId].sort().join("_");
+      const displayName = (profile.anonymousEnabled && profile.anonymousId 
+        ? profile.anonymousId 
+        : profile.fullName) || "User";
+
+      const audioUrl = audioBlob ? URL.createObjectURL(audioBlob) : undefined;
+      const tempId = Date.now().toString();
+      
+      // Store audio URL in map
+      if (audioUrl) {
+        audioUrlMapRef.current.set(tempId, audioUrl);
+      }
+      
+      // Add to local state immediately with audio
+      const newMessage: Message = {
+        id: tempId,
+        text: inputText.trim() || "🎤 Voice message",
+        senderId: profile.uid,
+        senderName: displayName,
+        createdAt: new Date(),
+        audioUrl,
+      };
+      setMessages((prev) => [...prev, newMessage]);
+
+      // Create/update conversation document with participants array
+      await setDoc(doc(db, "directMessages", chatId), {
+        participants: [profile.uid, mentorId],
+        lastMessage: inputText.trim() || "🎤 Voice message",
+        lastMessageTime: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      }, { merge: true });
+
+      const docRef = await addDoc(collection(db, "directMessages", chatId, "messages"), {
+        text: inputText.trim() || "🎤 Voice message",
+        senderId: profile.uid,
+        senderName: displayName,
+        createdAt: serverTimestamp(),
+        hasAudio: !!audioBlob,
+      });
+      
+      // Update conversation document with latest message
+      await setDoc(doc(db, "directMessages", chatId), {
+        participants: [profile.uid, mentorId],
+        lastMessage: inputText.trim() || "🎤 Voice message",
+        lastMessageTime: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      }, { merge: true });
+      
+      // Update the map with the real Firestore ID
+      if (audioUrl) {
+        audioUrlMapRef.current.set(docRef.id, audioUrl);
+        audioUrlMapRef.current.delete(tempId);
+      }
+      
+      setInputText("");
+      setAudioBlob(null);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <LayoutWrapper>
+        <div className="flex min-h-screen items-center justify-center bg-gray-900">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+        </div>
+      </LayoutWrapper>
+    );
+  }
+
+  if (!mentor) {
+    return (
+      <LayoutWrapper>
+        <div className="flex min-h-screen flex-col items-center justify-center bg-gray-900 text-white">
+          <p>Peer mentor not found</p>
+          <Button onClick={() => router.back()} className="mt-4">
+            Go back
+          </Button>
+        </div>
+      </LayoutWrapper>
+    );
+  }
+
+  return (
+    <LayoutWrapper>
+      <div className="flex h-screen flex-col bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+        {/* Header */}
+        <div className="relative z-10 border-b border-white/10 bg-black/20 px-4 py-4 backdrop-blur-xl md:px-8">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => router.back()}
+              className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-white/10 hover:text-white"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+
+            {mentor.avatar ? (
+              <img
+                src={mentor.avatar}
+                alt={mentor.fullName}
+                className="h-12 w-12 rounded-full object-cover border-2 border-white/20"
+              />
+            ) : (
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-lg font-bold text-white">
+                {mentor.fullName.split(" ").map((n) => n[0]).join("")}
+              </div>
+            )}
+
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <h1 className="font-semibold text-white truncate">{mentor.fullName}</h1>
+                {mentor.isOnline && (
+                  <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                )}
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-emerald-400">{mentor.specialization}</span>
+                <span className="text-gray-600">•</span>
+                <span className="flex items-center gap-1 text-gray-500">
+                  <GraduationCap className="h-3 w-3" />
+                  {mentor.school}
+                </span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto px-4 py-6 md:px-8">
+          <div className="mx-auto max-w-3xl space-y-4">
+            {/* About card (at top) */}
+            {messages.length === 0 && (
+              <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5">
+                <p className="mb-2 text-sm font-medium text-emerald-400">About {mentor.fullName.split(" ")[0]}</p>
+                <p className="text-sm text-gray-400">{mentor.about}</p>
+              </div>
+            )}
+
+            {messages.length === 0 && (
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center">
+                <MessageCircle className="mx-auto mb-3 h-8 w-8 text-gray-500" />
+                <p className="text-gray-400">Start the conversation!</p>
+                <p className="mt-1 text-sm text-gray-500">
+                  {mentor.fullName.split(" ")[0]} is here to listen and support you.
+                </p>
+              </div>
+            )}
+
+            {messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`flex ${msg.senderId === profile?.uid ? "justify-end" : "justify-start"}`}
+              >
+                <div
+                  className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                    msg.senderId === profile?.uid
+                      ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white"
+                      : "border border-white/10 bg-white/5 text-gray-100"
+                  }`}
+                >
+                  {msg.audioUrl ? (
+                    <div className="mb-2">
+                      <audio 
+                        controls 
+                        className="w-full max-w-xs h-10" 
+                        src={msg.audioUrl}
+                        style={{ minWidth: "200px" }}
+                      >
+                        Your browser does not support audio playback.
+                      </audio>
+                    </div>
+                  ) : null}
+                  {msg.text && <p className={`text-sm ${msg.audioUrl ? "mt-2" : ""}`}>{msg.text}</p>}
+                </div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+        </div>
+
+        {/* Input */}
+        <div className="border-t border-white/10 bg-black/20 p-4 backdrop-blur-xl md:p-6">
+          <div className="mx-auto max-w-3xl">
+            {/* Audio preview */}
+            {audioBlob && (
+              <div className="mb-3 flex items-center gap-3 rounded-xl bg-white/5 px-4 py-2">
+                <Mic className="h-5 w-5 text-emerald-400" />
+                <audio controls src={URL.createObjectURL(audioBlob)} className="h-8 flex-1" />
+                <button onClick={() => setAudioBlob(null)} className="text-gray-400 hover:text-white">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            )}
+            <div className="flex gap-3">
+              <button
+                onClick={isRecording ? stopRecording : startRecording}
+                className={`flex items-center gap-2 rounded-xl px-4 py-3 transition-all ${
+                  isRecording ? "bg-red-500/20 text-red-400" : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
+                }`}
+              >
+                {isRecording ? (
+                  <><MicOff className="h-5 w-5" /><span className="text-sm">{formatRecordingTime(recordingTime)}</span></>
+                ) : (
+                  <Mic className="h-5 w-5" />
+                )}
+              </button>
+              <input
+                type="text"
+                placeholder="Type or record a message..."
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-gray-500 transition-colors focus:border-emerald-500/50 focus:outline-none"
+              />
+              <Button
+                onClick={sendMessage}
+                disabled={(!inputText.trim() && !audioBlob) || sending}
+                className="rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-5"
+              >
+                <Send className="h-5 w-5" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </LayoutWrapper>
+  );
+}

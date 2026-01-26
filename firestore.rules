@@ -1,0 +1,65 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Users can only read/write their own profile + subcollections.
+    match /users/{userId} {
+      allow read, write: if isSignedIn() && request.auth.uid == userId;
+
+      match /aiThreads/{threadId} {
+        allow read, write: if isSignedIn() && request.auth.uid == userId;
+        match /messages/{messageId} {
+          allow read, write: if isSignedIn() && request.auth.uid == userId;
+        }
+      }
+    }
+
+    // Direct messages - users can read/write if they are a participant
+    match /directMessages/{chatId} {
+      allow read, write: if isSignedIn() && (
+        request.auth.uid in resource.data.participants ||
+        request.auth.uid in request.resource.data.participants
+      );
+      
+      match /messages/{messageId} {
+        allow read, write: if isSignedIn() && (
+          request.auth.uid in get(/databases/$(database)/documents/directMessages/$(chatId)).data.participants
+        );
+      }
+    }
+
+    // Forums - all authenticated users can read/write
+    match /forums/{forumId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+      
+      match /messages/{messageId} {
+        allow read, write: if isSignedIn();
+        
+        match /replies/{replyId} {
+          allow read, write: if isSignedIn();
+        }
+      }
+    }
+
+    // Bookings - users can read their own bookings, counselors can read their bookings
+    match /bookings/{bookingId} {
+      allow read: if isSignedIn() && (
+        request.auth.uid == resource.data.studentId ||
+        request.auth.uid == resource.data.counselorId
+      );
+      allow create: if isSignedIn() && (
+        request.auth.uid == request.resource.data.studentId ||
+        request.auth.uid == request.resource.data.counselorId
+      );
+      allow update: if isSignedIn() && (
+        request.auth.uid == resource.data.studentId ||
+        request.auth.uid == resource.data.counselorId
+      );
+    }
+  }
+}
+

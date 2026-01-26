@@ -1,0 +1,71 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1600" y2="900" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F0FDF4"/>
+      <stop offset="0.55" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#ECFDF5"/>
+    </linearGradient>
+    <radialGradient id="orb1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(380 220) rotate(35) scale(520 360)">
+      <stop stop-color="#86EFAC" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#86EFAC" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="orb2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1260 220) rotate(140) scale(560 380)">
+      <stop stop-color="#A7F3D0" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#A7F3D0" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="orb3" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(820 760) rotate(20) scale(720 420)">
+      <stop stop-color="#BBF7D0" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#BBF7D0" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#FFFFFF" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.55"/>
+    </linearGradient>
+    <filter id="blur" x="-80" y="-80" width="1760" height="1060" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+    <filter id="shadow" x="-40" y="-40" width="1680" height="980" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#0B1220" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <rect width="1600" height="900" fill="url(#orb1)"/>
+  <rect width="1600" height="900" fill="url(#orb2)"/>
+  <rect width="1600" height="900" fill="url(#orb3)"/>
+
+  <!-- Soft abstract counseling scene -->
+  <g filter="url(#blur)" opacity="0.9">
+    <path d="M260 720C420 560 610 520 760 620C900 716 1060 730 1220 610C1330 528 1420 520 1500 560V900H260V720Z" fill="#DCFCE7"/>
+  </g>
+
+  <!-- Glass panel -->
+  <g filter="url(#shadow)">
+    <rect x="190" y="170" width="1220" height="560" rx="34" fill="url(#card)" stroke="#E5E7EB" stroke-opacity="0.55"/>
+  </g>
+
+  <!-- Two abstract people + speech bubble -->
+  <g>
+    <!-- Person left -->
+    <circle cx="540" cy="410" r="54" fill="#16A34A" fill-opacity="0.14"/>
+    <path d="M470 602C486 535 530 498 590 498C650 498 694 535 710 602C713 614 703 626 691 626H489C477 626 467 614 470 602Z" fill="#16A34A" fill-opacity="0.12"/>
+    <circle cx="540" cy="402" r="30" fill="#0B1220" fill-opacity="0.10"/>
+
+    <!-- Person right -->
+    <circle cx="1020" cy="410" r="54" fill="#22C55E" fill-opacity="0.12"/>
+    <path d="M950 602C966 535 1010 498 1070 498C1130 498 1174 535 1190 602C1193 614 1183 626 1171 626H969C957 626 947 614 950 602Z" fill="#22C55E" fill-opacity="0.10"/>
+    <circle cx="1020" cy="402" r="30" fill="#0B1220" fill-opacity="0.10"/>
+
+    <!-- Speech bubble -->
+    <path d="M720 320C720 287 747 260 780 260H940C973 260 1000 287 1000 320V372C1000 405 973 432 940 432H835L790 470V432H780C747 432 720 405 720 372V320Z" fill="#FFFFFF" fill-opacity="0.75" stroke="#E5E7EB" stroke-opacity="0.65"/>
+    <rect x="760" y="306" width="200" height="14" rx="7" fill="#16A34A" fill-opacity="0.18"/>
+    <rect x="760" y="338" width="160" height="14" rx="7" fill="#16A34A" fill-opacity="0.14"/>
+    <rect x="760" y="370" width="120" height="14" rx="7" fill="#16A34A" fill-opacity="0.12"/>
+  </g>
+
+  <!-- Vignette -->
+  <rect width="1600" height="900" fill="url(#bg)" opacity="0.0"/>
+  <rect width="1600" height="900" fill="#0B1220" opacity="0.03"/>
+</svg>
+

@@ -19,6 +19,8 @@ import {
 import { doc, getDoc, collection, addDoc, query, where, orderBy, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/auth";
+import { useCall } from "@/context/callContext";
+import { Phone, Video } from "lucide-react";
 
 interface Counselor {
   uid: string;
@@ -96,6 +98,7 @@ export default function CounselorProfilePage() {
   const params = useParams();
   const router = useRouter();
   const { profile } = useAuth();
+  const { initiateCall, isInCall } = useCall();
   const counselorId = params.id as string;
 
   const [counselor, setCounselor] = useState<Counselor | null>(null);
@@ -478,6 +481,28 @@ export default function CounselorProfilePage() {
                 )}
               </div>
               <p className="text-sm text-blue-400">{counselor.specialization}</p>
+            </div>
+
+            {/* Call buttons */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => initiateCall(counselorId, "voice")}
+                disabled={isInCall}
+                className="flex items-center gap-2 rounded-lg bg-green-500/20 px-3 py-2 text-sm font-medium text-green-400 transition-all hover:bg-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Voice call"
+              >
+                <Phone className="h-4 w-4" />
+                <span className="hidden sm:inline">Call</span>
+              </button>
+              <button
+                onClick={() => initiateCall(counselorId, "video")}
+                disabled={isInCall}
+                className="flex items-center gap-2 rounded-lg bg-blue-500/20 px-3 py-2 text-sm font-medium text-blue-400 transition-all hover:bg-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Video call"
+              >
+                <Video className="h-4 w-4" />
+                <span className="hidden sm:inline">Video</span>
+              </button>
             </div>
 
           </div>

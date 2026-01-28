@@ -15,6 +15,7 @@ interface Conversation {
   lastMessageTime: Date;
   type: "counselor" | "peer-mentor";
   avatar?: string;
+  otherUserId?: string; // Store the other user's ID for navigation
 }
 
 export default function StudentInboxPage() {
@@ -53,14 +54,30 @@ export default function StudentInboxPage() {
 
                 // Only show counselors and peer mentors
                 if (otherUserData.role === "counselor" || otherUserData.role === "peer-mentor") {
-                  conversationsList.push({
-                    id: otherUserId,
-                    name: otherUserData.fullName || "Unknown",
-                    lastMessage: data.lastMessage?.slice(0, 80) || "No messages yet",
-                    lastMessageTime: data.lastMessageTime?.toDate() || new Date(),
-                    type: otherUserData.role === "counselor" ? "counselor" : "peer-mentor",
-                    avatar: otherUserData.avatar || otherUserData.profilePicture || undefined,
-                  });
+                  // Use chatId as the unique identifier to avoid duplicates
+                  const existingIndex = conversationsList.findIndex(c => c.id === chatId);
+                  if (existingIndex === -1) {
+                    conversationsList.push({
+                      id: chatId, // Use chatId instead of otherUserId for uniqueness
+                      name: otherUserData.fullName || "Unknown",
+                      lastMessage: data.lastMessage?.slice(0, 80) || "No messages yet",
+                      lastMessageTime: data.lastMessageTime?.toDate() || new Date(),
+                      type: otherUserData.role === "counselor" ? "counselor" : "peer-mentor",
+                      avatar: otherUserData.avatar || otherUserData.profilePicture || undefined,
+                      otherUserId: otherUserId, // Store for navigation
+                    });
+                  } else {
+                    // Update existing conversation if this one is more recent
+                    const existing = conversationsList[existingIndex];
+                    const newTime = data.lastMessageTime?.toDate() || new Date();
+                    if (newTime > existing.lastMessageTime) {
+                      conversationsList[existingIndex] = {
+                        ...existing,
+                        lastMessage: data.lastMessage?.slice(0, 80) || "No messages yet",
+                        lastMessageTime: newTime,
+                      };
+                    }
+                  }
                 }
               }
             } catch (e) {
@@ -167,8 +184,8 @@ export default function StudentInboxPage() {
                     key={conv.id}
                     onClick={() => router.push(
                       conv.type === "counselor" 
-                        ? `/student/counselors/${conv.id}`
-                        : `/student/peer-mentors/${conv.id}`
+                        ? `/student/counselors/${conv.otherUserId || conv.id}`
+                        : `/student/peer-mentors/${conv.otherUserId || conv.id}`
                     )}
                     className="group w-full rounded-xl border border-white/10 bg-white/5 p-5 text-left transition-all hover:border-emerald-500/30 hover:bg-white/10 backdrop-blur-sm"
                   >

@@ -82,7 +82,10 @@ export default function CounselorBookingsPage() {
       console.error("Error loading bookings:", error);
       if (error?.code === "failed-precondition") {
         console.warn("Firestore index required. Please create the composite index for bookings collection.");
+        console.warn("Click this link to create the index:", error.message?.match(/https:\/\/[^\s]+/)?.[0] || "https://console.firebase.google.com/project/theracklick/firestore/indexes");
         // Silently handle - index will be created automatically via the link in console
+      } else if (error?.code === "cancelled" || error?.name === "AbortError") {
+        console.warn("Bookings query was cancelled/aborted");
       }
       setLoading(false);
     });

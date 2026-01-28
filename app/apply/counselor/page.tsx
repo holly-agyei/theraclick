@@ -29,6 +29,10 @@ export default function CounselorApplyPage() {
       setError("Passwords do not match.");
       return;
     }
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      return;
+    }
     setIsLoading(true);
     try {
       await applyForRole({
@@ -48,7 +52,14 @@ export default function CounselorApplyPage() {
   };
 
   const isFormValid =
-    fullName.trim() && email.trim() && specialization.trim() && about.trim() && password.trim() && confirmPassword.trim();
+    fullName.trim().length > 0 &&
+    email.trim().length > 0 &&
+    email.includes("@") &&
+    specialization.trim().length > 0 &&
+    about.trim().length > 0 &&
+    password.trim().length >= 6 &&
+    confirmPassword.trim().length >= 6 &&
+    password === confirmPassword;
 
   return (
     <div className="flex h-screen min-h-[700px] overflow-hidden">
@@ -181,7 +192,11 @@ export default function CounselorApplyPage() {
               <Button
                 type="submit"
                 size="lg"
-                className="w-full bg-primary-500 text-white hover:bg-primary-400"
+                className={`w-full transition-all ${
+                  !isFirebaseBacked || isLoading || !isFormValid
+                    ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+                    : "bg-primary-500 text-white hover:bg-primary-400 active:bg-primary-600"
+                }`}
                 disabled={!isFirebaseBacked || isLoading || !isFormValid}
               >
                 {isLoading ? "Submitting..." : "Submit application"}

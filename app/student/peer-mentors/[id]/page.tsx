@@ -16,6 +16,10 @@ import {
 import { doc, getDoc, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/auth";
+import { useCall } from "@/context/callContext";
+import { Phone, Video } from "lucide-react";
+import { VoiceMessage } from "@/components/VoiceMessage";
+import { uploadVoiceMessage } from "@/lib/audioUpload";
 
 interface PeerMentor {
   uid: string;
@@ -90,6 +94,7 @@ export default function PeerMentorChatPage() {
   const params = useParams();
   const router = useRouter();
   const { profile } = useAuth();
+  const { initiateCall, isInCall } = useCall();
   const mentorId = params.id as string;
 
   const [mentor, setMentor] = useState<PeerMentor | null>(null);
@@ -246,13 +251,19 @@ export default function PeerMentorChatPage() {
         ? profile.anonymousId 
         : profile.fullName) || "User";
 
-      const audioUrl = audioBlob ? URL.createObjectURL(audioBlob) : undefined;
-      const tempId = Date.now().toString();
-      
-      // Store audio URL in map
-      if (audioUrl) {
-        audioUrlMapRef.current.set(tempId, audioUrl);
+      // Upload audio to Firebase Storage if present
+      let audioUrl: string | undefined;
+      if (audioBlob) {
+        audioUrl = await uploadVoiceMessage(audioBlob, chatId, profile.uid);
+        if (!audioUrl) {
+          console.error("Failed to upload voice message");
+          alert("Failed to upload voice message. Please try again.");
+          setSending(false);
+          return;
+        }
       }
+      
+      const tempId = Date.now().toString();
       
       // Add to local state immediately with audio
       const newMessage: Message = {
@@ -273,32 +284,19 @@ export default function PeerMentorChatPage() {
         updatedAt: serverTimestamp(),
       }, { merge: true });
 
-      const docRef = await addDoc(collection(db, "directMessages", chatId, "messages"), {
+      await addDoc(collection(db, "directMessages", chatId, "messages"), {
         text: inputText.trim() || "🎤 Voice message",
         senderId: profile.uid,
         senderName: displayName,
         createdAt: serverTimestamp(),
-        hasAudio: !!audioBlob,
+        audioUrl: audioUrl || null,
       });
-      
-      // Update conversation document with latest message
-      await setDoc(doc(db, "directMessages", chatId), {
-        participants: [profile.uid, mentorId],
-        lastMessage: inputText.trim() || "🎤 Voice message",
-        lastMessageTime: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      }, { merge: true });
-      
-      // Update the map with the real Firestore ID
-      if (audioUrl) {
-        audioUrlMapRef.current.set(docRef.id, audioUrl);
-        audioUrlMapRef.current.delete(tempId);
-      }
       
       setInputText("");
       setAudioBlob(null);
     } catch (e) {
       console.error(e);
+      alert("Failed to send message. Please try again.");
     } finally {
       setSending(false);
     }
@@ -369,6 +367,42 @@ export default function PeerMentorChatPage() {
               </div>
             </div>
 
+            {/* Call buttons */}
+            <div className="flex gap-2">
+              <button
+                onClick={async () => {
+                  try {
+                    await initiateCall(mentorId, "voice");
+                  } catch (error: any) {
+                    console.error("Call failed:", error);
+                    alert(`Failed to start call: ${error?.message || "Unknown error"}`);
+                  }
+                }}
+                disabled={isInCall}
+                className="flex items-center gap-2 rounded-lg bg-green-500/20 px-3 py-2 text-sm font-medium text-green-400 transition-all hover:bg-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Voice call"
+              >
+                <Phone className="h-4 w-4" />
+                <span className="hidden sm:inline">Call</span>
+              </button>
+              <button
+                onClick={async () => {
+                  try {
+                    await initiateCall(mentorId, "video");
+                  } catch (error: any) {
+                    console.error("Video call failed:", error);
+                    alert(`Failed to start video call: ${error?.message || "Unknown error"}`);
+                  }
+                }}
+                disabled={isInCall}
+                className="flex items-center gap-2 rounded-lg bg-blue-500/20 px-3 py-2 text-sm font-medium text-blue-400 transition-all hover:bg-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Video call"
+              >
+                <Video className="h-4 w-4" />
+                <span className="hidden sm:inline">Video</span>
+              </button>
+            </div>
+
           </div>
         </div>
 
@@ -407,14 +441,10 @@ export default function PeerMentorChatPage() {
                 >
                   {msg.audioUrl ? (
                     <div className="mb-2">
-                      <audio 
-                        controls 
-                        className="w-full max-w-xs h-10" 
-                        src={msg.audioUrl}
-                        style={{ minWidth: "200px" }}
-                      >
-                        Your browser does not support audio playback.
-                      </audio>
+                      <VoiceMessage 
+                        audioUrl={msg.audioUrl} 
+                        isOwnMessage={msg.senderId === profile?.uid}
+                      />
                     </div>
                   ) : null}
                   {msg.text && <p className={`text-sm ${msg.audioUrl ? "mt-2" : ""}`}>{msg.text}</p>}
@@ -430,10 +460,15 @@ export default function PeerMentorChatPage() {
           <div className="mx-auto max-w-3xl">
             {/* Audio preview */}
             {audioBlob && (
-              <div className="mb-3 flex items-center gap-3 rounded-xl bg-white/5 px-4 py-2">
-                <Mic className="h-5 w-5 text-emerald-400" />
-                <audio controls src={URL.createObjectURL(audioBlob)} className="h-8 flex-1" />
-                <button onClick={() => setAudioBlob(null)} className="text-gray-400 hover:text-white">
+              <div className="mb-3 flex items-center gap-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-3">
+                <Mic className="h-5 w-5 text-emerald-400 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <audio controls src={URL.createObjectURL(audioBlob)} className="w-full h-8" />
+                </div>
+                <button 
+                  onClick={() => setAudioBlob(null)} 
+                  className="flex-shrink-0 p-1 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                >
                   <X className="h-5 w-5" />
                 </button>
               </div>
@@ -441,9 +476,10 @@ export default function PeerMentorChatPage() {
             <div className="flex gap-3">
               <button
                 onClick={isRecording ? stopRecording : startRecording}
+                disabled={sending}
                 className={`flex items-center gap-2 rounded-xl px-4 py-3 transition-all ${
                   isRecording ? "bg-red-500/20 text-red-400" : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
-                }`}
+                } ${sending ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 {isRecording ? (
                   <><MicOff className="h-5 w-5" /><span className="text-sm">{formatRecordingTime(recordingTime)}</span></>
@@ -456,15 +492,20 @@ export default function PeerMentorChatPage() {
                 placeholder="Type or record a message..."
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-gray-500 transition-colors focus:border-emerald-500/50 focus:outline-none"
+                onKeyDown={(e) => e.key === "Enter" && !sending && sendMessage()}
+                disabled={sending}
+                className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-gray-500 transition-colors focus:border-emerald-500/50 focus:outline-none disabled:opacity-50"
               />
               <Button
                 onClick={sendMessage}
                 disabled={(!inputText.trim() && !audioBlob) || sending}
-                className="rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-5"
+                className="rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-5 min-w-[60px]"
               >
-                <Send className="h-5 w-5" />
+                {sending ? (
+                  <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <Send className="h-5 w-5" />
+                )}
               </Button>
             </div>
           </div>

@@ -32,6 +32,11 @@ export default function StudentSignupPage() {
       return;
     }
 
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      return;
+    }
+
     setIsLoading(true);
     try {
       await signupStudent({
@@ -51,13 +56,16 @@ export default function StudentSignupPage() {
   };
 
   const isFormValid =
-    fullName.trim() &&
-    email.trim() &&
-    schoolEmail.trim() &&
-    educationLevel.trim() &&
-    school.trim() &&
-    password.trim() &&
-    confirmPassword.trim();
+    fullName.trim().length > 0 &&
+    email.trim().length > 0 &&
+    email.includes("@") &&
+    schoolEmail.trim().length > 0 &&
+    schoolEmail.includes("@") &&
+    educationLevel.trim().length > 0 &&
+    school.trim().length > 0 &&
+    password.trim().length >= 6 &&
+    confirmPassword.trim().length >= 6 &&
+    password === confirmPassword;
 
   return (
     <div className="flex h-screen min-h-[700px] overflow-hidden">
@@ -202,7 +210,11 @@ export default function StudentSignupPage() {
               <Button
                 type="submit"
                 size="lg"
-                className="w-full bg-primary-500 text-white hover:bg-primary-400"
+                className={`w-full transition-all ${
+                  !isFirebaseBacked || isLoading || !isFormValid
+                    ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+                    : "bg-primary-500 text-white hover:bg-primary-400 active:bg-primary-600"
+                }`}
                 disabled={!isFirebaseBacked || isLoading || !isFormValid}
               >
                 {isLoading ? "Creating..." : "Create account"}

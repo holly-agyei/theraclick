@@ -162,51 +162,70 @@ export default function ChatPage() {
           content: m.text,
         }));
 
-      const res = await fetch("/api/ai/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: history,
-          userContext: {
-            role: profile.role,
-            displayName:
-              profile.role === "student" && profile.anonymousEnabled && profile.anonymousId
-                ? profile.anonymousId
-                : undefined,
-            school: profile.role === "student" ? profile.student?.school ?? undefined : undefined,
-            educationLevel:
-              profile.role === "student" ? profile.student?.educationLevel ?? undefined : undefined,
-            country: "Ghana",
-          },
-        }),
-      });
-      const data = (await res.json()) as { ok: boolean; mode?: string; message?: string };
-      const text = data?.message || "I'm here. Tell me what's going on.";
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      
+      try {
+        const res = await fetch("/api/ai/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: history,
+            userContext: {
+              role: profile.role,
+              displayName:
+                profile.role === "student" && profile.anonymousEnabled && profile.anonymousId
+                  ? profile.anonymousId
+                  : undefined,
+              school: profile.role === "student" ? profile.student?.school ?? undefined : undefined,
+              educationLevel:
+                profile.role === "student" ? profile.student?.educationLevel ?? undefined : undefined,
+              country: "Ghana",
+            },
+          }),
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+        const data = (await res.json()) as { ok: boolean; mode?: string; message?: string };
+        const text = data?.message || "I'm here. Tell me what's going on.";
 
-      if (data?.mode === "crisis") setSafetyMode("crisis");
+        if (data?.mode === "crisis") setSafetyMode("crisis");
 
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text,
-        sender: "ai",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, aiMessage]);
-      await appendAiThreadMessage(profile, threadId, { sender: "ai", text: aiMessage.text });
-    } catch (e) {
-      console.error(e);
-      const fallback: Message = {
-        id: (Date.now() + 1).toString(),
-        text:
-          "I'm having trouble responding right now. Can you try again? If this feels urgent, consider reaching out to someone you trust nearby.",
-        sender: "ai",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, fallback]);
-      await appendAiThreadMessage(profile, threadId, { sender: "ai", text: fallback.text });
-    } finally {
-      setIsTyping(false);
-    }
+        const aiMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text,
+          sender: "ai",
+          timestamp: new Date(),
+        };
+        setMessages((prev) => [...prev, aiMessage]);
+        await appendAiThreadMessage(profile, threadId, { sender: "ai", text: aiMessage.text });
+      } catch (fetchError: any) {
+        clearTimeout(timeoutId);
+        if (fetchError.name === "AbortError") {
+          console.warn("Request was aborted (timeout or cancelled)");
+          const timeoutMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            text: "The request took too long. Please try again.",
+            sender: "ai",
+            timestamp: new Date(),
+          };
+          setMessages((prev) => [...prev, timeoutMessage]);
+          await appendAiThreadMessage(profile, threadId, { sender: "ai", text: timeoutMessage.text });
+        } else {
+          console.error("Chat error:", fetchError);
+          const fallback: Message = {
+            id: (Date.now() + 1).toString(),
+            text:
+              "I'm having trouble responding right now. Can you try again? If this feels urgent, consider reaching out to someone you trust nearby.",
+            sender: "ai",
+            timestamp: new Date(),
+          };
+          setMessages((prev) => [...prev, fallback]);
+          await appendAiThreadMessage(profile, threadId, { sender: "ai", text: fallback.text });
+        }
+      } finally {
+        setIsTyping(false);
+      }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {

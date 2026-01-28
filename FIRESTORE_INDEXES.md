@@ -1,6 +1,6 @@
 # Required Firestore Indexes
 
-This document lists all the Firestore composite indexes required for Theraklick to function properly.
+This document lists all the Firestore composite indexes required for Theraclick to function properly.
 
 ## Bookings Collection
 
@@ -18,7 +18,7 @@ This document lists all the Firestore composite indexes required for Theraklick 
   - `studentId` (Ascending)
   - `date` (Ascending)
 - **Query Location**: `/app/student/bookings/page.tsx`
-- **Create Index**: You'll need to create this manually in Firebase Console
+- **Create Index**: You'll need to create this manually in Firebase Console or click the link in the browser console error
 
 ## How to Create Indexes
 
@@ -41,3 +41,10 @@ If you see a "failed-precondition" error:
 1. Check that the index has been created in Firebase Console
 2. Wait for the index to finish building (status will show "Enabled")
 3. Refresh the page
+
+## Firebase Storage Rules
+
+Don't forget to deploy storage rules for voice messages:
+```bash
+firebase deploy --only storage
+```

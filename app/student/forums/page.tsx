@@ -31,6 +31,8 @@ import {
   Leaf,
 } from "lucide-react";
 import { useAuth } from "@/context/auth";
+import { VoiceMessage } from "@/components/VoiceMessage";
+import { uploadVoiceMessage } from "@/lib/audioUpload";
 import { 
   collection, 
   addDoc, 
@@ -101,6 +103,7 @@ export default function ForumsPage() {
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -176,30 +179,49 @@ export default function ForumsPage() {
     if (!inputText.trim() && !audioBlob && !selectedImage) return;
     if (!selectedForum || !profile) return;
 
-    const displayName = (profile.anonymousEnabled && profile.anonymousId 
-      ? profile.anonymousId 
-      : profile.fullName) || "Anonymous";
-    const newMessage: Partial<ForumMessage> = {
-      text: inputText.trim(),
-      senderId: profile.uid,
-      senderName: displayName,
-      createdAt: new Date(),
-      reactions: {},
-      isAnonymous: profile.anonymousEnabled || false,
-      imageUrl: selectedImage || undefined,
-    };
+    setSending(true);
 
-    if (replyingTo && !isThreadReply) {
-      newMessage.replyTo = { id: replyingTo.id, text: replyingTo.text.slice(0, 50), senderName: replyingTo.senderName };
-    }
+    try {
+      const displayName = (profile.anonymousEnabled && profile.anonymousId 
+        ? profile.anonymousId 
+        : profile.fullName) || "Anonymous";
 
-    setInputText("");
-    setReplyingTo(null);
-    setSelectedImage(null);
-    setAudioBlob(null);
+      let audioUrl: string | undefined;
+      if (audioBlob) {
+        try {
+          audioUrl = await uploadVoiceMessage(audioBlob, `forum_${selectedForum.id}`, profile.uid);
+          if (!audioUrl) {
+            alert("Failed to upload voice message. Please try again.");
+            return;
+          }
+        } catch (e) {
+          console.error("Voice upload error:", e);
+          alert("Failed to upload voice message. Please try again.");
+          return;
+        }
+      }
 
-    if (db && profile?.uid) {
-      try {
+      const newMessage: Partial<ForumMessage> = {
+        text: inputText.trim() || (audioUrl ? "🎤 Voice message" : ""),
+        senderId: profile.uid,
+        senderName: displayName,
+        createdAt: new Date(),
+        reactions: {},
+        isAnonymous: profile.anonymousEnabled || false,
+        imageUrl: selectedImage || undefined,
+        audioUrl,
+      };
+
+      if (replyingTo && !isThreadReply) {
+        newMessage.replyTo = { id: replyingTo.id, text: replyingTo.text.slice(0, 50), senderName: replyingTo.senderName };
+      }
+
+      setInputText("");
+      setReplyingTo(null);
+      setSelectedImage(null);
+      setAudioBlob(null);
+
+      if (db && profile?.uid) {
         const messageData = {
           text: newMessage.text || "",
           senderId: profile.uid,
@@ -208,6 +230,7 @@ export default function ForumsPage() {
           reactions: {},
           isAnonymous: newMessage.isAnonymous || false,
           ...(newMessage.imageUrl && { imageUrl: newMessage.imageUrl }),
+          ...(newMessage.audioUrl && { audioUrl: newMessage.audioUrl }),
           ...(newMessage.replyTo && { replyTo: newMessage.replyTo }),
         };
 
@@ -219,15 +242,17 @@ export default function ForumsPage() {
         } else {
           await addDoc(collection(db, "forums", selectedForum.id, "messages"), messageData);
         }
-      } catch (e) { 
-        console.error("Error sending forum message:", e);
-      }
-    } else {
-      if (isThreadReply) {
-        setThreadReplies((prev) => [...prev, { id: Date.now().toString(), ...newMessage, createdAt: new Date() } as ForumMessage]);
       } else {
-        setMessages((prev) => [...prev, { id: Date.now().toString(), ...newMessage, createdAt: new Date() } as ForumMessage]);
+        if (isThreadReply) {
+          setThreadReplies((prev) => [...prev, { id: Date.now().toString(), ...newMessage, createdAt: new Date() } as ForumMessage]);
+        } else {
+          setMessages((prev) => [...prev, { id: Date.now().toString(), ...newMessage, createdAt: new Date() } as ForumMessage]);
+        }
       }
+    } catch (e) {
+      console.error("Error sending forum message:", e);
+    } finally {
+      setSending(false);
     }
   };
 
@@ -281,18 +306,22 @@ export default function ForumsPage() {
   };
 
   const startRecording = async () => {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      alert("Your browser does not support audio recording. Try Chrome or Firefox.");
+      return;
+    }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      
+
       let mimeType = "";
       for (const t of ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus", "audio/ogg"]) {
         if (MediaRecorder.isTypeSupported(t)) { mimeType = t; break; }
       }
-      
+
       const mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
-      
+
       mediaRecorder.ondataavailable = (e) => {
         if (e.data.size > 0) audioChunksRef.current.push(e.data);
       };
@@ -306,11 +335,12 @@ export default function ForumsPage() {
         setIsRecording(false);
         stream.getTracks().forEach((t) => t.stop());
       };
-      
-      mediaRecorder.start(1000); // 1s timeslice for cross-browser reliability
+
+      mediaRecorder.start(1000);
       setIsRecording(true);
-    } catch (e) {
-      console.error("Mic access denied:", e);
+    } catch (e: any) {
+      console.error("Mic access error:", e);
+      alert("Could not access microphone.\n\nPlease allow microphone access and try again.");
     }
   };
 
@@ -366,9 +396,9 @@ export default function ForumsPage() {
 
           {msg.imageUrl && <img src={msg.imageUrl} alt="Shared" className="mt-2 max-h-64 rounded-lg" />}
           {msg.audioUrl && (
-            <audio controls className="mt-2 w-full max-w-xs">
-              <source src={msg.audioUrl} type="audio/webm" />
-            </audio>
+            <div className="mt-2">
+              <VoiceMessage audioUrl={msg.audioUrl} isOwnMessage={msg.senderId === profile?.uid} />
+            </div>
           )}
 
           {/* Reactions */}
@@ -435,7 +465,7 @@ export default function ForumsPage() {
 
   return (
     <LayoutWrapper>
-      <div className="flex h-screen bg-[#F0FDF4]">
+      <div className="flex h-full bg-white">
         {/* Forum list sidebar */}
         <div className={`${showMobileForums ? "flex" : "hidden"} w-full flex-col border-r border-gray-200 bg-white md:flex md:w-72`}>
           <div className="border-b border-gray-200 p-4">
@@ -602,18 +632,23 @@ export default function ForumsPage() {
                       placeholder={selectedThread ? "Reply in thread..." : `Message #${selectedForum.name.toLowerCase()}`}
                       value={inputText}
                       onChange={(e) => setInputText(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && sendMessage(!!selectedThread)}
+                      onKeyDown={(e) => e.key === "Enter" && !sending && sendMessage(!!selectedThread)}
+                      disabled={sending}
                       className="flex-1 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5
                         text-sm text-gray-900 placeholder-gray-500 transition-colors
-                        focus:border-green-500 focus:outline-none"
+                        focus:border-green-500 focus:outline-none disabled:opacity-50"
                     />
                     
                     <button onClick={() => sendMessage(!!selectedThread)}
-                      disabled={!inputText.trim() && !audioBlob && !selectedImage}
+                      disabled={sending || (!inputText.trim() && !audioBlob && !selectedImage)}
                       className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full
                         bg-green-600 text-white transition-all hover:bg-green-700
                         disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.92]">
-                      <Send className="h-4 w-4" />
+                      {sending ? (
+                        <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <Send className="h-4 w-4" />
+                      )}
                     </button>
                   </div>
                 </div>

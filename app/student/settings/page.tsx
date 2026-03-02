@@ -1,21 +1,22 @@
 "use client";
 
 import { LayoutWrapper } from "@/components/LayoutWrapper";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/context/auth";
-import { Shield, User, EyeOff, LogOut, Save, School, GraduationCap } from "lucide-react";
+import { User, EyeOff, LogOut, Save, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 export default function StudentSettingsPage() {
   const { profile, setStudentAnonymousEnabled, logout } = useAuth();
-  const [editing, setEditing] = useState(false);
+  const [editingProfile, setEditingProfile] = useState(false);
   const [saving, setSaving] = useState(false);
   const [school, setSchool] = useState(profile?.student?.school || "");
-  const [educationLevel, setEducationLevel] = useState(profile?.student?.educationLevel || "");
+  const [educationLevel, setEducationLevel] = useState(
+    profile?.student?.educationLevel || ""
+  );
 
   const isStudent = profile?.role === "student";
   const anonEnabled = !!profile?.anonymousEnabled;
@@ -32,7 +33,7 @@ export default function StudentSettingsPage() {
           schoolEmail: profile.student?.schoolEmail || null,
         },
       });
-      setEditing(false);
+      setEditingProfile(false);
     } catch (e) {
       console.error("Error updating profile:", e);
       alert("Failed to update profile");
@@ -41,177 +42,183 @@ export default function StudentSettingsPage() {
     }
   };
 
+  const initials =
+    profile?.fullName
+      ?.split(" ")
+      .map((n: string) => n[0])
+      .join("")
+      .slice(0, 2) || "S";
+
   return (
     <LayoutWrapper>
-        <div className="min-h-screen bg-[#F0FDF4]">
-        <div className="px-4 py-6 pb-24 md:px-8 md:py-10">
-          <div className="mx-auto max-w-3xl">
-            {/* Header */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-              <p className="mt-2 text-gray-500">Manage your account and preferences</p>
-            </div>
+      <div className="min-h-screen bg-gray-50/80">
+        <div className="px-4 py-6 pb-28 md:px-8 md:py-10">
+          <div className="mx-auto max-w-lg">
+            <h1 className="mb-6 text-2xl font-bold text-gray-900">Settings</h1>
 
-            {/* Account Info */}
-            <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-              <div className="mb-4 flex items-center gap-3">
-                <div className="rounded-lg bg-blue-100 p-2">
-                  <User className="h-5 w-5 text-blue-600" />
+            {/* Profile Card */}
+            <div className="mb-2 rounded-2xl bg-white p-4 shadow-sm">
+              <div className="flex items-center gap-4">
+                <div className="h-14 w-14 shrink-0 rounded-full bg-green-600 flex items-center justify-center text-lg font-bold text-white ring-2 ring-green-500 ring-offset-2">
+                  {initials}
                 </div>
-                <h2 className="text-lg font-semibold text-gray-900">Account Information</h2>
-              </div>
-              <div className="space-y-3">
-                <div>
-                  <p className="text-sm text-gray-500">Full Name</p>
-                  <p className="mt-1 text-gray-900">{profile?.fullName || "—"}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Email</p>
-                  <p className="mt-1 text-gray-900">{profile?.email || "—"}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Student Profile */}
-            {isStudent && (
-              <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-                <div className="mb-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="rounded-lg bg-green-100 p-2">
-                      <School className="h-5 w-5 text-green-600" />
-                    </div>
-                    <h2 className="text-lg font-semibold text-gray-900">Student Profile</h2>
-                  </div>
-                  {!editing && (
-                    <Button
-                      onClick={() => setEditing(true)}
-                      variant="outline"
-                      className="border-gray-200 text-gray-700 hover:bg-gray-100"
-                    >
-                      Edit
-                    </Button>
-                  )}
-                </div>
-                {editing ? (
-                  <div className="space-y-4">
-                    <div>
-                      <label className="mb-2 block text-sm font-medium text-gray-700">School</label>
-                      <Input
-                        value={school}
-                        onChange={(e) => setSchool(e.target.value)}
-                        placeholder="Your school name"
-                        className="border-gray-200 bg-white text-gray-900"
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-2 block text-sm font-medium text-gray-700">Education Level</label>
-                      <Input
-                        value={educationLevel}
-                        onChange={(e) => setEducationLevel(e.target.value)}
-                        placeholder="e.g., High School, University"
-                        className="border-gray-200 bg-white text-gray-900"
-                      />
-                    </div>
-                    <div className="flex gap-3">
-                      <Button
-                        onClick={handleSaveProfile}
-                        disabled={saving}
-                        className="bg-green-600 hover:bg-green-700 text-white"
-                      >
-                        <Save className="mr-2 h-4 w-4" />
-                        {saving ? "Saving..." : "Save Changes"}
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          setEditing(false);
-                          setSchool(profile?.student?.school || "");
-                          setEducationLevel(profile?.student?.educationLevel || "");
-                        }}
-                        variant="outline"
-                        className="border-gray-200 text-gray-700"
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-sm text-gray-500">School</p>
-                      <p className="mt-1 text-gray-900">{profile?.student?.school || "Not set"}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Education Level</p>
-                      <p className="mt-1 text-gray-900">{profile?.student?.educationLevel || "Not set"}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Anonymous Mode */}
-            {isStudent && (
-              <div className="mb-6 rounded-2xl border border-green-200 bg-green-50 p-6">
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="rounded-lg bg-green-100 p-2">
-                    <EyeOff className="h-5 w-5 text-green-600" />
-                  </div>
-                  <h2 className="text-lg font-semibold text-gray-900">Anonymous Mode</h2>
-                </div>
-                <p className="mb-4 text-sm text-gray-500">
-                  When enabled, your display name becomes an anonymous ID across the app. Your real identity remains private.
-                </p>
-                <div className="mb-4 rounded-lg bg-white border border-gray-100 p-4">
-                  <p className="text-sm text-gray-700">
-                    <span className="font-semibold">Status:</span>{" "}
-                    <span className={anonEnabled ? "text-green-600" : "text-gray-500"}>
-                      {anonEnabled ? "Enabled" : "Disabled"}
-                    </span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-base font-semibold text-gray-900 truncate">
+                    {profile?.fullName || "—"}
                   </p>
-                  {anonEnabled && anonId && (
-                    <p className="mt-2 text-sm text-gray-700">
-                      <span className="font-semibold">Your Anonymous ID:</span>{" "}
-                      <span className="font-mono text-green-600">{anonId}</span>
-                    </p>
-                  )}
+                  <p className="text-sm text-gray-500 truncate">
+                    {profile?.email || "—"}
+                  </p>
                 </div>
-                <Button
-                  onClick={() => void setStudentAnonymousEnabled(!anonEnabled)}
-                  className={`w-full sm:w-auto ${
-                    anonEnabled
-                      ? "bg-red-50 text-red-600 hover:bg-red-100"
-                      : "bg-green-50 text-green-600 hover:bg-green-100"
-                  }`}
-                >
-                  {anonEnabled ? "Turn Off Anonymous Mode" : "Turn On Anonymous Mode"}
-                </Button>
-              </div>
-            )}
-
-            {/* Logout */}
-            <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-              <div className="flex items-center gap-3">
-                <div className="rounded-lg bg-red-100 p-2">
-                  <LogOut className="h-5 w-5 text-red-600" />
-                </div>
-                <div className="flex-1">
-                  <h2 className="text-lg font-semibold text-gray-900">Sign Out</h2>
-                  <p className="mt-1 text-sm text-gray-500">You'll be returned to the home screen</p>
-                </div>
-                <Button
-                  onClick={() => void logout()}
-                  variant="outline"
-                  className="border-red-300 text-red-600 hover:bg-red-50"
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Log Out
-                </Button>
               </div>
             </div>
+
+            {/* Profile Section */}
+            {isStudent && (
+              <>
+                <p className="mb-2 mt-5 px-1 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Profile
+                </p>
+                <div className="rounded-2xl bg-white shadow-sm overflow-hidden">
+                  <button
+                    onClick={() => setEditingProfile(!editingProfile)}
+                    className="flex w-full items-center gap-3 px-4 py-3.5 transition-colors hover:bg-gray-50"
+                  >
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-100">
+                      <User className="h-5 w-5 text-orange-500" />
+                    </div>
+                    <p className="flex-1 text-left text-sm font-medium text-gray-900">
+                      Edit Profile
+                    </p>
+                    <ChevronRight
+                      className={`h-5 w-5 shrink-0 text-gray-400 transition-transform ${
+                        editingProfile ? "rotate-90" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {editingProfile && (
+                    <div className="border-t border-gray-100 px-4 py-4">
+                      <div className="space-y-3">
+                        <div>
+                          <label className="mb-1.5 block text-xs font-medium text-gray-500">
+                            School
+                          </label>
+                          <Input
+                            value={school}
+                            onChange={(e) => setSchool(e.target.value)}
+                            placeholder="Your school name"
+                            className="border-gray-200 bg-gray-50 text-gray-900 text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="mb-1.5 block text-xs font-medium text-gray-500">
+                            Education Level
+                          </label>
+                          <Input
+                            value={educationLevel}
+                            onChange={(e) => setEducationLevel(e.target.value)}
+                            placeholder="e.g., High School, University"
+                            className="border-gray-200 bg-gray-50 text-gray-900 text-sm"
+                          />
+                        </div>
+                        <div className="flex gap-2 pt-1">
+                          <Button
+                            onClick={handleSaveProfile}
+                            disabled={saving}
+                            size="sm"
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                          >
+                            <Save className="mr-1.5 h-3.5 w-3.5" />
+                            {saving ? "Saving..." : "Save"}
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              setEditingProfile(false);
+                              setSchool(profile?.student?.school || "");
+                              setEducationLevel(
+                                profile?.student?.educationLevel || ""
+                              );
+                            }}
+                            variant="outline"
+                            size="sm"
+                            className="border-gray-200 text-gray-600"
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+
+            {/* Privacy Section */}
+            {isStudent && (
+              <>
+                <p className="mb-2 mt-5 px-1 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Privacy
+                </p>
+                <div className="rounded-2xl bg-white shadow-sm overflow-hidden">
+                  <div className="flex items-center gap-3 px-4 py-3.5">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-teal-100">
+                      <EyeOff className="h-5 w-5 text-teal-600" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900">
+                        Anonymous Mode
+                      </p>
+                      {anonEnabled && anonId && (
+                        <p className="text-xs text-gray-400 truncate">
+                          ID: <span className="font-mono">{anonId}</span>
+                        </p>
+                      )}
+                    </div>
+                    <button
+                      onClick={() =>
+                        void setStudentAnonymousEnabled(!anonEnabled)
+                      }
+                      className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors duration-200 ${
+                        anonEnabled ? "bg-green-500" : "bg-gray-300"
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-200 ${
+                          anonEnabled ? "translate-x-6" : "translate-x-1"
+                        }`}
+                      />
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* Account Section */}
+            <p className="mb-2 mt-5 px-1 text-xs font-semibold uppercase tracking-wider text-gray-400">
+              Account
+            </p>
+            <div className="rounded-2xl bg-white shadow-sm overflow-hidden">
+              <button
+                onClick={() => void logout()}
+                className="flex w-full items-center gap-3 px-4 py-3.5 transition-colors hover:bg-gray-50"
+              >
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100">
+                  <LogOut className="h-5 w-5 text-red-500" />
+                </div>
+                <p className="flex-1 text-left text-sm font-medium text-gray-900">
+                  Logout
+                </p>
+                <ChevronRight className="h-5 w-5 shrink-0 text-gray-400" />
+              </button>
+            </div>
+
+            <p className="mt-8 text-center text-xs text-gray-400">
+              TheraClick v1.0
+            </p>
           </div>
         </div>
       </div>
     </LayoutWrapper>
   );
 }
-

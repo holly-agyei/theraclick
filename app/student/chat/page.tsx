@@ -236,7 +236,7 @@ export default function ChatPage() {
 
   return (
     <LayoutWrapper>
-      <div className="flex h-screen flex-col bg-[#F0FDF4]">
+      <div className="flex h-full flex-col bg-white">
         {/* Header */}
         <div className="relative z-10 border-b border-gray-200 bg-white px-4 py-4 shadow-sm md:px-8 md:py-5">
           <div className="flex items-center gap-4">

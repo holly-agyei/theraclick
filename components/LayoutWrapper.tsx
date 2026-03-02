@@ -44,30 +44,29 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   }, [loading, profile?.role, profile?.status, pathname, router]);
 
   return (
-    <div className="flex min-h-screen bg-[#F0FDF4]">
+    <div className="flex h-dvh flex-col bg-white">
       <Sidebar />
-      <main className="flex-1 pb-20 md:pb-0 md:overflow-auto">
-        <div className="min-h-screen w-full">
-          {loading ? (
-            <div className="flex min-h-screen items-center justify-center bg-[#F0FDF4]">
-              <div className="text-center">
-                <div className="relative mx-auto mb-5 h-14 w-14">
-                  <div className="absolute inset-0 rounded-full border-2 border-green-200" />
-                  <div className="absolute inset-0 animate-spin rounded-full
-                    border-2 border-transparent border-t-green-600"
-                    style={{ animationDuration: "1s" }} />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Brain className="h-6 w-6 text-green-600" strokeWidth={1.5} />
-                  </div>
+      <main className="flex-1 overflow-y-auto pb-20 md:pb-0">
+        {loading ? (
+          <div className="flex min-h-[60vh] items-center justify-center">
+            <div className="text-center">
+              <div className="relative mx-auto mb-5 h-14 w-14">
+                <div className="absolute inset-0 rounded-full border-2 border-green-200" />
+                <div
+                  className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-green-600"
+                  style={{ animationDuration: "1s" }}
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Brain className="h-6 w-6 text-green-600" strokeWidth={1.5} />
                 </div>
-                <p className="text-sm font-medium text-gray-900">Preparing your safe space…</p>
-                <p className="mt-1 text-xs text-gray-500">Setting up your session.</p>
               </div>
+              <p className="text-sm font-medium text-gray-900">Preparing your safe space...</p>
+              <p className="mt-1 text-xs text-gray-500">Setting up your session.</p>
             </div>
-          ) : (
-            children
-          )}
-        </div>
+          </div>
+        ) : (
+          children
+        )}
       </main>
       <BottomNav />
     </div>

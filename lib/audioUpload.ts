@@ -1,80 +1,87 @@
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "./firebase";
 
+const UPLOAD_TIMEOUT_MS = 5000;
+
 /**
- * Upload an audio blob to Firebase Storage and get the download URL
- * Falls back to base64 data URL if Storage fails
+ * Upload an audio blob to Firebase Storage and get the download URL.
+ * Falls back to base64 data URL if Storage fails or times out.
  */
 export async function uploadVoiceMessage(
   audioBlob: Blob,
   chatId: string,
   senderId: string
 ): Promise<string | undefined> {
-  console.log("=== UPLOADING VOICE MESSAGE ===");
-  console.log("Blob size:", audioBlob.size);
-  console.log("Blob type:", audioBlob.type);
-  console.log("Chat ID:", chatId);
-  console.log("Sender ID:", senderId);
-
-  // If blob is empty, return undefined
   if (!audioBlob || audioBlob.size === 0) {
     console.error("Audio blob is empty");
     return undefined;
   }
 
-  // Try Firebase Storage first
+  // Try Firebase Storage first (with timeout to prevent hanging)
   if (storage) {
     try {
       const timestamp = Date.now();
       const ext = getExtension(audioBlob.type);
       const path = `voice-messages/${chatId}/${senderId}/voice_${timestamp}${ext}`;
-      
-      console.log("Uploading to Firebase Storage:", path);
-      
+
       const storageRef = ref(storage, path);
-      const snapshot = await uploadBytes(storageRef, audioBlob, {
-        contentType: audioBlob.type || "audio/webm",
-      });
-      
-      const url = await getDownloadURL(snapshot.ref);
-      console.log("✓ Upload successful:", url);
+
+      const snapshot = await withTimeout(
+        uploadBytes(storageRef, audioBlob, {
+          contentType: audioBlob.type || "audio/webm",
+        }),
+        UPLOAD_TIMEOUT_MS,
+        "Storage upload timed out"
+      );
+
+      const url = await withTimeout(
+        getDownloadURL(snapshot.ref),
+        UPLOAD_TIMEOUT_MS,
+        "getDownloadURL timed out"
+      );
+
       return url;
     } catch (error: any) {
-      console.error("Firebase Storage error:", error?.code, error?.message);
-      // Fall through to base64 fallback
+      console.warn("Firebase Storage failed, falling back to base64:", error?.message || error?.code);
     }
-  } else {
-    console.log("Firebase Storage not available");
   }
 
-  // Fallback: Convert to base64 data URL
-  console.log("Using base64 fallback...");
+  // Fallback: base64 data URL stored directly in Firestore
   try {
     const dataUrl = await blobToBase64(audioBlob);
-    if (dataUrl) {
-      console.log("✓ Base64 conversion successful, length:", dataUrl.length);
-      return dataUrl;
-    }
-  } catch (error) {
-    console.error("Base64 conversion failed:", error);
+    if (dataUrl) return dataUrl;
+  } catch (error: any) {
+    console.error("Base64 conversion failed:", error?.message);
   }
 
   return undefined;
 }
 
-/**
- * Convert blob to base64 data URL
- */
+function withTimeout<T>(
+  promise: Promise<T>,
+  ms: number,
+  message: string
+): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error(message)), ms)
+    ),
+  ]);
+}
+
 function blobToBase64(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onloadend = () => {
       const result = reader.result as string;
       if (result && result.length > 0) {
-        // Firestore document limit is ~1MB. Allow up to 800KB for the audio data
-        // (leaves room for other fields in the document)
-        if (result.length > 800000) {
-          reject(new Error("Audio too large for base64 storage. Try a shorter recording."));
+        if (result.length > 800_000) {
+          reject(
+            new Error(
+              "Audio too large for base64 storage. Try a shorter recording."
+            )
+          );
           return;
         }
         resolve(result);

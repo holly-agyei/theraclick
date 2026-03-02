@@ -15,12 +15,17 @@ import {
   Mic,
   MicOff,
   X,
+  Phone,
+  Video,
+  PhoneIncoming,
+  PhoneOutgoing,
+  PhoneMissed,
+  PhoneOff,
 } from "lucide-react";
-import { doc, getDoc, collection, addDoc, query, where, orderBy, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
+import { doc, getDoc, collection, addDoc, query, where, orderBy, onSnapshot, serverTimestamp, setDoc, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/auth";
 import { useCall } from "@/context/callContext";
-import { Phone, Video } from "lucide-react";
 import { VoiceMessage } from "@/components/VoiceMessage";
 import { uploadVoiceMessage } from "@/lib/audioUpload";
 
@@ -42,6 +47,10 @@ interface Message {
   senderName: string;
   createdAt: Date;
   audioUrl?: string;
+  type?: "text" | "call";
+  callType?: "voice" | "video";
+  callStatus?: "missed" | "outgoing" | "incoming" | "rejected" | "ended";
+  callDuration?: number;
 }
 
 interface BookingRequest {
@@ -120,8 +129,6 @@ export default function CounselorProfilePage() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const audioUrlMapRef = useRef<Map<string, string>>(new Map()); // Store audio URLs by message ID
-
   // Booking state
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [bookingMessage, setBookingMessage] = useState("");
@@ -173,14 +180,11 @@ export default function CounselorProfilePage() {
     const unsub = onSnapshot(q, (snap) => {
       const msgs: Message[] = snap.docs.map((d) => {
         const data = d.data();
-        const msgId = d.id;
-        // Preserve audio URL if we have it stored locally
-        const audioUrl = audioUrlMapRef.current.get(msgId);
         return {
-          id: msgId,
+          id: d.id,
           ...data,
           createdAt: data.createdAt?.toDate() || new Date(),
-          audioUrl: audioUrl || undefined,
+          audioUrl: data.audioUrl || undefined,
         } as Message;
       });
       setMessages(msgs);
@@ -418,10 +422,29 @@ export default function CounselorProfilePage() {
     });
   };
 
+  const formatMessageTime = (date: Date) => {
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return "Just now";
+    if (mins < 60) return `${mins} min ago`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+    const days = Math.floor(hours / 24);
+    if (days === 1) return "Yesterday";
+    return date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+  };
+
+  const formatCallDuration = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return m > 0 ? `${m}m ${s}s` : `${s}s`;
+  };
+
   if (loading) {
     return (
       <LayoutWrapper>
-        <div className="flex min-h-screen items-center justify-center bg-[#F0FDF4]">
+        <div className="flex min-h-screen items-center justify-center bg-white">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-green-500 border-t-transparent" />
         </div>
       </LayoutWrapper>
@@ -431,7 +454,7 @@ export default function CounselorProfilePage() {
   if (!counselor) {
     return (
       <LayoutWrapper>
-        <div className="flex min-h-screen flex-col items-center justify-center bg-[#F0FDF4] text-gray-900">
+        <div className="flex min-h-screen flex-col items-center justify-center bg-white text-gray-900">
           <p>Counselor not found</p>
           <Button onClick={() => router.back()} className="mt-4">
             Go back
@@ -443,7 +466,7 @@ export default function CounselorProfilePage() {
 
   return (
     <LayoutWrapper>
-      <div className="flex h-screen flex-col bg-[#F0FDF4]">
+      <div className="flex h-full flex-col bg-white">
         {/* Header */}
         <div className="relative z-10 border-b border-gray-200 bg-white px-4 py-3 shadow-sm md:px-8">
           <div className="flex items-center gap-4">
@@ -546,54 +569,73 @@ export default function CounselorProfilePage() {
           <>
             {/* Messages */}
             <div className="flex-1 overflow-y-auto px-4 py-6 md:px-8">
-              <div className="mx-auto max-w-3xl space-y-4">
+              <div className="mx-auto max-w-3xl space-y-3">
                 {messages.length === 0 && (
                   <div className="rounded-2xl border border-gray-200 bg-white p-6 text-center">
-                    <MessageCircle className="mx-auto mb-3 h-8 w-8 text-gray-500" />
+                    <MessageCircle className="mx-auto mb-3 h-8 w-8 text-gray-400" />
                     <p className="text-gray-500">No messages yet. Start the conversation!</p>
-                    <p className="mt-1 text-sm text-gray-500">
-                      Your messages are private and confidential.
-                    </p>
+                    <p className="mt-1 text-xs text-gray-400">Your messages are private and confidential.</p>
                   </div>
                 )}
-                {messages.map((msg, idx) => {
+                {messages.map((msg) => {
                   const isOwn = msg.senderId === profile?.uid;
-                  // Show timestamp if gap > 5 min from previous message
-                  const prevMsg = idx > 0 ? messages[idx - 1] : null;
-                  const showTimestamp = !prevMsg ||
-                    (msg.createdAt.getTime() - prevMsg.createdAt.getTime() > 5 * 60 * 1000);
 
-                  return (
-                    <div key={msg.id}>
-                      {showTimestamp && (
-                        <div className="my-3 text-center">
-                          <span className="rounded-full bg-gray-100 px-3 py-1 text-[10px] text-gray-500 uppercase">
-                            {msg.createdAt.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
-                          </span>
-                        </div>
-                      )}
-                      <div className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
-                        <div
-                          className={`max-w-[70%] px-3.5 py-2.5 text-[15px] leading-relaxed
-                            ${isOwn
-                              ? "rounded-[18px_18px_4px_18px] bg-green-600 text-white"
-                              : "rounded-[18px_18px_18px_4px] bg-white border border-gray-200 text-gray-800"
-                            }`}
-                          style={{ wordBreak: "break-word" }}
-                        >
-                          {msg.audioUrl && (
-                            <div className="mb-1.5">
-                              <VoiceMessage
-                                audioUrl={msg.audioUrl}
-                                isOwnMessage={isOwn}
-                              />
-                            </div>
+                  if (msg.type === "call") {
+                    const isMissed = msg.callStatus === "missed";
+                    const isRejected = msg.callStatus === "rejected";
+                    const isVideo = msg.callType === "video";
+                    const CallIcon = isMissed ? PhoneMissed
+                      : isRejected ? PhoneOff
+                      : msg.callStatus === "outgoing" ? PhoneOutgoing
+                      : isVideo ? Video
+                      : PhoneIncoming;
+                    const label = isMissed ? "Missed" : isRejected ? "Declined" : msg.callStatus === "outgoing" ? "Outgoing" : msg.callStatus === "ended" ? "Ended" : "Incoming";
+                    const tint = isMissed ? "bg-red-50 text-red-600" : isRejected ? "bg-gray-100 text-gray-500" : isVideo ? "bg-blue-50 text-blue-600" : "bg-green-50 text-green-600";
+
+                    return (
+                      <div key={msg.id} className="flex justify-center my-3">
+                        <div className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium ${tint}`}>
+                          <CallIcon className="h-3.5 w-3.5" />
+                          <span>{isVideo ? "Video Call" : "Voice Call"}</span>
+                          <span className="opacity-60">·</span>
+                          <span className="opacity-70">{label}</span>
+                          {msg.callStatus === "ended" && msg.callDuration != null && (
+                            <><span className="opacity-60">·</span><span className="opacity-70">{formatCallDuration(msg.callDuration)}</span></>
                           )}
-                          {msg.text && msg.text !== "🎤 Voice message" && (
-                            <p className={`text-sm ${msg.audioUrl ? "mt-1.5" : ""}`}>{msg.text}</p>
-                          )}
+                          <span className="opacity-40">·</span>
+                          <span className="opacity-50">{formatMessageTime(msg.createdAt)}</span>
                         </div>
                       </div>
+                    );
+                  }
+
+                  return (
+                    <div key={msg.id} className={`flex flex-col ${isOwn ? "items-end" : "items-start"}`}>
+                      {!isOwn && (
+                        <span className="mb-1 ml-1 text-[11px] font-medium text-gray-400">
+                          {counselor?.fullName?.split(" ")[0] || msg.senderName}
+                        </span>
+                      )}
+                      <div
+                        className={`max-w-[75%] px-4 py-2.5 text-sm leading-relaxed
+                          ${isOwn
+                            ? "rounded-[18px_18px_4px_18px] bg-green-600 text-white"
+                            : "rounded-[18px_18px_18px_4px] bg-gray-100 text-gray-800"
+                          }`}
+                        style={{ wordBreak: "break-word" }}
+                      >
+                        {msg.audioUrl && (
+                          <div className="mb-1.5">
+                            <VoiceMessage audioUrl={msg.audioUrl} isOwnMessage={isOwn} />
+                          </div>
+                        )}
+                        {msg.text && msg.text !== "🎤 Voice message" && (
+                          <p className={msg.audioUrl ? "mt-1" : ""}>{msg.text}</p>
+                        )}
+                      </div>
+                      <span className={`mt-1 text-[11px] text-gray-400 ${isOwn ? "mr-1" : "ml-1"}`}>
+                        {formatMessageTime(msg.createdAt)}
+                      </span>
                     </div>
                   );
                 })}
@@ -601,40 +643,32 @@ export default function CounselorProfilePage() {
               </div>
             </div>
 
-            {/* Input bar — sticky, mobile-safe */}
+            {/* Input bar */}
             <div className="border-t border-gray-200 bg-white"
               style={{ padding: "12px 16px", paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
               <div className="mx-auto max-w-3xl">
-                {/* Audio preview */}
                 {audioBlob && (
                   <div className="mb-2 flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-2.5">
                     <Mic className="h-4 w-4 text-green-600 shrink-0" />
                     <audio controls src={URL.createObjectURL(audioBlob)} className="flex-1 h-8" />
-                    <button onClick={() => setAudioBlob(null)}
-                      className="shrink-0 p-1 rounded-full text-gray-400 hover:text-gray-700">
+                    <button onClick={() => setAudioBlob(null)} className="shrink-0 p-1 rounded-full text-gray-400 hover:text-gray-700">
                       <X className="h-4 w-4" />
                     </button>
                   </div>
                 )}
-                <div className="flex items-end gap-2">
-                  {/* Mic button */}
+                <div className="flex items-center gap-2">
                   <button
                     onClick={isRecording ? stopRecording : startRecording}
                     disabled={sending}
                     className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all
-                      ${isRecording
-                        ? "bg-red-50 text-red-500"
-                        : "text-gray-400 hover:bg-gray-100 hover:text-gray-700"
-                      } ${sending ? "opacity-40" : ""}`}
+                      ${isRecording ? "bg-red-50 text-red-500" : "text-gray-400 hover:bg-gray-100 hover:text-gray-700"}
+                      ${sending ? "opacity-40" : ""}`}
                   >
                     {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
                   </button>
-
                   {isRecording && (
                     <span className="shrink-0 text-xs text-red-500 font-medium">{formatRecordingTime(recordingTime)}</span>
                   )}
-
-                  {/* Text input */}
                   <input
                     type="text"
                     placeholder="Message..."
@@ -642,19 +676,13 @@ export default function CounselorProfilePage() {
                     onChange={(e) => setInputText(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && !sending && sendMessage()}
                     disabled={sending}
-                    className="flex-1 rounded-[20px] border border-gray-200 bg-gray-50 px-4 py-2.5
-                      text-[15px] text-gray-900 placeholder-gray-400 transition-colors
-                      focus:border-green-500 focus:outline-none disabled:opacity-40"
+                    className="flex-1 rounded-full border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-green-500 focus:outline-none disabled:opacity-40"
                   />
-
-                  {/* Send button — only when there's content */}
-                  {(inputText.trim() || audioBlob) ? (
+                  {(inputText.trim() || audioBlob) && (
                     <button
                       onClick={sendMessage}
                       disabled={sending}
-                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full
-                        bg-green-600 text-white transition-all active:scale-[0.88]
-                        disabled:opacity-40"
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-600 text-white transition-all active:scale-95 disabled:opacity-40"
                     >
                       {sending ? (
                         <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -662,7 +690,7 @@ export default function CounselorProfilePage() {
                         <Send className="h-4 w-4" />
                       )}
                     </button>
-                  ) : null}
+                  )}
                 </div>
               </div>
             </div>
@@ -769,6 +797,3 @@ export default function CounselorProfilePage() {
     </LayoutWrapper>
   );
 }
-
-// Helper for useEffect
-import { getDocs } from "firebase/firestore";

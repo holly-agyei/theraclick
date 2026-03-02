@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { LayoutWrapper } from "@/components/LayoutWrapper";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Send, Mic, MicOff, X, User, MessageCircle, Phone, Video } from "lucide-react";
+import { ArrowLeft, Send, Mic, MicOff, X, User, MessageCircle, Phone, Video, PhoneIncoming, PhoneOutgoing, PhoneMissed, PhoneOff } from "lucide-react";
 import { doc, getDoc, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/auth";
@@ -19,6 +19,10 @@ interface Message {
   senderName: string;
   createdAt: Date;
   audioUrl?: string;
+  type?: "text" | "call";
+  callType?: "voice" | "video";
+  callStatus?: "missed" | "outgoing" | "incoming" | "rejected" | "ended";
+  callDuration?: number;
 }
 
 interface Student {
@@ -217,9 +221,28 @@ export default function PeerMentorChatPage() {
     ? student.anonymousId 
     : student?.fullName || "Student";
 
+  const formatMessageTime = (date: Date) => {
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return "Just now";
+    if (mins < 60) return `${mins} min ago`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+    const days = Math.floor(hours / 24);
+    if (days === 1) return "Yesterday";
+    return date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+  };
+
+  const formatCallDuration = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return m > 0 ? `${m}m ${s}s` : `${s}s`;
+  };
+
   return (
     <LayoutWrapper>
-      <div className="flex h-screen flex-col bg-[#F0FDF4]">
+      <div className="flex h-full flex-col bg-white">
         {/* Header */}
         <div className="relative z-10 border-b border-gray-200 bg-white px-4 py-4 md:px-8">
           <div className="flex items-center gap-4">
@@ -288,92 +311,123 @@ export default function PeerMentorChatPage() {
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto px-4 py-6 md:px-8">
-          <div className="mx-auto max-w-3xl space-y-4">
+          <div className="mx-auto max-w-3xl space-y-3">
             {messages.length === 0 && (
               <div className="rounded-2xl border border-gray-200 bg-white p-6 text-center">
-                <MessageCircle className="mx-auto mb-3 h-8 w-8 text-gray-500" />
+                <MessageCircle className="mx-auto mb-3 h-8 w-8 text-gray-400" />
                 <p className="text-gray-500">No messages yet. Start the conversation!</p>
               </div>
             )}
-            {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`flex ${msg.senderId === profile?.uid ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                    msg.senderId === profile?.uid
-                      ? "bg-green-600 text-white"
-                      : "border border-gray-200 bg-white text-gray-900"
-                  }`}
-                >
-                  {msg.audioUrl ? (
-                    <VoiceMessage 
-                      audioUrl={msg.audioUrl} 
-                      isOwnMessage={msg.senderId === profile?.uid}
-                    />
-                  ) : null}
-                  {msg.text && msg.text !== "🎤 Voice message" && (
-                    <p className={`text-sm ${msg.audioUrl ? "mt-2" : ""}`}>{msg.text}</p>
+            {messages.map((msg) => {
+              const isOwn = msg.senderId === profile?.uid;
+
+              if (msg.type === "call") {
+                const isMissed = msg.callStatus === "missed";
+                const isRejected = msg.callStatus === "rejected";
+                const isVideo = msg.callType === "video";
+                const CallIcon = isMissed ? PhoneMissed : isRejected ? PhoneOff : msg.callStatus === "outgoing" ? PhoneOutgoing : isVideo ? Video : PhoneIncoming;
+                const label = isMissed ? "Missed" : isRejected ? "Declined" : msg.callStatus === "outgoing" ? "Outgoing" : msg.callStatus === "ended" ? "Ended" : "Incoming";
+                const tint = isMissed ? "bg-red-50 text-red-600" : isRejected ? "bg-gray-100 text-gray-500" : isVideo ? "bg-blue-50 text-blue-600" : "bg-green-50 text-green-600";
+
+                return (
+                  <div key={msg.id} className="flex justify-center my-3">
+                    <div className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium ${tint}`}>
+                      <CallIcon className="h-3.5 w-3.5" />
+                      <span>{isVideo ? "Video Call" : "Voice Call"}</span>
+                      <span className="opacity-60">·</span>
+                      <span className="opacity-70">{label}</span>
+                      {msg.callStatus === "ended" && msg.callDuration != null && (
+                        <><span className="opacity-60">·</span><span className="opacity-70">{formatCallDuration(msg.callDuration)}</span></>
+                      )}
+                      <span className="opacity-40">·</span>
+                      <span className="opacity-50">{formatMessageTime(msg.createdAt)}</span>
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <div key={msg.id} className={`flex flex-col ${isOwn ? "items-end" : "items-start"}`}>
+                  {!isOwn && (
+                    <span className="mb-1 ml-1 text-[11px] font-medium text-gray-400">
+                      {studentDisplayName}
+                    </span>
                   )}
+                  <div
+                    className={`max-w-[75%] px-4 py-2.5 text-sm leading-relaxed
+                      ${isOwn
+                        ? "rounded-[18px_18px_4px_18px] bg-green-600 text-white"
+                        : "rounded-[18px_18px_18px_4px] bg-gray-100 text-gray-800"
+                      }`}
+                    style={{ wordBreak: "break-word" }}
+                  >
+                    {msg.audioUrl && (
+                      <div className="mb-1.5">
+                        <VoiceMessage audioUrl={msg.audioUrl} isOwnMessage={isOwn} />
+                      </div>
+                    )}
+                    {msg.text && msg.text !== "🎤 Voice message" && (
+                      <p className={msg.audioUrl ? "mt-1" : ""}>{msg.text}</p>
+                    )}
+                  </div>
+                  <span className={`mt-1 text-[11px] text-gray-400 ${isOwn ? "mr-1" : "ml-1"}`}>
+                    {formatMessageTime(msg.createdAt)}
+                  </span>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             <div ref={messagesEndRef} />
           </div>
         </div>
 
-        {/* Input */}
-        <div className="border-t border-gray-200 bg-white p-4 md:p-6">
+        {/* Input bar */}
+        <div className="border-t border-gray-200 bg-white"
+          style={{ padding: "12px 16px", paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
           <div className="mx-auto max-w-3xl">
             {audioBlob && (
-              <div className="mb-3 flex items-center gap-3 rounded-xl bg-green-50 border border-green-200 px-4 py-3">
-                <Mic className="h-5 w-5 text-green-600 flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <audio controls src={URL.createObjectURL(audioBlob)} className="w-full h-8" />
-                </div>
-                <button 
-                  onClick={() => setAudioBlob(null)} 
-                  className="flex-shrink-0 p-1 rounded-full text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-                >
-                  <X className="h-5 w-5" />
+              <div className="mb-2 flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-2.5">
+                <Mic className="h-4 w-4 text-green-600 shrink-0" />
+                <audio controls src={URL.createObjectURL(audioBlob)} className="flex-1 h-8" />
+                <button onClick={() => setAudioBlob(null)} className="shrink-0 p-1 rounded-full text-gray-400 hover:text-gray-700">
+                  <X className="h-4 w-4" />
                 </button>
               </div>
             )}
-            <div className="flex gap-3">
+            <div className="flex items-center gap-2">
               <button
                 onClick={isRecording ? stopRecording : startRecording}
                 disabled={sending}
-                className={`flex items-center gap-2 rounded-xl px-4 py-3 transition-all ${
-                  isRecording ? "bg-red-500/20 text-red-400" : "bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
-                } ${sending ? "opacity-50 cursor-not-allowed" : ""}`}
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all
+                  ${isRecording ? "bg-red-50 text-red-500" : "text-gray-400 hover:bg-gray-100 hover:text-gray-700"}
+                  ${sending ? "opacity-40" : ""}`}
               >
-                {isRecording ? (
-                  <><MicOff className="h-5 w-5" /><span className="text-sm">{formatRecordingTime(recordingTime)}</span></>
-                ) : (
-                  <Mic className="h-5 w-5" />
-                )}
+                {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
               </button>
+              {isRecording && (
+                <span className="shrink-0 text-xs text-red-500 font-medium">{formatRecordingTime(recordingTime)}</span>
+              )}
               <input
                 type="text"
-                placeholder="Type or record a message..."
+                placeholder="Message..."
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && !sending && sendMessage()}
                 disabled={sending}
-                className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-500 transition-colors focus:border-green-500 focus:outline-none disabled:opacity-50"
+                className="flex-1 rounded-full border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-green-500 focus:outline-none disabled:opacity-40"
               />
-              <Button
-                onClick={sendMessage}
-                disabled={(!inputText.trim() && !audioBlob) || sending}
-                className="rounded-xl bg-green-600 hover:bg-green-700 px-5 min-w-[60px]"
-              >
-                {sending ? (
-                  <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <Send className="h-5 w-5" />
-                )}
-              </Button>
+              {(inputText.trim() || audioBlob) && (
+                <button
+                  onClick={sendMessage}
+                  disabled={sending}
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-600 text-white transition-all active:scale-95 disabled:opacity-40"
+                >
+                  {sending ? (
+                    <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
+                </button>
+              )}
             </div>
           </div>
         </div>

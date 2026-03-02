@@ -3,92 +3,72 @@
 import { useRouter } from "next/navigation";
 import { LayoutWrapper } from "@/components/LayoutWrapper";
 import {
-  Calendar, Clock, ArrowRight, Bell, Lightbulb, Heart,
-  MessageCircle, Brain, Moon, Sparkles, Wind, Flag,
-  TrendingUp, BookOpen, ChevronRight, Leaf,
+  Calendar, Clock, ArrowRight, Bell,
+  MessageCircle, Brain, Moon, Wind, Flag,
+  BookOpen, ChevronRight, Leaf, Heart,
 } from "lucide-react";
 import { useAuth } from "@/context/auth";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect } from "react";
 import {
   collection, query, where, limit, onSnapshot, doc, getDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { ReportIssueModal } from "@/components/ReportIssueModal";
 
-const moods = [
-  { id: "great", label: "Great", color: "bg-emerald-500", response: "Glad to hear it! Keep that momentum." },
-  { id: "okay", label: "Okay", color: "bg-blue-500", response: "Thanks for checking in. We're here if you need anything." },
-  { id: "low", label: "Low", color: "bg-amber-500", response: "It's okay to feel this way. Would you like to talk to someone?" },
-  { id: "stressed", label: "Stressed", color: "bg-red-400", response: "Take a breath. Let's work through this together." },
-];
-
-const wellnessFeed = [
-  { icon: Brain, label: "MENTAL HEALTH", text: "1 in 4 college students report feeling anxious most days. You're not alone." },
-  { icon: Moon, label: "SLEEP TIP", text: "Blue light from screens suppresses melatonin by 50%. Try a 30-min screen-off before bed." },
-  { icon: Heart, label: "SELF-CARE", text: "Even 10 minutes of walking reduces cortisol levels by 25%." },
-  { icon: Wind, label: "BREATHING", text: "Box breathing (4s in, 4s hold, 4s out, 4s hold) can lower heart rate in under 2 minutes." },
-  { icon: Lightbulb, label: "DID YOU KNOW", text: "Journaling for 15 minutes a day has been shown to boost immune function." },
-  { icon: Leaf, label: "MINDFULNESS", text: "A 5-minute body scan reduces stress perception by 23%, even during exams." },
-  { icon: TrendingUp, label: "STUDY TIP", text: "Spaced repetition with breaks is 40% more effective than cramming for long hours." },
-  { icon: Brain, label: "AWARENESS", text: "Depression and anxiety are the #1 and #2 mental health issues among university students." },
-  { icon: Heart, label: "CONNECTION", text: "People with 3+ close friendships report 2x higher life satisfaction." },
-  { icon: Moon, label: "RECOVERY", text: "A 20-minute nap between study sessions improves retention by 34%." },
-];
-
 const insightCards = [
   {
-    label: "BREATHE",
+    label: "Breathe",
     title: "60-Second Reset",
     body: "When overwhelmed, try 4-7-8 breathing: inhale 4s, hold 7s, exhale 8s. Repeat 3 times.",
-    action: "Try it now",
     href: null,
-    color: "text-emerald-600",
-    bgColor: "bg-emerald-50",
+    icon: Wind,
+    accent: "text-emerald-600",
+    bg: "bg-emerald-50",
   },
   {
-    label: "SLEEP",
+    label: "Sleep",
     title: "Your Sleep Score Matters",
     body: "Students who sleep 7+ hours score 10% higher on exams. Quality sleep is a study strategy.",
-    action: "Read more",
     href: "https://www.sleepfoundation.org/sleep-hygiene",
-    color: "text-blue-600",
-    bgColor: "bg-blue-50",
+    icon: Moon,
+    accent: "text-blue-600",
+    bg: "bg-blue-50",
   },
   {
-    label: "MINDSET",
+    label: "Mindset",
     title: "Reframe Negative Thoughts",
     body: "Replace 'I can't handle this' with 'I'm learning to handle this.' Small shifts, big impact.",
-    action: "Learn CBT basics",
     href: "https://www.verywellmind.com/what-is-cognitive-behavior-therapy-2795747",
-    color: "text-purple-600",
-    bgColor: "bg-purple-50",
+    icon: Brain,
+    accent: "text-purple-600",
+    bg: "bg-purple-50",
   },
   {
-    label: "MOVEMENT",
-    title: "Move for 10 Minutes",
-    body: "A short walk releases endorphins and BDNF, which improve mood and memory retention.",
-    action: "Quick exercises",
-    href: "https://www.nhs.uk/live-well/exercise/exercise-health-benefits/",
-    color: "text-amber-600",
-    bgColor: "bg-amber-50",
-  },
-  {
-    label: "CONNECT",
+    label: "Connection",
     title: "Reach Out Today",
     body: "Loneliness increases stress hormones by 20%. Even a 5-minute conversation helps.",
-    action: "Talk to someone",
     href: null,
-    color: "text-pink-600",
-    bgColor: "bg-pink-50",
+    icon: Heart,
+    accent: "text-pink-600",
+    bg: "bg-pink-50",
   },
   {
-    label: "NUTRITION",
+    label: "Nutrition",
     title: "Brain Food",
     body: "Omega-3s, blueberries, and dark chocolate boost focus and reduce brain fog during study sessions.",
-    action: "Nutrition tips",
     href: "https://www.health.harvard.edu/mind-and-mood/foods-linked-to-better-brainpower",
-    color: "text-orange-600",
-    bgColor: "bg-orange-50",
+    icon: Leaf,
+    accent: "text-orange-600",
+    bg: "bg-orange-50",
+  },
+  {
+    label: "Mindfulness",
+    title: "5-Minute Body Scan",
+    body: "A 5-minute body scan reduces stress perception by 23%, even during exams.",
+    href: null,
+    icon: Wind,
+    accent: "text-teal-600",
+    bg: "bg-teal-50",
   },
 ];
 
@@ -111,51 +91,20 @@ export default function StudentDashboardPage() {
   const router = useRouter();
   const { profile } = useAuth();
 
-  const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [upcomingBookings, setUpcomingBookings] = useState<UpcomingBooking[]>([]);
   const [loadingBookings, setLoadingBookings] = useState(true);
-  const [upcomingSoon, setUpcomingSoon] = useState<UpcomingBooking | null>(null);
   const [recentConversations, setRecentConversations] = useState<RecentConversation[]>([]);
   const [loadingConversations, setLoadingConversations] = useState(true);
-  const [entered, setEntered] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
-
-  const [feedIndex, setFeedIndex] = useState(0);
-  const [feedVisible, setFeedVisible] = useState(true);
-
-  const trackRef = useRef<HTMLDivElement>(null);
 
   const firstName =
     profile?.role === "student" && profile.anonymousEnabled && profile.anonymousId
       ? profile.anonymousId
       : profile?.fullName?.split(" ")[0] || null;
 
-  const greeting = (() => {
-    const h = new Date().getHours();
-    if (h < 12) return "Good morning";
-    if (h < 17) return "Good afternoon";
-    return "Good evening";
-  })();
-
   const todayFormatted = new Date().toLocaleDateString("en-US", {
     weekday: "long", month: "short", day: "numeric",
   });
-
-  useEffect(() => {
-    const id = setTimeout(() => setEntered(true), 80);
-    return () => clearTimeout(id);
-  }, []);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setFeedVisible(false);
-      setTimeout(() => {
-        setFeedIndex((prev) => (prev + 1) % wellnessFeed.length);
-        setFeedVisible(true);
-      }, 400);
-    }, 6000);
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     if (!profile || !db) { setLoadingBookings(false); return; }
@@ -169,35 +118,23 @@ export default function StudentDashboardPage() {
 
     const unsub = onSnapshot(q, (snap) => {
       const bookings: UpcomingBooking[] = [];
-      let soonest: UpcomingBooking | null = null;
-      let soonestTime = Infinity;
-
       snap.docs.forEach((d) => {
         const data = d.data();
         const bookingDate = new Date(`${data.date}T${data.startTime}`);
         if (bookingDate > new Date()) {
-          const booking: UpcomingBooking = {
+          bookings.push({
             id: d.id,
             counselorName: data.counselorName || "Counselor",
             date: data.date,
             startTime: data.startTime,
             endTime: data.endTime,
-          };
-          bookings.push(booking);
-          const hoursUntil = (bookingDate.getTime() - Date.now()) / (1000 * 60 * 60);
-          if (hoursUntil > 0 && hoursUntil <= 24 && hoursUntil < soonestTime) {
-            soonest = booking;
-            soonestTime = hoursUntil;
-          }
+          });
         }
       });
-
       bookings.sort((a, b) =>
         new Date(`${a.date}T${a.startTime}`).getTime() - new Date(`${b.date}T${b.startTime}`).getTime()
       );
-
       setUpcomingBookings(bookings.slice(0, 3));
-      setUpcomingSoon(soonest);
       setLoadingBookings(false);
     }, () => setLoadingBookings(false));
 
@@ -209,7 +146,6 @@ export default function StudentDashboardPage() {
 
     const unsub = onSnapshot(collection(db, "directMessages"), async (snap) => {
       const list: RecentConversation[] = [];
-
       for (const convDoc of snap.docs) {
         const data = convDoc.data();
         const participants = data.participants as string[] | undefined;
@@ -234,9 +170,8 @@ export default function StudentDashboardPage() {
           }
         }
       }
-
       list.sort((a, b) => b.lastMessageTime.getTime() - a.lastMessageTime.getTime());
-      setRecentConversations(list.slice(0, 3));
+      setRecentConversations(list.slice(0, 5));
       setLoadingConversations(false);
     }, () => setLoadingConversations(false));
 
@@ -246,17 +181,8 @@ export default function StudentDashboardPage() {
   const formatBookingDate = (dateStr: string, startTime: string) => {
     const date = new Date(`${dateStr}T${startTime}`);
     return date.toLocaleDateString("en-US", {
-      weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
+      weekday: "short", month: "short", day: "numeric",
     });
-  };
-
-  const getTimeUntil = (dateStr: string, startTime: string) => {
-    const date = new Date(`${dateStr}T${startTime}`);
-    const hours = Math.floor((date.getTime() - Date.now()) / (1000 * 60 * 60));
-    if (hours < 1) return `${Math.floor((date.getTime() - Date.now()) / (1000 * 60))} minutes`;
-    if (hours < 24) return `${hours} hours`;
-    const days = Math.floor(hours / 24);
-    return `${days} day${days > 1 ? "s" : ""}`;
   };
 
   const formatConvTime = (date: Date) => {
@@ -273,365 +199,333 @@ export default function StudentDashboardPage() {
     return date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
   };
 
-  const s = (ms: number) =>
-    `transition-all duration-[600ms] delay-[${ms}ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${entered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`;
-
-  const currentFeed = wellnessFeed[feedIndex];
-  const FeedIcon = currentFeed.icon;
-
   return (
     <LayoutWrapper>
-      <div className="min-h-screen bg-[#FAFAF8]">
-        <div className="relative z-10 px-4 py-6 pb-24 md:px-8 md:py-10">
-          <div className="mx-auto max-w-4xl">
+      <div className="min-h-screen bg-white">
+        <div className="px-4 py-8 pb-28 md:px-8 md:py-10">
+          <div className="mx-auto max-w-5xl">
 
             {/* Header */}
-            <div className={`mb-8 flex items-start justify-between ${s(0)}`}>
+            <div className="mb-8 flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-extrabold text-gray-900 md:text-3xl">
-                  {greeting}{firstName ? `, ${firstName}` : ""}
+                <h1 className="text-3xl font-bold text-gray-900">
+                  Dashboard
                 </h1>
-                <p className="mt-1 text-sm text-gray-500">{todayFormatted}</p>
-                {!firstName && profile && (
-                  <button
-                    onClick={() => router.push("/student/settings")}
-                    className="mt-2 text-xs text-green-600 hover:underline"
-                  >
-                    Add your name to personalize your experience
-                  </button>
+                {firstName && (
+                  <p className="mt-1 text-sm text-gray-500">
+                    Welcome back, {firstName}
+                  </p>
                 )}
               </div>
-              <button
-                onClick={() => router.push("/student/inbox")}
-                className="rounded-xl border border-gray-200 bg-white p-2.5
-                  shadow-sm transition-all hover:border-green-300 hover:shadow-md"
-                aria-label="Inbox"
-              >
-                <Bell className="h-5 w-5 text-gray-500" />
-              </button>
+              <div className="flex items-center gap-3">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700">
+                  <Calendar className="h-3.5 w-3.5" />
+                  {todayFormatted}
+                </span>
+                <button
+                  onClick={() => router.push("/student/inbox")}
+                  className="rounded-lg border border-gray-200 p-2 transition-colors hover:bg-gray-50"
+                  aria-label="Inbox"
+                >
+                  <Bell className="h-5 w-5 text-gray-500" />
+                </button>
+              </div>
             </div>
 
-            {/* Upcoming Session Alert */}
-            {upcomingSoon && (
-              <div className={`mb-6 rounded-2xl border border-amber-200
-                bg-amber-50 p-5 ${s(60)}`}>
-                <div className="flex items-start gap-4">
-                  <div className="rounded-xl bg-amber-100 p-3">
-                    <Bell className="h-5 w-5 text-amber-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-semibold text-gray-900">Upcoming session</p>
-                    <p className="mt-1 text-sm text-gray-600">
-                      {upcomingSoon.counselorName} in{" "}
-                      <span className="font-medium text-amber-600">
-                        {getTimeUntil(upcomingSoon.date, upcomingSoon.startTime)}
-                      </span>
-                    </p>
-                    <p className="mt-1 flex items-center gap-1.5 text-xs text-gray-500">
-                      <Clock className="h-3.5 w-3.5" />
-                      {formatBookingDate(upcomingSoon.date, upcomingSoon.startTime)}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => router.push("/student/bookings")}
-                    className="shrink-0 rounded-lg border border-amber-300 px-4 py-2
-                      text-sm font-medium text-amber-700 transition-all
-                      hover:bg-amber-100"
-                  >
-                    View
-                  </button>
+            {/* Stats Row */}
+            <div className="mb-8 rounded-xl border border-gray-200 bg-white">
+              <div className="grid grid-cols-2 divide-x divide-gray-200 md:grid-cols-4">
+                <div className="p-5">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                    Upcoming Sessions
+                  </p>
+                  <p className="mt-2 text-3xl font-bold text-gray-900">
+                    {loadingBookings ? "--" : upcomingBookings.length}
+                  </p>
+                </div>
+                <div className="p-5">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                    Conversations
+                  </p>
+                  <p className="mt-2 text-3xl font-bold text-gray-900">
+                    {loadingConversations ? "--" : recentConversations.length}
+                  </p>
+                </div>
+                <div className="p-5">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                    Counselors
+                  </p>
+                  <p className="mt-2 text-3xl font-bold text-gray-900">
+                    {loadingConversations
+                      ? "--"
+                      : recentConversations.filter((c) => c.type === "counselor").length}
+                  </p>
+                </div>
+                <div className="p-5">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                    Peer Mentors
+                  </p>
+                  <p className="mt-2 text-3xl font-bold text-gray-900">
+                    {loadingConversations
+                      ? "--"
+                      : recentConversations.filter((c) => c.type === "peer-mentor").length}
+                  </p>
                 </div>
               </div>
-            )}
+            </div>
 
-            {/* Mood Check-in */}
-            <div className={`mb-6 rounded-2xl border border-gray-200
-              bg-white p-5 shadow-sm ${s(100)}`}>
-              <p className="mb-3 text-sm font-medium text-gray-900">
-                How are you feeling right now?
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {moods.map((mood) => (
-                  <button
-                    key={mood.id}
-                    onClick={() => setSelectedMood(mood.id)}
-                    className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium
-                      transition-all duration-200
-                      ${selectedMood === mood.id
-                        ? "border-green-500 bg-green-600 text-white scale-[1.04]"
-                        : "border-gray-200 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50"
-                      }`}
-                  >
-                    <span className={`h-2 w-2 rounded-full ${mood.color} ${selectedMood === mood.id ? "bg-white" : ""}`} />
-                    {mood.label}
-                  </button>
-                ))}
+            {/* Upcoming Sessions */}
+            <div className="mb-8">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-900">Upcoming sessions</h2>
+                <button
+                  onClick={() => router.push("/student/bookings")}
+                  className="text-sm font-medium text-green-600 hover:text-green-700"
+                >
+                  All bookings
+                </button>
               </div>
-              {selectedMood && (
-                <div className="mt-3 flex items-start gap-2 rounded-xl bg-green-50 p-3">
-                  <Sparkles className="mt-0.5 h-4 w-4 text-green-600 shrink-0" />
-                  <p className="text-sm text-gray-700">
-                    {moods.find((m) => m.id === selectedMood)?.response}
-                  </p>
+
+              {loadingBookings ? (
+                <div className="grid gap-4 sm:grid-cols-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-28 animate-pulse rounded-xl bg-gray-100" />
+                  ))}
+                </div>
+              ) : upcomingBookings.length === 0 ? (
+                <div className="rounded-xl border border-dashed border-gray-300 py-10 text-center">
+                  <Calendar className="mx-auto mb-2 h-8 w-8 text-gray-300" />
+                  <p className="text-sm text-gray-500">No upcoming sessions</p>
+                  <button
+                    onClick={() => router.push("/student/counselors")}
+                    className="mt-3 text-sm font-medium text-green-600 hover:underline"
+                  >
+                    Book a session
+                  </button>
+                </div>
+              ) : (
+                <div className="grid gap-4 sm:grid-cols-3">
+                  {upcomingBookings.map((booking) => (
+                    <button
+                      key={booking.id}
+                      onClick={() => router.push("/student/bookings")}
+                      className="group rounded-xl border border-gray-200 bg-green-50/40 p-5 text-left transition-all hover:border-green-300 hover:shadow-sm"
+                    >
+                      <p className="text-lg font-semibold text-gray-900">
+                        {booking.counselorName}
+                      </p>
+                      <p className="mt-1 flex items-center gap-1.5 text-sm text-gray-500">
+                        <Clock className="h-3.5 w-3.5" />
+                        {booking.startTime} - {booking.endTime}
+                      </p>
+                      <p className="mt-0.5 text-xs text-gray-400">
+                        {formatBookingDate(booking.date, booking.startTime)}
+                      </p>
+                      <div className="mt-3 flex h-8 w-8 items-center justify-center rounded-full bg-green-600 text-xs font-bold text-white">
+                        {booking.counselorName
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .slice(0, 2)}
+                      </div>
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
 
-            {/* Live Wellness Feed */}
-            <div className={`mb-6 overflow-hidden rounded-2xl border border-gray-200
-              bg-white shadow-sm ${s(160)}`}>
-              <div className="flex items-center gap-2 border-b border-gray-100 px-5 py-2">
-                <span className="live-dot" />
-                <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-green-600">
-                  Wellness Feed
-                </span>
-              </div>
-              <div className="relative h-[72px] overflow-hidden px-5">
-                <div
-                  className={`absolute inset-x-5 flex items-center gap-4 py-4
-                    transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)]
-                    ${feedVisible
-                      ? "translate-y-0 opacity-100"
-                      : "translate-y-4 opacity-0"
-                    }`}
+            {/* Recent Conversations Table */}
+            <div className="mb-8">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-900">Recent conversations</h2>
+                <button
+                  onClick={() => router.push("/student/inbox")}
+                  className="inline-flex items-center gap-1 rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs font-medium text-green-700 transition-colors hover:bg-green-100"
                 >
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-green-50">
-                    <FeedIcon className="h-4.5 w-4.5 text-green-600" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-gray-400">
-                      {currentFeed.label}
-                    </p>
-                    <p className="mt-0.5 truncate text-sm leading-snug text-gray-700">
-                      {currentFeed.text}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center justify-center gap-1 pb-3">
-                {wellnessFeed.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => { setFeedVisible(false); setTimeout(() => { setFeedIndex(i); setFeedVisible(true); }, 200); }}
-                    className={`h-1 rounded-full transition-all duration-300 ${
-                      i === feedIndex ? "w-4 bg-green-600" : "w-1 bg-gray-200"
-                    }`}
-                    aria-label={`Tip ${i + 1}`}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Insights Track */}
-            <div className={`mb-6 ${s(220)}`}>
-              <div className="mb-3 flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-gray-900">
-                  Wellness Insights
-                </h2>
-                <span className="text-[10px] uppercase tracking-widest text-gray-400">
-                  Swipe
-                </span>
-              </div>
-              <div className="insights-track" ref={trackRef}>
-                {insightCards.map((card, i) => (
-                  <div key={i} className="insight-card group">
-                    <div className={`mb-3 flex h-8 w-8 items-center justify-center rounded-lg ${card.bgColor}`}>
-                      {i === 0 && <Wind className={`h-4 w-4 ${card.color}`} />}
-                      {i === 1 && <Moon className={`h-4 w-4 ${card.color}`} />}
-                      {i === 2 && <Brain className={`h-4 w-4 ${card.color}`} />}
-                      {i === 3 && <TrendingUp className={`h-4 w-4 ${card.color}`} />}
-                      {i === 4 && <Heart className={`h-4 w-4 ${card.color}`} />}
-                      {i === 5 && <Leaf className={`h-4 w-4 ${card.color}`} />}
-                    </div>
-                    <p className="insight-label">{card.label}</p>
-                    <p className="insight-title">{card.title}</p>
-                    <p className="insight-body">{card.body}</p>
-                    {card.href ? (
-                      <a
-                        href={card.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="insight-action"
-                      >
-                        {card.action} <ChevronRight className="h-3.5 w-3.5" />
-                      </a>
-                    ) : (
-                      <button
-                        onClick={() => {
-                          if (card.label === "CONNECT") router.push("/student/counselors");
-                        }}
-                        className="insight-action"
-                      >
-                        {card.action} <ChevronRight className="h-3.5 w-3.5" />
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Two-Column: Sessions + Conversations */}
-            <div className="mb-6 grid gap-4 lg:grid-cols-2">
-              {/* Upcoming Sessions */}
-              <div className={`rounded-2xl border border-gray-200 bg-white p-5 shadow-sm ${s(280)}`}>
-                <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-sm font-semibold text-gray-900">Upcoming sessions</h2>
-                  <button
-                    onClick={() => router.push("/student/bookings")}
-                    className="flex items-center gap-1 text-xs text-green-600 hover:text-green-700"
-                  >
-                    View all <ArrowRight className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-                {loadingBookings ? (
-                  <div className="space-y-3">
-                    {[1, 2].map((i) => (
-                      <div key={i} className="h-14 animate-pulse rounded-xl bg-gray-100" />
-                    ))}
-                  </div>
-                ) : upcomingBookings.length === 0 ? (
-                  <div className="py-6 text-center">
-                    <Calendar className="mx-auto mb-2 h-8 w-8 text-gray-300" />
-                    <p className="text-sm text-gray-500">No upcoming sessions</p>
-                    <button
-                      onClick={() => router.push("/student/counselors")}
-                      className="mt-3 text-xs text-green-600 hover:underline"
-                    >
-                      Book a session
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-2.5">
-                    {upcomingBookings.map((booking) => (
-                      <div key={booking.id}
-                        className="flex items-center gap-3 rounded-xl border border-gray-100
-                          bg-gray-50 p-3 transition-all hover:border-green-200">
-                        <div className="rounded-lg bg-green-50 p-2">
-                          <Calendar className="h-4 w-4 text-green-600" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">{booking.counselorName}</p>
-                          <p className="text-xs text-gray-500">{formatBookingDate(booking.date, booking.startTime)}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                  View All
+                </button>
               </div>
 
-              {/* Recent Conversations */}
-              <div className={`rounded-2xl border border-gray-200 bg-white p-5 shadow-sm ${s(340)}`}>
-                <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-sm font-semibold text-gray-900">Recent conversations</h2>
-                  <button
-                    onClick={() => router.push("/student/inbox")}
-                    className="flex items-center gap-1 text-xs text-green-600 hover:text-green-700"
-                  >
-                    View all <ArrowRight className="h-3.5 w-3.5" />
-                  </button>
+              {loadingConversations ? (
+                <div className="space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-12 animate-pulse rounded-lg bg-gray-100" />
+                  ))}
                 </div>
-                {loadingConversations ? (
-                  <div className="space-y-3">
-                    {[1, 2].map((i) => (
-                      <div key={i} className="h-14 animate-pulse rounded-xl bg-gray-100" />
-                    ))}
-                  </div>
-                ) : recentConversations.length === 0 ? (
-                  <div className="py-6 text-center">
-                    <MessageCircle className="mx-auto mb-2 h-8 w-8 text-gray-300" />
-                    <p className="text-sm text-gray-500">No conversations yet</p>
-                    <p className="mt-1 text-xs text-gray-400">
-                      Start chatting with a counselor or peer mentor
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-2.5">
-                    {recentConversations.map((conv) => (
-                      <button
-                        key={conv.id}
-                        onClick={() =>
-                          router.push(
-                            conv.type === "counselor"
-                              ? `/student/counselors/${conv.id}`
-                              : `/student/peer-mentors/${conv.id}`
-                          )
-                        }
-                        className="flex w-full items-center gap-3 rounded-xl border border-gray-100
-                          bg-gray-50 p-3 text-left transition-all hover:border-green-200"
-                      >
-                        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ${
-                          conv.type === "counselor" ? "bg-blue-500" : "bg-green-500"
-                        }`}>
-                          {conv.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-gray-900 truncate">{conv.name}</span>
-                            <span className="ml-2 shrink-0 text-[10px] text-gray-400">
-                              {formatConvTime(conv.lastMessageTime)}
+              ) : recentConversations.length === 0 ? (
+                <div className="rounded-xl border border-dashed border-gray-300 py-10 text-center">
+                  <MessageCircle className="mx-auto mb-2 h-8 w-8 text-gray-300" />
+                  <p className="text-sm text-gray-500">No conversations yet</p>
+                  <p className="mt-1 text-xs text-gray-400">
+                    Start chatting with a counselor or peer mentor
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-hidden rounded-xl border border-gray-200">
+                  <table className="w-full text-left text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-100 bg-gray-50/60">
+                        <th className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                          Name
+                        </th>
+                        <th className="hidden px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-gray-400 sm:table-cell">
+                          Last Message
+                        </th>
+                        <th className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                          Time
+                        </th>
+                        <th className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                          Type
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {recentConversations.map((conv) => (
+                        <tr
+                          key={conv.id}
+                          onClick={() =>
+                            router.push(
+                              conv.type === "counselor"
+                                ? `/student/counselors/${conv.id}`
+                                : `/student/peer-mentors/${conv.id}`
+                            )
+                          }
+                          className="cursor-pointer transition-colors hover:bg-gray-50"
+                        >
+                          <td className="px-5 py-3.5">
+                            <div className="flex items-center gap-3">
+                              <div
+                                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white ${
+                                  conv.type === "counselor" ? "bg-blue-500" : "bg-green-500"
+                                }`}
+                              >
+                                {conv.name
+                                  .split(" ")
+                                  .map((n) => n[0])
+                                  .join("")
+                                  .slice(0, 2)}
+                              </div>
+                              <span className="font-medium text-gray-900">{conv.name}</span>
+                            </div>
+                          </td>
+                          <td className="hidden max-w-[200px] truncate px-5 py-3.5 text-gray-500 sm:table-cell">
+                            {conv.lastMessage}
+                          </td>
+                          <td className="whitespace-nowrap px-5 py-3.5 text-gray-400">
+                            {formatConvTime(conv.lastMessageTime)}
+                          </td>
+                          <td className="px-5 py-3.5">
+                            <span
+                              className={`inline-block rounded-full px-2.5 py-0.5 text-[11px] font-medium ${
+                                conv.type === "counselor"
+                                  ? "bg-blue-50 text-blue-600"
+                                  : "bg-green-50 text-green-600"
+                              }`}
+                            >
+                              {conv.type === "counselor" ? "Counselor" : "Peer Mentor"}
                             </span>
-                          </div>
-                          <p className="mt-0.5 truncate text-xs text-gray-500">{conv.lastMessage}</p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
 
-            {/* Quick Reads */}
-            <div className={`mb-6 ${s(400)}`}>
-              <h2 className="mb-3 text-sm font-semibold text-gray-900">Quick reads</h2>
-              <div className="grid gap-3 sm:grid-cols-2">
+            {/* Wellness Tips Grid */}
+            <div className="mb-8">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-900">Wellness tips</h2>
                 <a
                   href="https://www.who.int/news-room/fact-sheets/detail/mental-health-strengthening-our-response"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 rounded-2xl border border-gray-200
-                    bg-white p-4 shadow-sm transition-all hover:border-green-200 hover:shadow-md
-                    group"
+                  className="flex items-center gap-1 text-sm font-medium text-green-600 hover:text-green-700"
                 >
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50">
+                  Resources <ArrowRight className="h-3.5 w-3.5" />
+                </a>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {insightCards.map((card) => {
+                  const Icon = card.icon;
+                  return (
+                    <div
+                      key={card.label}
+                      className="rounded-xl border border-gray-200 p-5 transition-colors hover:bg-gray-50"
+                    >
+                      <div className="mb-3 flex items-center gap-2.5">
+                        <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${card.bg}`}>
+                          <Icon className={`h-4 w-4 ${card.accent}`} />
+                        </div>
+                        <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                          {card.label}
+                        </span>
+                      </div>
+                      <p className="text-sm font-medium text-gray-900">{card.title}</p>
+                      <p className="mt-1 text-xs leading-relaxed text-gray-500">{card.body}</p>
+                      {card.href && (
+                        <a
+                          href={card.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-green-600 hover:text-green-700"
+                        >
+                          Read more <ChevronRight className="h-3 w-3" />
+                        </a>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Quick Reads */}
+            <div className="mb-8">
+              <h2 className="mb-4 text-lg font-semibold text-gray-900">Quick reads</h2>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <a
+                  href="https://www.who.int/news-room/fact-sheets/detail/mental-health-strengthening-our-response"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center gap-3 rounded-xl border border-gray-200 p-4 transition-colors hover:bg-gray-50"
+                >
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-50">
                     <BookOpen className="h-4 w-4 text-emerald-600" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-gray-900 group-hover:text-green-600 transition-colors">
+                    <p className="text-sm font-medium text-gray-900 group-hover:text-green-600">
                       Mental Health: Facts & Figures
                     </p>
                     <p className="text-xs text-gray-500">WHO Report</p>
                   </div>
-                  <ArrowRight className="h-4 w-4 text-gray-400 shrink-0 group-hover:text-green-600 transition-colors" />
+                  <ArrowRight className="h-4 w-4 shrink-0 text-gray-300 group-hover:text-green-600" />
                 </a>
                 <a
                   href="https://www.headspace.com/meditation/meditation-for-beginners"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 rounded-2xl border border-gray-200
-                    bg-white p-4 shadow-sm transition-all hover:border-blue-200 hover:shadow-md
-                    group"
+                  className="group flex items-center gap-3 rounded-xl border border-gray-200 p-4 transition-colors hover:bg-gray-50"
                 >
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50">
                     <Wind className="h-4 w-4 text-blue-600" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
+                    <p className="text-sm font-medium text-gray-900 group-hover:text-blue-600">
                       Meditation for Beginners
                     </p>
                     <p className="text-xs text-gray-500">Headspace</p>
                   </div>
-                  <ArrowRight className="h-4 w-4 text-gray-400 shrink-0 group-hover:text-blue-600 transition-colors" />
+                  <ArrowRight className="h-4 w-4 shrink-0 text-gray-300 group-hover:text-blue-600" />
                 </a>
               </div>
             </div>
 
             {/* Report Issue */}
-            <div className={`text-center ${s(460)}`}>
+            <div className="text-center">
               <button
                 onClick={() => setShowReportModal(true)}
-                className="inline-flex items-center gap-2 rounded-full border border-gray-200
-                  px-4 py-2 text-xs text-gray-500 transition-all hover:border-red-200
-                  hover:text-red-500"
+                className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-xs text-gray-500 transition-colors hover:border-red-200 hover:text-red-500"
               >
                 <Flag className="h-3 w-3" />
                 Report an issue

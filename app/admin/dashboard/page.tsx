@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/AdminLayout";
-import { Card, CardContent } from "@/components/ui/card";
-import { Users, CheckCircle, XCircle, Clock, TrendingUp } from "lucide-react";
+import { Users, CheckCircle, XCircle, Clock, Calendar, ChevronRight } from "lucide-react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
@@ -17,6 +16,10 @@ interface Stats {
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<Stats>({ pending: 0, approved: 0, rejected: 0, total: 0 });
   const [loading, setLoading] = useState(true);
+
+  const todayFormatted = new Date().toLocaleDateString("en-US", {
+    weekday: "long", month: "short", day: "numeric",
+  });
 
   useEffect(() => {
     async function loadStats() {
@@ -50,112 +53,96 @@ export default function AdminDashboardPage() {
 
   return (
     <AdminLayout>
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto max-w-5xl">
+
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="mt-2 text-gray-500">Overview of user applications and approvals</p>
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+            <p className="mt-1 text-sm text-gray-500">
+              Overview of user applications and approvals
+            </p>
+          </div>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700">
+            <Calendar className="h-3.5 w-3.5" />
+            {todayFormatted}
+          </span>
         </div>
 
-        {/* Stats Grid */}
+        {/* Stats Row */}
         {loading ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-32 animate-pulse rounded-2xl border border-gray-200 bg-white" />
-            ))}
-          </div>
+          <div className="mb-8 h-24 animate-pulse rounded-xl bg-gray-100" />
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <Card className="border-gray-200 bg-white">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500">Pending</p>
-                    <p className="mt-2 text-3xl font-bold text-gray-900">{stats.pending}</p>
-                  </div>
-                  <div className="rounded-xl bg-amber-100 p-3">
-                    <Clock className="h-6 w-6 text-amber-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-gray-200 bg-white">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500">Approved</p>
-                    <p className="mt-2 text-3xl font-bold text-gray-900">{stats.approved}</p>
-                  </div>
-                  <div className="rounded-xl bg-green-100 p-3">
-                    <CheckCircle className="h-6 w-6 text-green-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-gray-200 bg-white">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500">Rejected</p>
-                    <p className="mt-2 text-3xl font-bold text-gray-900">{stats.rejected}</p>
-                  </div>
-                  <div className="rounded-xl bg-red-100 p-3">
-                    <XCircle className="h-6 w-6 text-red-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-gray-200 bg-white">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500">Total Users</p>
-                    <p className="mt-2 text-3xl font-bold text-gray-900">{stats.total}</p>
-                  </div>
-                  <div className="rounded-xl bg-blue-100 p-3">
-                    <Users className="h-6 w-6 text-blue-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="mb-8 rounded-xl border border-gray-200 bg-white">
+            <div className="grid grid-cols-2 divide-x divide-gray-200 md:grid-cols-4">
+              <div className="p-5">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                  Pending
+                </p>
+                <p className="mt-2 text-3xl font-bold text-gray-900">{stats.pending}</p>
+              </div>
+              <div className="p-5">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                  Approved
+                </p>
+                <p className="mt-2 text-3xl font-bold text-gray-900">{stats.approved}</p>
+              </div>
+              <div className="p-5">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                  Rejected
+                </p>
+                <p className="mt-2 text-3xl font-bold text-gray-900">{stats.rejected}</p>
+              </div>
+              <div className="p-5">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                  Total Users
+                </p>
+                <p className="mt-2 text-3xl font-bold text-gray-900">{stats.total}</p>
+              </div>
+            </div>
           </div>
         )}
 
         {/* Quick Actions */}
-        <div className="mt-8">
-          <h2 className="mb-4 text-xl font-semibold text-gray-900">Quick Actions</h2>
-          <div className="grid gap-4 md:grid-cols-3">
+        <div>
+          <h2 className="mb-4 text-lg font-semibold text-gray-900">Quick actions</h2>
+          <div className="grid gap-3 sm:grid-cols-3">
             <a
               href="/admin/pending"
-              className="group rounded-2xl border border-gray-200 bg-white p-6 transition-all hover:border-green-500/30 hover:bg-gray-50"
+              className="flex items-center gap-3 rounded-xl border border-gray-200 p-4 transition-colors hover:bg-gray-50"
             >
-              <Clock className="mb-3 h-8 w-8 text-amber-600" />
-              <h3 className="font-semibold text-gray-900">Review Pending</h3>
-              <p className="mt-1 text-sm text-gray-500">Approve or reject applications</p>
+              <Clock className="h-5 w-5 shrink-0 text-amber-600" />
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-gray-900">Review Pending</p>
+                <p className="text-xs text-gray-500">Approve or reject applications</p>
+              </div>
+              <ChevronRight className="ml-auto h-4 w-4 shrink-0 text-gray-300" />
             </a>
-
             <a
               href="/admin/approved"
-              className="group rounded-2xl border border-gray-200 bg-white p-6 transition-all hover:border-green-500/30 hover:bg-gray-50"
+              className="flex items-center gap-3 rounded-xl border border-gray-200 p-4 transition-colors hover:bg-gray-50"
             >
-              <CheckCircle className="mb-3 h-8 w-8 text-green-600" />
-              <h3 className="font-semibold text-gray-900">View Approved</h3>
-              <p className="mt-1 text-sm text-gray-500">See all active counselors & mentors</p>
+              <CheckCircle className="h-5 w-5 shrink-0 text-green-600" />
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-gray-900">View Approved</p>
+                <p className="text-xs text-gray-500">Active counselors and mentors</p>
+              </div>
+              <ChevronRight className="ml-auto h-4 w-4 shrink-0 text-gray-300" />
             </a>
-
             <a
               href="/admin/rejected"
-              className="group rounded-2xl border border-gray-200 bg-white p-6 transition-all hover:border-red-500/30 hover:bg-gray-50"
+              className="flex items-center gap-3 rounded-xl border border-gray-200 p-4 transition-colors hover:bg-gray-50"
             >
-              <XCircle className="mb-3 h-8 w-8 text-red-600" />
-              <h3 className="font-semibold text-gray-900">Rejected Users</h3>
-              <p className="mt-1 text-sm text-gray-500">View rejected applications</p>
+              <XCircle className="h-5 w-5 shrink-0 text-red-500" />
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-gray-900">Rejected Users</p>
+                <p className="text-xs text-gray-500">View rejected applications</p>
+              </div>
+              <ChevronRight className="ml-auto h-4 w-4 shrink-0 text-gray-300" />
             </a>
           </div>
         </div>
+
       </div>
     </AdminLayout>
   );

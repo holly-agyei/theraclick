@@ -134,7 +134,7 @@ export function VoiceMessage({ audioUrl, isOwnMessage = false }: VoiceMessagePro
         <audio
           controls
           src={audioUrl}
-          crossOrigin="anonymous"
+          {...(!audioUrl.startsWith("data:") && { crossOrigin: "anonymous" as const })}
           className="w-full h-10 rounded-lg"
           style={{ filter: isOwnMessage ? "invert(1) brightness(2)" : "none" }}
         />
@@ -154,7 +154,7 @@ export function VoiceMessage({ audioUrl, isOwnMessage = false }: VoiceMessagePro
         ref={audioRef}
         src={audioUrl}
         preload="metadata"
-        crossOrigin="anonymous"
+        {...(!audioUrl.startsWith("data:") && { crossOrigin: "anonymous" as const })}
       />
 
       {/* Play / Pause */}

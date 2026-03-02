@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect, useRef, useCallb
 import { WebRTCCallManager, CallStatus, CallType } from "@/lib/webrtc";
 import { useAuth } from "./auth";
 import { db } from "@/lib/firebase";
-import { collection, query, where, onSnapshot, doc, getDoc } from "firebase/firestore";
+import { collection, query, where, onSnapshot, doc, getDoc, addDoc, serverTimestamp } from "firebase/firestore";
 
 interface CallContextValue {
   // Call state
@@ -45,6 +45,32 @@ interface CallContextValue {
 
 const CallContext = createContext<CallContextValue | null>(null);
 
+async function writeCallEventToChat(
+  myUid: string,
+  myName: string,
+  otherUserId: string,
+  type: CallType,
+  status: "missed" | "outgoing" | "incoming" | "rejected" | "ended",
+  durationSeconds?: number,
+) {
+  if (!db) return;
+  try {
+    const chatId = [myUid, otherUserId].sort().join("_");
+    await addDoc(collection(db, "directMessages", chatId, "messages"), {
+      text: "",
+      senderId: myUid,
+      senderName: myName,
+      createdAt: serverTimestamp(),
+      type: "call",
+      callType: type,
+      callStatus: status,
+      ...(durationSeconds != null && { callDuration: durationSeconds }),
+    });
+  } catch (e) {
+    console.error("Failed to write call event:", e);
+  }
+}
+
 export function CallProvider({ children }: { children: React.ReactNode }) {
   const { profile } = useAuth();
   const [isInCall, setIsInCall] = useState(false);
@@ -63,9 +89,9 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
   const callManagerRef = useRef<WebRTCCallManager | null>(null);
   const incomingCallListenerRef = useRef<(() => void) | null>(null);
   const incomingCallDocListenerRef = useRef<(() => void) | null>(null);
-  // Ref to track isInCall without causing re-subscriptions in the Firestore listener
   const isInCallRef = useRef(false);
   isInCallRef.current = isInCall;
+  const callStartTimeRef = useRef<number | null>(null);
 
   // Initialize call manager
   useEffect(() => {
@@ -77,6 +103,9 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
           console.log("Call status changed:", status);
           setCallStatus(status);
           setIsInCall(status === "active" || status === "connecting" || status === "ringing");
+          if (status === "active") {
+            callStartTimeRef.current = Date.now();
+          }
         },
         onLocalStream: (stream) => {
           console.log("Local stream received via callback");
@@ -191,23 +220,22 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
     
     const unsub = onSnapshot(callDocRef, (snapshot) => {
       if (!snapshot.exists()) {
-        // Call document was deleted - caller cancelled
         console.log("Incoming call cancelled by caller");
+        if (incomingCall && profile?.uid) {
+          writeCallEventToChat(profile.uid, profile.fullName || "User", incomingCall.callerId, incomingCall.callType, "missed");
+        }
         setIncomingCall(null);
         return;
       }
       
       const callData = snapshot.data();
-      // Dismiss incoming call notification if:
-      // - Call was ended/rejected/missed (obvious cases)
-      // - Call moved to "connecting" or "active" (picked up on ANOTHER device/tab)
-      // WHY: Without "connecting"/"active", a second device keeps ringing even after
-      // the call was accepted on the first device.
       const dismissStatuses = ["ended", "rejected", "missed", "connecting", "active"];
       if (callData?.status && dismissStatuses.includes(callData.status)) {
-        // Only dismiss if WE didn't accept it (avoid dismissing on the device that accepted)
         if (!isInCallRef.current) {
           console.log("Incoming call dismissed — status:", callData.status);
+          if (callData.status === "missed" && incomingCall && profile?.uid) {
+            writeCallEventToChat(profile.uid, profile.fullName || "User", incomingCall.callerId, incomingCall.callType, "missed");
+          }
           setIncomingCall(null);
         }
       }
@@ -351,13 +379,19 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
   const rejectCall = useCallback(async (callId: string, callerId: string) => {
     if (!callManagerRef.current) return;
 
+    const rejectedCallType = incomingCall?.callType || "voice";
+
     try {
       await callManagerRef.current.rejectCall(callId, callerId);
       setIncomingCall(null);
     } catch (error: any) {
       console.error("Error rejecting call:", error);
     }
-  }, []);
+
+    if (profile?.uid) {
+      writeCallEventToChat(profile.uid, profile.fullName || "User", callerId, rejectedCallType, "rejected");
+    }
+  }, [incomingCall?.callType, profile?.uid, profile?.fullName]);
 
   // WHY: We reset state in a finally block so even if endCall() throws
   // (network error, Firestore unavailable), the UI always returns to idle.
@@ -379,15 +413,25 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
   const endCall = useCallback(async () => {
     if (!callManagerRef.current) return;
 
+    const wasCallerLocal = isCaller;
+    const remoteId = remoteUserId;
+    const type = callType;
+    const startTime = callStartTimeRef.current;
+
     try {
       await callManagerRef.current.endCall();
     } catch (error: any) {
       console.error("Error ending call:", error);
     } finally {
-      // Always reset UI state regardless of whether endCall succeeded
       resetCallState();
+      callStartTimeRef.current = null;
     }
-  }, [resetCallState]);
+
+    if (wasCallerLocal && remoteId && type && profile?.uid) {
+      const duration = startTime ? Math.round((Date.now() - startTime) / 1000) : undefined;
+      writeCallEventToChat(profile.uid, profile.fullName || "User", remoteId, type, "ended", duration);
+    }
+  }, [resetCallState, isCaller, remoteUserId, callType, profile?.uid, profile?.fullName]);
 
   const toggleMute = useCallback(() => {
     if (!callManagerRef.current) return;

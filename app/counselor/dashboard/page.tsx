@@ -1,11 +1,5 @@
 "use client";
 
-/**
- * COUNSELOR DASHBOARD — Dr. Mensah's home view.
- * Shows today's sessions, pending requests, availability toggle, recent conversations.
- * No emojis. Clean, professional but warm.
- */
-
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth";
@@ -55,14 +49,9 @@ export default function CounselorDashboardPage() {
   const [isAvailable, setIsAvailable] = useState(true);
   const [togglingAvailability, setTogglingAvailability] = useState(false);
 
-  const firstName = profile?.fullName?.split(" ")[0] || "Dr.";
-
-  const greeting = (() => {
-    const h = new Date().getHours();
-    if (h < 12) return "Good morning";
-    if (h < 17) return "Good afternoon";
-    return "Good evening";
-  })();
+  const todayFormatted = new Date().toLocaleDateString("en-US", {
+    weekday: "long", month: "short", day: "numeric",
+  });
 
   useEffect(() => {
     async function loadData() {
@@ -72,13 +61,11 @@ export default function CounselorDashboardPage() {
       }
 
       try {
-        // Check current availability status
         const userDoc = await getDoc(doc(db, "users", profile.uid));
         if (userDoc.exists()) {
           setIsAvailable(userDoc.data().isAvailable !== false);
         }
 
-        // Load conversations
         const conversationsList: Conversation[] = [];
         const conversationsSnap = await getDocs(collection(db, "directMessages"));
 
@@ -115,7 +102,6 @@ export default function CounselorDashboardPage() {
         });
         setConversations(conversationsList);
 
-        // Load upcoming bookings
         const bookingsRef = collection(db, "bookings");
         const bookingsSnap = await getDocs(query(bookingsRef, where("counselorId", "==", profile.uid), orderBy("date", "asc")));
         const bookingsList: BookingRequest[] = [];
@@ -129,7 +115,7 @@ export default function CounselorDashboardPage() {
             const studentDoc = await getDoc(doc(db, "users", data.studentId));
             const studentData = studentDoc.exists() ? studentDoc.data() : null;
 
-            const booking: BookingRequest = {
+            bookingsList.push({
               id: bookingDoc.id,
               studentId: data.studentId,
               studentName: studentData?.anonymousEnabled && studentData?.anonymousId
@@ -140,8 +126,7 @@ export default function CounselorDashboardPage() {
               endTime: data.endTime,
               status: data.status || "confirmed",
               topic: data.topic || undefined,
-            };
-            bookingsList.push(booking);
+            });
 
             if (data.date === today) todayCount++;
           }
@@ -189,229 +174,237 @@ export default function CounselorDashboardPage() {
 
   return (
     <LayoutWrapper>
-      <div className="min-h-screen bg-[#F0FDF4]">
-        <div className="relative z-10 px-4 py-6 pb-24 md:px-8 md:py-10">
+      <div className="min-h-screen bg-white">
+        <div className="px-4 py-8 pb-28 md:px-8 md:py-10">
           <div className="mx-auto max-w-5xl">
 
             {/* Header */}
-            <div className="mb-8">
-              <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
-                {greeting}, {firstName}
-              </h1>
-              <p className="mt-1 text-sm text-gray-500">
-                {stats.todaySessions > 0
-                  ? `You have ${stats.todaySessions} session${stats.todaySessions > 1 ? "s" : ""} today`
-                  : "No sessions scheduled for today"
-                }
-              </p>
-            </div>
-
-            {/* Availability Toggle */}
-            <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Your availability</p>
-                  <p className="mt-0.5 text-xs text-gray-500">
-                    {isAvailable
-                      ? "Students can see you are available right now"
-                      : "You are currently set as unavailable"
-                    }
-                  </p>
-                </div>
+            <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+                <p className="mt-1 text-sm text-gray-500">
+                  {stats.todaySessions > 0
+                    ? `${stats.todaySessions} session${stats.todaySessions > 1 ? "s" : ""} today`
+                    : "No sessions today"}
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
                 <button
                   onClick={toggleAvailability}
                   disabled={togglingAvailability}
-                  className="flex items-center gap-2 transition-all"
+                  className="flex items-center gap-2 rounded-full border border-gray-200 px-3 py-1.5 transition-colors hover:bg-gray-50"
                 >
                   {isAvailable ? (
-                    <ToggleRight className="h-8 w-8 text-green-600" />
+                    <ToggleRight className="h-5 w-5 text-green-600" />
                   ) : (
-                    <ToggleLeft className="h-8 w-8 text-gray-500" />
+                    <ToggleLeft className="h-5 w-5 text-gray-400" />
                   )}
-                  <span className={`text-sm font-medium ${isAvailable ? "text-green-600" : "text-gray-500"}`}>
+                  <span className={`text-xs font-medium ${isAvailable ? "text-green-600" : "text-gray-500"}`}>
                     {isAvailable ? "Available" : "Unavailable"}
                   </span>
                 </button>
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700">
+                  <Calendar className="h-3.5 w-3.5" />
+                  {todayFormatted}
+                </span>
               </div>
             </div>
 
-            {/* Stats */}
-            <div className="mb-6 grid gap-3 grid-cols-3">
-              <div className="rounded-2xl border border-gray-200 bg-white p-4">
-                <p className="text-xs text-gray-500">Students</p>
-                <p className="mt-1 text-2xl font-bold text-gray-900">{stats.totalStudents}</p>
-              </div>
-              <div className="rounded-2xl border border-gray-200 bg-white p-4">
-                <p className="text-xs text-gray-500">Active chats</p>
-                <p className="mt-1 text-2xl font-bold text-gray-900">{stats.activeChats}</p>
-              </div>
-              <div className="rounded-2xl border border-gray-200 bg-white p-4">
-                <p className="text-xs text-gray-500">Today</p>
-                <p className="mt-1 text-2xl font-bold text-gray-900">{stats.todaySessions}</p>
+            {/* Stats Row */}
+            <div className="mb-8 rounded-xl border border-gray-200 bg-white">
+              <div className="grid grid-cols-3 divide-x divide-gray-200">
+                <div className="p-5">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Students</p>
+                  <p className="mt-2 text-3xl font-bold text-gray-900">
+                    {loading ? "--" : stats.totalStudents}
+                  </p>
+                </div>
+                <div className="p-5">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Active Chats</p>
+                  <p className="mt-2 text-3xl font-bold text-gray-900">
+                    {loading ? "--" : stats.activeChats}
+                  </p>
+                </div>
+                <div className="p-5">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Today&apos;s Sessions</p>
+                  <p className="mt-2 text-3xl font-bold text-gray-900">
+                    {loading ? "--" : stats.todaySessions}
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Today's Sessions */}
-            <div className="mb-6">
+            {/* Upcoming Sessions */}
+            <div className="mb-8">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-gray-900">Upcoming sessions</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Upcoming sessions</h2>
                 <button
                   onClick={() => router.push("/counselor/bookings")}
-                  className="text-xs text-green-600 hover:text-green-500"
+                  className="text-sm font-medium text-green-600 hover:text-green-700"
                 >
-                  View all
+                  All bookings
                 </button>
               </div>
 
               {loading ? (
-                <div className="space-y-3">
-                  {[1, 2].map((i) => (
-                    <div key={i} className="h-20 rounded-xl border border-gray-200 bg-white animate-pulse" />
+                <div className="grid gap-4 sm:grid-cols-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-28 animate-pulse rounded-xl bg-gray-100" />
                   ))}
                 </div>
               ) : bookingRequests.length === 0 ? (
-                <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
-                  <Calendar className="mx-auto mb-2 h-8 w-8 text-gray-400" />
+                <div className="rounded-xl border border-dashed border-gray-300 py-10 text-center">
+                  <Calendar className="mx-auto mb-2 h-8 w-8 text-gray-300" />
                   <p className="text-sm text-gray-500">No upcoming sessions</p>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {bookingRequests.slice(0, 5).map((booking) => {
+                <div className="grid gap-4 sm:grid-cols-3">
+                  {bookingRequests.slice(0, 3).map((booking) => {
                     const bookingDate = new Date(`${booking.date}T${booking.startTime}`);
                     const isToday = booking.date === new Date().toISOString().split("T")[0];
                     return (
-                      <div
+                      <button
                         key={booking.id}
-                        className={`rounded-xl border p-4 transition-all
-                          ${isToday
-                            ? "border-green-200 bg-green-50"
-                            : "border-gray-200 bg-white"
-                          }`}
+                        onClick={() => router.push(`/counselor/inbox/${booking.studentId}`)}
+                        className="group rounded-xl border border-gray-200 bg-green-50/40 p-5 text-left transition-all hover:border-green-300 hover:shadow-sm"
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className={`flex h-10 w-10 items-center justify-center rounded-full
-                              text-sm font-bold
-                              ${isToday ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-900"}`}>
-                              {booking.studentName.split(" ").map(n => n[0]).join("").slice(0, 2)}
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-gray-900">{booking.studentName}</p>
-                              <p className="text-xs text-gray-500">
-                                {bookingDate.toLocaleDateString("en-US", {
-                                  weekday: "short", month: "short", day: "numeric",
-                                })} at {booking.startTime} - {booking.endTime}
-                              </p>
-                              {booking.topic && (
-                                <p className="mt-0.5 text-xs text-gray-400">{booking.topic}</p>
-                              )}
-                            </div>
+                        <p className="text-lg font-semibold text-gray-900">{booking.studentName}</p>
+                        <p className="mt-1 flex items-center gap-1.5 text-sm text-gray-500">
+                          <Clock className="h-3.5 w-3.5" />
+                          {booking.startTime} - {booking.endTime}
+                        </p>
+                        <p className="mt-0.5 text-xs text-gray-400">
+                          {bookingDate.toLocaleDateString("en-US", {
+                            weekday: "short", month: "short", day: "numeric",
+                          })}
+                        </p>
+                        {booking.topic && (
+                          <p className="mt-1 text-xs text-gray-400">{booking.topic}</p>
+                        )}
+                        <div className="mt-3 flex items-center justify-between">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-600 text-xs font-bold text-white">
+                            {booking.studentName.split(" ").map(n => n[0]).join("").slice(0, 2)}
                           </div>
-                          <button
-                            onClick={() => router.push(`/counselor/inbox/${booking.studentId}`)}
-                            className="rounded-full bg-green-600 px-4 py-2 text-xs font-medium text-white
-                              transition-all hover:bg-green-700 active:scale-[0.95]"
-                          >
-                            {isToday ? "Start Session" : "Chat"}
-                          </button>
+                          {isToday && (
+                            <span className="rounded-full bg-green-600 px-2.5 py-0.5 text-[11px] font-medium text-white">
+                              Today
+                            </span>
+                          )}
                         </div>
-                      </div>
+                      </button>
                     );
                   })}
                 </div>
               )}
             </div>
 
-            {/* Quick Actions */}
-            <div className="mb-6 grid gap-3 sm:grid-cols-3">
-              <button
-                onClick={() => router.push("/counselor/students")}
-                className="flex items-center gap-3 rounded-2xl border border-gray-200
-                  bg-white p-4 text-left transition-all hover:border-gray-300 hover:bg-gray-100"
-              >
-                <Users className="h-5 w-5 text-blue-600 shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-gray-900">All Students</p>
-                  <p className="text-xs text-gray-500">View and manage</p>
-                </div>
-              </button>
-              <button
-                onClick={() => router.push("/counselor/inbox")}
-                className="flex items-center gap-3 rounded-2xl border border-gray-200
-                  bg-white p-4 text-left transition-all hover:border-gray-300 hover:bg-gray-100"
-              >
-                <Mail className="h-5 w-5 text-green-600 shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-gray-900">Inbox</p>
-                  <p className="text-xs text-gray-500">All conversations</p>
-                </div>
-              </button>
-              <button
-                onClick={() => router.push("/counselor/availability")}
-                className="flex items-center gap-3 rounded-2xl border border-gray-200
-                  bg-white p-4 text-left transition-all hover:border-gray-300 hover:bg-gray-100"
-              >
-                <Calendar className="h-5 w-5 text-[#F5C842] shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-gray-900">Availability</p>
-                  <p className="text-xs text-gray-500">Manage time slots</p>
-                </div>
-              </button>
-            </div>
-
-            {/* Recent Conversations */}
-            <div className="mb-6">
+            {/* Recent Conversations Table */}
+            <div className="mb-8">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-gray-900">Recent conversations</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Recent conversations</h2>
                 <button
                   onClick={() => router.push("/counselor/inbox")}
-                  className="text-xs text-green-600 hover:text-green-500"
+                  className="inline-flex items-center gap-1 rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs font-medium text-green-700 transition-colors hover:bg-green-100"
                 >
-                  View all
+                  View All
                 </button>
               </div>
 
               {loading ? (
                 <div className="space-y-3">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="h-16 rounded-xl border border-gray-200 bg-white animate-pulse" />
+                    <div key={i} className="h-12 animate-pulse rounded-lg bg-gray-100" />
                   ))}
                 </div>
               ) : conversations.length === 0 ? (
-                <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
-                  <MessageCircle className="mx-auto mb-2 h-8 w-8 text-gray-400" />
+                <div className="rounded-xl border border-dashed border-gray-300 py-10 text-center">
+                  <MessageCircle className="mx-auto mb-2 h-8 w-8 text-gray-300" />
                   <p className="text-sm text-gray-500">No conversations yet</p>
                   <p className="mt-1 text-xs text-gray-400">Students will reach out to you here</p>
                 </div>
               ) : (
-                <div className="space-y-2">
-                  {conversations.slice(0, 5).map((conv) => (
-                    <button
-                      key={conv.studentId}
-                      onClick={() => router.push(`/counselor/inbox/${conv.studentId}`)}
-                      className="flex w-full items-center gap-3 rounded-xl border border-gray-200
-                        bg-white p-3 text-left transition-all hover:border-green-200"
-                    >
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full
-                        bg-blue-100 text-sm font-bold text-blue-600">
-                        {conv.studentName.split(" ").map((n) => n[0]).join("").slice(0, 2)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-gray-900 truncate">{conv.studentName}</span>
-                          {conv.lastMessageTime && (
-                            <span className="ml-2 shrink-0 text-[10px] text-gray-500">{formatTime(conv.lastMessageTime)}</span>
-                          )}
-                        </div>
-                        {conv.lastMessage && (
-                          <p className="mt-0.5 truncate text-xs text-gray-500">{conv.lastMessage}</p>
-                        )}
-                      </div>
-                      <ChevronRight className="h-4 w-4 text-gray-500 shrink-0" />
-                    </button>
-                  ))}
+                <div className="overflow-hidden rounded-xl border border-gray-200">
+                  <table className="w-full text-left text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-100 bg-gray-50/60">
+                        <th className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                          Name
+                        </th>
+                        <th className="hidden px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-gray-400 sm:table-cell">
+                          Last Message
+                        </th>
+                        <th className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                          Time
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {conversations.slice(0, 5).map((conv) => (
+                        <tr
+                          key={conv.studentId}
+                          onClick={() => router.push(`/counselor/inbox/${conv.studentId}`)}
+                          className="cursor-pointer transition-colors hover:bg-gray-50"
+                        >
+                          <td className="px-5 py-3.5">
+                            <div className="flex items-center gap-3">
+                              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-600">
+                                {conv.studentName.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+                              </div>
+                              <span className="font-medium text-gray-900">{conv.studentName}</span>
+                            </div>
+                          </td>
+                          <td className="hidden max-w-[200px] truncate px-5 py-3.5 text-gray-500 sm:table-cell">
+                            {conv.lastMessage || "No messages"}
+                          </td>
+                          <td className="whitespace-nowrap px-5 py-3.5 text-gray-400">
+                            {conv.lastMessageTime ? formatTime(conv.lastMessageTime) : "--"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )}
+            </div>
+
+            {/* Quick Actions */}
+            <div>
+              <h2 className="mb-4 text-lg font-semibold text-gray-900">Quick actions</h2>
+              <div className="grid gap-3 sm:grid-cols-3">
+                <button
+                  onClick={() => router.push("/counselor/students")}
+                  className="flex items-center gap-3 rounded-xl border border-gray-200 p-4 text-left transition-colors hover:bg-gray-50"
+                >
+                  <Users className="h-5 w-5 shrink-0 text-blue-600" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-gray-900">All Students</p>
+                    <p className="text-xs text-gray-500">View and manage</p>
+                  </div>
+                  <ChevronRight className="ml-auto h-4 w-4 shrink-0 text-gray-300" />
+                </button>
+                <button
+                  onClick={() => router.push("/counselor/inbox")}
+                  className="flex items-center gap-3 rounded-xl border border-gray-200 p-4 text-left transition-colors hover:bg-gray-50"
+                >
+                  <Mail className="h-5 w-5 shrink-0 text-green-600" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-gray-900">Inbox</p>
+                    <p className="text-xs text-gray-500">All conversations</p>
+                  </div>
+                  <ChevronRight className="ml-auto h-4 w-4 shrink-0 text-gray-300" />
+                </button>
+                <button
+                  onClick={() => router.push("/counselor/availability")}
+                  className="flex items-center gap-3 rounded-xl border border-gray-200 p-4 text-left transition-colors hover:bg-gray-50"
+                >
+                  <Calendar className="h-5 w-5 shrink-0 text-amber-500" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-gray-900">Availability</p>
+                    <p className="text-xs text-gray-500">Manage time slots</p>
+                  </div>
+                  <ChevronRight className="ml-auto h-4 w-4 shrink-0 text-gray-300" />
+                </button>
+              </div>
             </div>
 
           </div>

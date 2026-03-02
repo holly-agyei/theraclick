@@ -107,7 +107,7 @@ export default function CounselorBookingDetailPage() {
 
   return (
     <LayoutWrapper>
-      <div className="min-h-screen bg-[#F0FDF4]">
+      <div className="min-h-screen bg-white">
         <div className="px-4 py-6 pb-24 md:px-8 md:py-10">
           <div className="mx-auto max-w-3xl">
             {/* Header */}

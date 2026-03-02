@@ -147,7 +147,7 @@ export function VoiceMessage({ audioUrl, isOwnMessage = false }: VoiceMessagePro
 
   return (
     <div className={`flex items-center gap-3 min-w-[200px] max-w-[280px] ${
-      isOwnMessage ? "text-white" : "text-gray-200"
+      isOwnMessage ? "text-white" : "text-gray-700"
     }`}>
       {/* Hidden audio element */}
       <audio
@@ -166,7 +166,7 @@ export function VoiceMessage({ audioUrl, isOwnMessage = false }: VoiceMessagePro
             ? "bg-red-500/30 cursor-not-allowed"
             : isOwnMessage
               ? "bg-white/20 hover:bg-white/30 active:scale-90"
-              : "bg-white/10 hover:bg-white/20 active:scale-90"
+              : "bg-gray-100 hover:bg-gray-200 active:scale-90"
         }`}
       >
         {error ? (
@@ -189,8 +189,8 @@ export function VoiceMessage({ audioUrl, isOwnMessage = false }: VoiceMessagePro
                 key={i}
                 className={`flex-1 rounded-full transition-colors ${
                   isActive
-                    ? isOwnMessage ? "bg-white" : "bg-[#2BB5A0]"
-                    : isOwnMessage ? "bg-white/30" : "bg-white/10"
+                    ? isOwnMessage ? "bg-white" : "bg-green-600"
+                    : isOwnMessage ? "bg-white/30" : "bg-gray-200"
                 }`}
                 style={{ height: `${height}%` }}
               />

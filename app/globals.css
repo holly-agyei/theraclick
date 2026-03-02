@@ -8,23 +8,29 @@
 
 @layer base {
   :root {
-    /* Brand tokens */
+    /* Brand tokens — light green theme */
+    --tk-green: #16A34A;
+    --tk-green-light: #22C55E;
+    --tk-green-tint: #DCFCE7;
+    --tk-green-glow: rgba(22, 163, 74, 0.15);
+    --tk-surface: #F0FDF4;
+    --tk-muted: #6B7280;
+    --tk-dark: #111827;
+
+    /* Auth-only tokens (kept for login/signup pages) */
     --tk-teal: #2BB5A0;
     --tk-teal-deep: #1A7A6E;
     --tk-teal-deeper: #0F4F47;
     --tk-teal-glow: rgba(43, 181, 160, 0.15);
     --tk-gold: #F5C842;
     --tk-gold-warm: #E8A800;
-    --tk-surface: #F7FDFC;
-    --tk-muted: #6B8C89;
-    --tk-dark: #0D1F1D;
 
-    /* Easing — the heartbeat of the motion system */
+    /* Easing */
     --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
     --ease-in-out-tk: cubic-bezier(0.87, 0, 0.13, 1);
-    --spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* slight overshoot — feels alive */
+    --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-    /* Shadcn theme hooks */
+    /* Shadcn theme hooks — light theme */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
@@ -41,7 +47,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 166 52% 44%;
+    --ring: 142 71% 45%;
     --radius: 0.5rem;
   }
 }
@@ -59,7 +65,6 @@
 
 @layer utilities {
 
-  /* Ambient: floating gradient orbs */
   @keyframes tk-drift {
     0%   { transform: translate(0, 0); }
     100% { transform: translate(40px, -30px); }
@@ -73,7 +78,6 @@
     50%      { transform: scale(1.3); opacity: 0.35; }
   }
 
-  /* Floating elements */
   @keyframes tk-float {
     0%, 100% { transform: translate3d(0, 0, 0); }
     50%      { transform: translate3d(0, -10px, 0); }
@@ -83,27 +87,23 @@
     50%      { transform: translate3d(0, 12px, 0) scale(1.03); }
   }
 
-  /* Gradient cycling */
   @keyframes tk-gradient-shift {
     0%   { background-position: 0% 50%; }
     50%  { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
   }
 
-  /* Shimmer sweep across cards */
   @keyframes tk-shimmer {
     0%   { transform: translateX(-120%) skewX(-12deg); opacity: 0; }
     25%  { opacity: 0.4; }
     100% { transform: translateX(140%) skewX(-12deg); opacity: 0; }
   }
 
-  /* Badge pulse (e.g. "Available Now" dot) */
   @keyframes tk-pulse-badge {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(43,181,160,0.6); }
-    50%      { box-shadow: 0 0 0 8px rgba(43,181,160,0); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.6); }
+    50%      { box-shadow: 0 0 0 8px rgba(22, 163, 74, 0); }
   }
 
-  /* Interactive shake for errors */
   @keyframes tk-shake {
     0%, 100% { transform: translateX(0); }
     20%  { transform: translateX(-6px); }
@@ -112,19 +112,16 @@
     80%  { transform: translateX(4px); }
   }
 
-  /* Typing dots that "breathe" */
   @keyframes tk-dot-breathe {
     0%, 100% { transform: scale(0.6); opacity: 0.4; }
     50%      { transform: scale(1);   opacity: 1; }
   }
 
-  /* Ripple on tap/click */
   @keyframes tk-ripple {
     0%   { transform: scale(0); opacity: 0.5; }
     100% { transform: scale(3); opacity: 0; }
   }
 
-  /* Slide + fade entrance */
   @keyframes tk-slide-up {
     from { opacity: 0; transform: translateY(24px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -134,19 +131,16 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* Bloom entrance (scale in) */
   @keyframes tk-bloom {
     from { opacity: 0; transform: scale(0.85); }
     to   { opacity: 1; transform: scale(1); }
   }
 
-  /* Video background slow cinematic zoom */
   @keyframes videoBreath {
     from { transform: scale(1.0); }
     to   { transform: scale(1.07); }
   }
 
-  /* Ambient orb drift patterns — organic, ocean-light feel */
   @keyframes driftOrb1 {
     from { transform: translate(0px, 0px); }
     to   { transform: translate(50px, 60px); }
@@ -160,19 +154,16 @@
     to   { transform: translate(20px, -30px) scale(1.15); }
   }
 
-  /* Icon gentle float — always running (feature slides) */
   @keyframes iconFloat {
     from { transform: translateY(0px); }
     to   { transform: translateY(-6px); }
   }
 
-  /* Breathe-in: blur → clear */
   @keyframes tk-breathe-in {
     from { opacity: 0; filter: blur(8px); }
     to   { opacity: 1; filter: blur(0); }
   }
 
-  /* Generic fade */
   @keyframes fade-in {
     from { opacity: 0; }
     to   { opacity: 1; }
@@ -206,7 +197,6 @@
     pointer-events: none;
   }
 
-  /* Stagger delays for sequential entrances */
   .tk-delay-1 { animation-delay: 80ms; }
   .tk-delay-2 { animation-delay: 160ms; }
   .tk-delay-3 { animation-delay: 240ms; }
@@ -214,11 +204,9 @@
   .tk-delay-5 { animation-delay: 400ms; }
   .tk-delay-6 { animation-delay: 480ms; }
 
-  /* Spring / expo timing utilities */
   .tk-spring   { transition-timing-function: var(--spring); }
   .tk-ease-expo { transition-timing-function: var(--ease-out-expo); }
 
-  /* Legacy compat */
   .animate-in { animation: fade-in 0.3s ease-out; }
   .fade-in    { animation: fade-in 0.3s ease-out; }
   .slide-in-from-bottom-2 { animation: slide-in-from-bottom-2 0.3s ease-out; }
@@ -233,35 +221,35 @@
   }
 }
 
-/* ─── CUSTOM SCROLLBAR ────────────────────────── */
+/* ─── CUSTOM SCROLLBAR (green-tinted) ────────── */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(43, 181, 160, 0.2);
+  background: rgba(22, 163, 74, 0.2);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(43, 181, 160, 0.4);
+  background: rgba(22, 163, 74, 0.4);
 }
 
 /* ─── BRANDED INPUT STYLE ─────────────────────── */
 .tk-input {
   width: 100%;
   border-radius: 14px;
-  border: 1.5px solid rgba(43, 181, 160, 0.2);
-  background: #F7FDFC;
+  border: 1.5px solid #E5E7EB;
+  background: #FFFFFF;
   padding: 14px 16px;
   font-size: 15px;
-  color: #0D1F1D;
+  color: #111827;
   outline: none;
   transition: border-color 200ms, box-shadow 200ms, transform 200ms;
 }
 .tk-input::placeholder {
-  color: rgba(107, 140, 137, 0.5);
+  color: #9CA3AF;
 }
 .tk-input:focus {
-  border-color: #2BB5A0;
-  box-shadow: 0 0 0 4px rgba(43, 181, 160, 0.1);
+  border-color: #16A34A;
+  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
   transform: scale(1.01);
 }
 .tk-input:disabled {
@@ -269,7 +257,35 @@
   cursor: not-allowed;
 }
 
-/* ─── BRANDED BUTTON (gold CTA) ───────────────── */
+/* ─── BRANDED BUTTON (green CTA) ─────────────── */
+.tk-btn-green {
+  width: 100%;
+  border-radius: 14px;
+  background: #16A34A;
+  padding: 14px 24px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #FFFFFF;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(22, 163, 74, 0.2);
+  transition: all 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.tk-btn-green:hover:not(:disabled) {
+  transform: scale(1.02);
+  background: #22C55E;
+  box-shadow: 0 12px 32px rgba(22, 163, 74, 0.3);
+}
+.tk-btn-green:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.tk-btn-green:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Keep old gold button class for auth pages that still use it */
 .tk-btn-gold {
   width: 100%;
   border-radius: 14px;
@@ -298,15 +314,14 @@
 }
 
 /* ══════════════════════════════════════════════
-   AUTH PANEL — MOBILE STABILITY (Fix 3)
+   AUTH PANEL — MOBILE STABILITY (kept for auth pages)
    ══════════════════════════════════════════════ */
 
-/* Auth page wrapper — column stack on mobile, side-by-side on desktop */
 @media (max-width: 768px) {
   .auth-page-wrapper {
     display: flex;
     flex-direction: column;
-    min-height: 100dvh;      /* dvh avoids mobile browser bar jump */
+    min-height: 100dvh;
     overflow-x: hidden;
     width: 100%;
   }
@@ -318,7 +333,6 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Left panel = stable top banner */
   .auth-left-panel {
     width: 100%;
     height: 200px;
@@ -326,19 +340,19 @@
   }
 }
 
-/* iOS zoom prevention — inputs below 16px trigger auto-zoom */
+/* iOS zoom prevention */
 input, textarea, select {
   font-size: 16px !important;
   -webkit-text-size-adjust: 100%;
 }
 
-/* Touch targets — remove 300ms tap delay */
+/* Touch targets */
 button, a, [role="button"] {
   touch-action: manipulation;
 }
 
 /* ══════════════════════════════════════════════
-   INSIGHTS TRACK — Horizontal scrollable cards
+   INSIGHTS TRACK — Horizontal scrollable cards (light theme)
    ══════════════════════════════════════════════ */
 .insights-track {
   display: flex;
@@ -355,15 +369,17 @@ button, a, [role="button"] {
   scroll-snap-align: start;
   flex-shrink: 0;
   width: 280px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.07);
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
   border-radius: 16px;
   padding: 24px;
-  transition: transform 250ms var(--spring), border-color 250ms;
+  transition: transform 250ms var(--spring), border-color 250ms, box-shadow 250ms;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 .insight-card:hover {
   transform: translateY(-3px);
-  border-color: rgba(43,181,160,0.25);
+  border-color: rgba(22, 163, 74, 0.3);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
 }
 
 .insight-label {
@@ -371,19 +387,19 @@ button, a, [role="button"] {
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--tk-teal);
+  color: #16A34A;
   margin-bottom: 10px;
 }
 .insight-title {
   font-size: 17px;
   font-weight: 700;
-  color: white;
+  color: #111827;
   margin-bottom: 10px;
   line-height: 1.3;
 }
 .insight-body {
   font-size: 13px;
-  color: rgba(255,255,255,0.60);
+  color: #6B7280;
   line-height: 1.6;
   margin-bottom: 16px;
 }
@@ -391,7 +407,7 @@ button, a, [role="button"] {
 .insight-action {
   font-size: 13px;
   font-weight: 600;
-  color: var(--tk-teal);
+  color: #16A34A;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -401,10 +417,10 @@ button, a, [role="button"] {
   border: none;
   padding: 0;
 }
-.insight-action:hover { color: white; }
+.insight-action:hover { color: #15803D; }
 
 /* ══════════════════════════════════════════════
-   LIVE FEED — slide-up ticker for rotating tips
+   LIVE FEED
    ══════════════════════════════════════════════ */
 @keyframes feed-slide-up {
   0%   { transform: translateY(100%); opacity: 0; }
@@ -425,11 +441,10 @@ button, a, [role="button"] {
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(43,181,160,0.4); }
-  50%      { box-shadow: 0 0 20px 4px rgba(43,181,160,0.15); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4); }
+  50%      { box-shadow: 0 0 20px 4px rgba(22, 163, 74, 0.15); }
 }
 
-/* Status dot animation */
 @keyframes live-dot {
   0%, 100% { opacity: 1; }
   50%      { opacity: 0.3; }
@@ -438,6 +453,6 @@ button, a, [role="button"] {
 .live-dot {
   width: 6px; height: 6px;
   border-radius: 50%;
-  background: #2BB5A0;
+  background: #16A34A;
   animation: live-dot 1.5s ease-in-out infinite;
 }

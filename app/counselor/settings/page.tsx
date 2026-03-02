@@ -159,42 +159,42 @@ export default function CounselorSettingsPage() {
 
   return (
     <LayoutWrapper>
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      <div className="min-h-screen bg-[#F0FDF4]">
         <div className="px-4 py-6 pb-24 md:px-8 md:py-10">
           <div className="mx-auto max-w-3xl">
             {/* Header */}
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-white">Settings</h1>
-              <p className="mt-2 text-gray-400">Manage your account and profile</p>
+              <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
+              <p className="mt-2 text-gray-500">Manage your account and profile</p>
             </div>
 
             {/* Account Info */}
-            <div className="mb-6 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+            <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-6">
               <div className="mb-4 flex items-center gap-3">
-                <div className="rounded-lg bg-blue-500/20 p-2">
-                  <User className="h-5 w-5 text-blue-400" />
+                <div className="rounded-lg bg-blue-100 p-2">
+                  <User className="h-5 w-5 text-blue-600" />
                 </div>
-                <h2 className="text-lg font-semibold text-white">Account Information</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Account Information</h2>
               </div>
               <div className="space-y-3">
                 <div>
-                  <p className="text-sm text-gray-400">Full Name</p>
-                  <p className="mt-1 text-white">{profile?.fullName || "—"}</p>
+                  <p className="text-sm text-gray-500">Full Name</p>
+                  <p className="mt-1 text-gray-900">{profile?.fullName || "—"}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-400">Email</p>
-                  <p className="mt-1 text-white">{profile?.email || "—"}</p>
+                  <p className="text-sm text-gray-500">Email</p>
+                  <p className="mt-1 text-gray-900">{profile?.email || "—"}</p>
                 </div>
               </div>
             </div>
 
             {/* Profile Picture */}
-            <div className="mb-6 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+            <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-6">
               <div className="mb-4 flex items-center gap-3">
-                <div className="rounded-lg bg-purple-500/20 p-2">
-                  <ImageIcon className="h-5 w-5 text-purple-400" />
+                <div className="rounded-lg bg-purple-100 p-2">
+                  <ImageIcon className="h-5 w-5 text-purple-600" />
                 </div>
-                <h2 className="text-lg font-semibold text-white">Profile Picture</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Profile Picture</h2>
               </div>
               <div className="flex items-center gap-6">
                 <div className="relative">
@@ -203,7 +203,7 @@ export default function CounselorSettingsPage() {
                       <img
                         src={profilePicture}
                         alt="Profile"
-                        className="h-24 w-24 rounded-full object-cover border-2 border-white/20"
+                        className="h-24 w-24 rounded-full object-cover border-2 border-gray-200"
                       />
                       <button
                         onClick={handleRemovePhoto}
@@ -213,7 +213,7 @@ export default function CounselorSettingsPage() {
                       </button>
                     </div>
                   ) : (
-                    <div className="h-24 w-24 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-2xl font-bold text-white border-2 border-white/20">
+                    <div className="h-24 w-24 rounded-full bg-blue-600 flex items-center justify-center text-2xl font-bold text-white border-2 border-gray-200">
                       {profile?.fullName?.split(" ").map(n => n[0]).join("").slice(0, 2) || "C"}
                     </div>
                   )}
@@ -235,7 +235,7 @@ export default function CounselorSettingsPage() {
                       type="button"
                       disabled={uploadingPhoto}
                       variant="outline"
-                      className="border-white/10 text-gray-300 hover:bg-white/10 disabled:opacity-50"
+                      className="border-gray-200 text-gray-700 hover:bg-gray-100 disabled:opacity-50"
                       onClick={() => fileInputRef.current?.click()}
                     >
                       <Upload className={`mr-2 h-4 w-4 ${uploadingPhoto ? "animate-pulse" : ""}`} />
@@ -244,10 +244,10 @@ export default function CounselorSettingsPage() {
                   </label>
                   {uploadingPhoto && (
                     <div className="mt-2">
-                      <div className="h-1 w-full overflow-hidden rounded-full bg-white/10">
-                        <div className="h-full w-full animate-pulse bg-blue-500/50" />
+                      <div className="h-1 w-full overflow-hidden rounded-full bg-gray-200">
+                        <div className="h-full w-full animate-pulse bg-green-500" />
                       </div>
-                      <p className="mt-1 text-xs text-gray-400">Processing image...</p>
+                      <p className="mt-1 text-xs text-gray-500">Processing image...</p>
                     </div>
                   )}
                   {!uploadingPhoto && (
@@ -260,19 +260,19 @@ export default function CounselorSettingsPage() {
             </div>
 
             {/* Professional Profile */}
-            <div className="mb-6 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+            <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-6">
               <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="rounded-lg bg-purple-500/20 p-2">
-                    <Briefcase className="h-5 w-5 text-purple-400" />
+                  <div className="rounded-lg bg-purple-100 p-2">
+                    <Briefcase className="h-5 w-5 text-purple-600" />
                   </div>
-                  <h2 className="text-lg font-semibold text-white">Professional Profile</h2>
+                  <h2 className="text-lg font-semibold text-gray-900">Professional Profile</h2>
                 </div>
                 {!editing && (
                   <Button
                     onClick={() => setEditing(true)}
                     variant="outline"
-                    className="border-white/10 text-gray-300 hover:bg-white/10"
+                    className="border-gray-200 text-gray-700 hover:bg-gray-100"
                   >
                     Edit
                   </Button>
@@ -281,29 +281,29 @@ export default function CounselorSettingsPage() {
               {editing ? (
                 <div className="space-y-4">
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-300">Specialization</label>
+                    <label className="mb-2 block text-sm font-medium text-gray-700">Specialization</label>
                     <Input
                       value={specialization}
                       onChange={(e) => setSpecialization(e.target.value)}
                       placeholder="e.g., Anxiety, Depression, Academic Stress"
-                      className="border-white/10 bg-white/5 text-white"
+                      className="border-gray-200 bg-white text-gray-900"
                     />
                   </div>
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-300">About</label>
+                    <label className="mb-2 block text-sm font-medium text-gray-700">About</label>
                     <textarea
                       value={about}
                       onChange={(e) => setAbout(e.target.value)}
                       placeholder="Tell students about your background and approach..."
                       rows={4}
-                      className="w-full resize-none rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-gray-500 focus:border-purple-500/50 focus:outline-none"
+                      className="w-full resize-none rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-500 focus:border-green-500 focus:outline-none"
                     />
                   </div>
                   <div className="flex gap-3">
                     <Button
                       onClick={handleSaveProfile}
                       disabled={saving}
-                      className="bg-gradient-to-r from-purple-500 to-pink-600"
+                      className="bg-green-600 hover:bg-green-700"
                     >
                       <Save className="mr-2 h-4 w-4" />
                       {saving ? "Saving..." : "Save Changes"}
@@ -315,7 +315,7 @@ export default function CounselorSettingsPage() {
                         setAbout(profile?.application?.about || "");
                       }}
                       variant="outline"
-                      className="border-white/10 text-gray-300"
+                      className="border-gray-200 text-gray-700"
                     >
                       Cancel
                     </Button>
@@ -324,31 +324,31 @@ export default function CounselorSettingsPage() {
               ) : (
                 <div className="space-y-3">
                   <div>
-                    <p className="text-sm text-gray-400">Specialization</p>
-                    <p className="mt-1 text-white">{profile?.application?.specialization || "Not set"}</p>
+                    <p className="text-sm text-gray-500">Specialization</p>
+                    <p className="mt-1 text-gray-900">{profile?.application?.specialization || "Not set"}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-400">About</p>
-                    <p className="mt-1 text-white whitespace-pre-wrap">{profile?.application?.about || "Not set"}</p>
+                    <p className="text-sm text-gray-500">About</p>
+                    <p className="mt-1 text-gray-900 whitespace-pre-wrap">{profile?.application?.about || "Not set"}</p>
                   </div>
                 </div>
               )}
             </div>
 
             {/* Logout */}
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+            <div className="rounded-2xl border border-gray-200 bg-white p-6">
               <div className="flex items-center gap-3">
-                <div className="rounded-lg bg-red-500/20 p-2">
-                  <LogOut className="h-5 w-5 text-red-400" />
+                <div className="rounded-lg bg-red-100 p-2">
+                  <LogOut className="h-5 w-5 text-red-600" />
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-lg font-semibold text-white">Sign Out</h2>
-                  <p className="mt-1 text-sm text-gray-400">You'll be returned to the home screen</p>
+                  <h2 className="text-lg font-semibold text-gray-900">Sign Out</h2>
+                  <p className="mt-1 text-sm text-gray-500">You'll be returned to the home screen</p>
                 </div>
                 <Button
                   onClick={() => void logout()}
                   variant="outline"
-                  className="border-red-500/50 text-red-400 hover:bg-red-500/10"
+                  className="border-red-300 text-red-600 hover:bg-red-100"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
                   Log Out

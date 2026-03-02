@@ -54,17 +54,17 @@ export default function AdminReportsPage() {
   const filtered = reports.filter((r) => filter === "all" || r.status === filter);
 
   const statusIcon = (status: string) => {
-    if (status === "resolved") return <CheckCircle className="h-4 w-4 text-emerald-400" />;
-    if (status === "reviewed") return <AlertTriangle className="h-4 w-4 text-amber-400" />;
-    return <Clock className="h-4 w-4 text-gray-400" />;
+    if (status === "resolved") return <CheckCircle className="h-4 w-4 text-green-600" />;
+    if (status === "reviewed") return <AlertTriangle className="h-4 w-4 text-amber-600" />;
+    return <Clock className="h-4 w-4 text-gray-500" />;
   };
 
   return (
     <AdminLayout>
       <div className="mx-auto max-w-5xl">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white">User Reports</h1>
-          <p className="mt-2 text-gray-400">Issues and feedback reported by users</p>
+          <h1 className="text-3xl font-bold text-gray-900">User Reports</h1>
+          <p className="mt-2 text-gray-500">Issues and feedback reported by users</p>
         </div>
 
         {/* Filter tabs */}
@@ -75,8 +75,8 @@ export default function AdminReportsPage() {
               onClick={() => setFilter(f)}
               className={`rounded-full px-4 py-2 text-sm font-medium capitalize transition-all
                 ${filter === f
-                  ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
-                  : "text-gray-400 hover:text-white hover:bg-white/5 border border-transparent"
+                  ? "bg-green-100 text-green-600 border border-green-500/30"
+                  : "text-gray-500 hover:text-gray-900 hover:bg-gray-100 border border-transparent"
                 }`}
             >
               {f} {f !== "all" && `(${reports.filter((r) => r.status === f).length})`}
@@ -88,33 +88,33 @@ export default function AdminReportsPage() {
         {loading ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-24 animate-pulse rounded-xl border border-white/10 bg-white/5" />
+              <div key={i} className="h-24 animate-pulse rounded-xl border border-gray-200 bg-white" />
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-12 text-center">
-            <Flag className="mx-auto mb-4 h-12 w-12 text-gray-600" />
-            <p className="text-gray-400">No reports found</p>
+          <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center">
+            <Flag className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+            <p className="text-gray-500">No reports found</p>
           </div>
         ) : (
           <div className="space-y-3">
             {filtered.map((report) => (
               <div
                 key={report.id}
-                className="rounded-xl border border-white/10 bg-white/5 p-5"
+                className="rounded-xl border border-gray-200 bg-white p-5"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
                       {statusIcon(report.status)}
-                      <span className="text-sm font-medium text-white capitalize">
+                      <span className="text-sm font-medium text-gray-900 capitalize">
                         {report.issueType}
                       </span>
-                      <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-gray-400 capitalize">
+                      <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] text-gray-500 capitalize">
                         {report.status}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-300 mb-2">{report.description}</p>
+                    <p className="text-sm text-gray-700 mb-2">{report.description}</p>
                     <p className="text-xs text-gray-500">
                       {report.userName} ({report.userRole}) &middot;{" "}
                       {report.createdAt.toLocaleDateString("en-US", {
@@ -127,8 +127,8 @@ export default function AdminReportsPage() {
                     {report.status === "pending" && (
                       <button
                         onClick={() => updateStatus(report.id, "reviewed")}
-                        className="rounded-lg bg-amber-500/20 px-3 py-1.5 text-xs font-medium text-amber-400
-                          hover:bg-amber-500/30"
+                        className="rounded-lg bg-amber-100 px-3 py-1.5 text-xs font-medium text-amber-600
+                          hover:bg-amber-200"
                       >
                         Mark Reviewed
                       </button>
@@ -136,8 +136,8 @@ export default function AdminReportsPage() {
                     {report.status !== "resolved" && (
                       <button
                         onClick={() => updateStatus(report.id, "resolved")}
-                        className="rounded-lg bg-emerald-500/20 px-3 py-1.5 text-xs font-medium text-emerald-400
-                          hover:bg-emerald-500/30"
+                        className="rounded-lg bg-green-100 px-3 py-1.5 text-xs font-medium text-green-600
+                          hover:bg-green-200"
                       >
                         Resolve
                       </button>

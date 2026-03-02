@@ -95,7 +95,7 @@ export default function CounselorBookingDetailPage() {
     return (
       <LayoutWrapper>
         <div className="flex min-h-screen items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-green-500 border-t-transparent" />
         </div>
       </LayoutWrapper>
     );
@@ -107,39 +107,39 @@ export default function CounselorBookingDetailPage() {
 
   return (
     <LayoutWrapper>
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      <div className="min-h-screen bg-[#F0FDF4]">
         <div className="px-4 py-6 pb-24 md:px-8 md:py-10">
           <div className="mx-auto max-w-3xl">
             {/* Header */}
             <div className="mb-8">
               <button
                 onClick={() => router.back()}
-                className="mb-4 flex items-center gap-2 text-gray-400 transition-colors hover:text-white"
+                className="mb-4 flex items-center gap-2 text-gray-500 transition-colors hover:text-gray-900"
               >
                 <ArrowLeft className="h-5 w-5" />
                 <span>Back to Bookings</span>
               </button>
-              <h1 className="text-3xl font-bold text-white">Booking Request</h1>
+              <h1 className="text-3xl font-bold text-gray-900">Booking Request</h1>
             </div>
 
             {/* Booking Card */}
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+            <div className="rounded-2xl border border-gray-200 bg-white p-6">
               <div className="mb-6">
                 <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-lg font-bold text-white">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-lg font-bold text-white">
                     {booking.studentName.split(" ").map((n) => n[0]).join("").slice(0, 2)}
                   </div>
                   <div>
-                    <h2 className="text-xl font-semibold text-white">{booking.studentName}</h2>
-                    <p className="text-sm text-gray-400">Student</p>
+                    <h2 className="text-xl font-semibold text-gray-900">{booking.studentName}</h2>
+                    <p className="text-sm text-gray-500">Student</p>
                   </div>
                 </div>
 
                 <div className="mb-4 flex items-center gap-2">
                   <span className={`rounded-full px-3 py-1 text-xs font-medium ${
-                    booking.status === "approved" ? "bg-emerald-500/20 text-emerald-400" :
-                    booking.status === "rejected" ? "bg-red-500/20 text-red-400" :
-                    "bg-amber-500/20 text-amber-400"
+                    booking.status === "approved" ? "bg-green-100 text-green-600" :
+                    booking.status === "rejected" ? "bg-red-100 text-red-600" :
+                    "bg-amber-100 text-amber-600"
                   }`}>
                     {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
                   </span>
@@ -152,14 +152,14 @@ export default function CounselorBookingDetailPage() {
               {/* Requested Times */}
               <div className="mb-6">
                 <div className="mb-3 flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-blue-400" />
-                  <h3 className="font-semibold text-white">Requested Times</h3>
+                  <Clock className="h-5 w-5 text-blue-600" />
+                  <h3 className="font-semibold text-gray-900">Requested Times</h3>
                 </div>
-                <div className="space-y-2 rounded-lg bg-white/5 p-4">
+                <div className="space-y-2 rounded-lg bg-gray-50 p-4">
                   {booking.requestedTimes.length > 0 ? (
                     booking.requestedTimes.map((time, idx) => (
-                      <div key={idx} className="flex items-center gap-2 text-gray-300">
-                        <div className="h-2 w-2 rounded-full bg-blue-400" />
+                      <div key={idx} className="flex items-center gap-2 text-gray-700">
+                        <div className="h-2 w-2 rounded-full bg-blue-600" />
                         <span>{time}</span>
                       </div>
                     ))
@@ -172,9 +172,9 @@ export default function CounselorBookingDetailPage() {
               {/* Message */}
               {booking.message && (
                 <div className="mb-6">
-                  <h3 className="mb-2 font-semibold text-white">Message from Student</h3>
-                  <div className="rounded-lg bg-white/5 p-4">
-                    <p className="text-gray-300">{booking.message}</p>
+                  <h3 className="mb-2 font-semibold text-gray-900">Message from Student</h3>
+                  <div className="rounded-lg bg-gray-50 p-4">
+                    <p className="text-gray-700">{booking.message}</p>
                   </div>
                 </div>
               )}
@@ -185,7 +185,7 @@ export default function CounselorBookingDetailPage() {
                   <Button
                     onClick={() => handleStatusUpdate("approved")}
                     disabled={updating}
-                    className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600"
+                    className="flex-1 bg-green-600 hover:bg-green-700"
                   >
                     <CheckCircle className="mr-2 h-5 w-5" />
                     Approve Request
@@ -194,7 +194,7 @@ export default function CounselorBookingDetailPage() {
                     onClick={() => handleStatusUpdate("rejected")}
                     disabled={updating}
                     variant="outline"
-                    className="flex-1 border-red-500/50 text-red-400 hover:bg-red-500/10"
+                    className="flex-1 border-red-300 text-red-600 hover:bg-red-100"
                   >
                     <XCircle className="mr-2 h-5 w-5" />
                     Reject Request
@@ -202,7 +202,7 @@ export default function CounselorBookingDetailPage() {
                   <Button
                     onClick={() => router.push(`/counselor/inbox/${booking.studentId}`)}
                     variant="outline"
-                    className="flex-1 border-white/10 text-gray-300 hover:bg-white/10"
+                    className="flex-1 border-gray-200 text-gray-700 hover:bg-gray-100"
                   >
                     <MessageCircle className="mr-2 h-5 w-5" />
                     Chat with Student
@@ -213,7 +213,7 @@ export default function CounselorBookingDetailPage() {
               {booking.status !== "pending" && (
                 <Button
                   onClick={() => router.push(`/counselor/inbox/${booking.studentId}`)}
-                  className="w-full bg-gradient-to-r from-blue-500 to-indigo-600"
+                  className="w-full bg-blue-600 hover:bg-blue-700"
                 >
                   <MessageCircle className="mr-2 h-5 w-5" />
                   Chat with Student

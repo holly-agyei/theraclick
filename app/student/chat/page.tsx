@@ -236,25 +236,19 @@ export default function ChatPage() {
 
   return (
     <LayoutWrapper>
-      <div className="flex h-screen flex-col bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-        {/* Ambient effects */}
-        <div className="pointer-events-none fixed inset-0 overflow-hidden">
-          <div className="absolute -left-20 top-20 h-72 w-72 rounded-full bg-emerald-500/10 blur-[100px]" />
-          <div className="absolute -right-20 bottom-20 h-64 w-64 rounded-full bg-blue-500/10 blur-[100px]" />
-        </div>
-
+      <div className="flex h-screen flex-col bg-[#F0FDF4]">
         {/* Header */}
-        <div className="relative z-10 border-b border-white/10 bg-black/20 px-4 py-4 backdrop-blur-xl md:px-8 md:py-5">
+        <div className="relative z-10 border-b border-gray-200 bg-white px-4 py-4 shadow-sm md:px-8 md:py-5">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/20">
-              <Bot className="h-6 w-6 text-white" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green-100">
+              <Bot className="h-6 w-6 text-green-600" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg font-semibold text-white">AI Support</h1>
-                <Sparkles className="h-4 w-4 text-emerald-400" />
+                <h1 className="text-lg font-semibold text-gray-900">AI Support</h1>
+                <Sparkles className="h-4 w-4 text-green-600" />
               </div>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-gray-500">
                 Always available · Anonymous · Safe space
               </p>
             </div>
@@ -265,12 +259,12 @@ export default function ChatPage() {
         <div className="relative z-10 flex-1 overflow-y-auto px-4 py-6 md:px-8">
           <div className="mx-auto max-w-3xl space-y-4">
             {safetyMode === "crisis" && (
-              <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 backdrop-blur-sm">
+              <div className="rounded-2xl border border-amber-300 bg-amber-50 p-4">
                 <div className="flex items-start gap-3">
-                  <ShieldAlert className="mt-0.5 h-5 w-5 text-amber-400" />
+                  <ShieldAlert className="mt-0.5 h-5 w-5 text-amber-600" />
                   <div>
-                    <p className="text-sm font-semibold text-amber-200">Safety check</p>
-                    <p className="mt-1 text-sm text-amber-200/80">
+                    <p className="text-sm font-semibold text-amber-800">Safety check</p>
+                    <p className="mt-1 text-sm text-amber-700">
                       If you're in immediate danger, call your local emergency number or go to the nearest emergency room.
                     </p>
                   </div>
@@ -285,8 +279,8 @@ export default function ChatPage() {
                 <div
                   className={`max-w-[85%] rounded-2xl px-5 py-3 md:max-w-[70%] ${
                     message.sender === "user"
-                      ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/20"
-                      : "border border-white/10 bg-white/5 text-gray-100 backdrop-blur-sm"
+                      ? "bg-green-600 text-white"
+                      : "bg-white border border-gray-200 text-gray-800"
                   }`}
                 >
                   {message.audioUrl && (
@@ -295,7 +289,7 @@ export default function ChatPage() {
                     </audio>
                   )}
                   {message.sender === "ai" ? (
-                    <div className="prose prose-sm prose-invert max-w-none prose-headings:text-emerald-400 prose-headings:font-semibold prose-headings:text-sm prose-headings:mt-3 prose-headings:mb-1 prose-p:my-1 prose-ul:my-1 prose-li:my-0">
+                    <div className="prose prose-sm max-w-none prose-headings:text-green-700 prose-headings:font-semibold prose-headings:text-sm prose-headings:mt-3 prose-headings:mb-1 prose-p:my-1 prose-ul:my-1 prose-li:my-0">
                       <ReactMarkdown>{message.text}</ReactMarkdown>
                     </div>
                   ) : (
@@ -306,11 +300,11 @@ export default function ChatPage() {
             ))}
             {isTyping && (
               <div className="flex justify-start">
-                <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 backdrop-blur-sm">
+                <div className="rounded-2xl bg-white border border-gray-200 px-5 py-3">
                   <div className="flex gap-1.5">
-                    <div className="h-2 w-2 animate-bounce rounded-full bg-emerald-400"></div>
-                    <div className="h-2 w-2 animate-bounce rounded-full bg-emerald-400" style={{ animationDelay: "0.1s" }}></div>
-                    <div className="h-2 w-2 animate-bounce rounded-full bg-emerald-400" style={{ animationDelay: "0.2s" }}></div>
+                    <div className="h-2 w-2 animate-bounce rounded-full bg-green-500"></div>
+                    <div className="h-2 w-2 animate-bounce rounded-full bg-green-500" style={{ animationDelay: "0.1s" }}></div>
+                    <div className="h-2 w-2 animate-bounce rounded-full bg-green-500" style={{ animationDelay: "0.2s" }}></div>
                   </div>
                 </div>
               </div>
@@ -320,14 +314,14 @@ export default function ChatPage() {
         </div>
 
         {/* Input */}
-        <div className="relative z-10 border-t border-white/10 bg-black/20 p-4 backdrop-blur-xl md:p-6">
+        <div className="relative z-10 border-t border-gray-200 bg-white p-4 md:p-6">
           <div className="mx-auto max-w-3xl">
             {/* Audio preview */}
             {audioBlob && (
-              <div className="mb-3 flex items-center gap-3 rounded-xl bg-white/5 px-4 py-2">
-                <Mic className="h-5 w-5 text-emerald-400" />
+              <div className="mb-3 flex items-center gap-3 rounded-xl bg-gray-50 px-4 py-2">
+                <Mic className="h-5 w-5 text-green-600" />
                 <audio controls src={URL.createObjectURL(audioBlob)} className="h-8 flex-1" />
-                <button onClick={cancelRecording} className="text-gray-400 hover:text-white">
+                <button onClick={cancelRecording} className="text-gray-400 hover:text-gray-700">
                   <X className="h-5 w-5" />
                 </button>
               </div>
@@ -340,7 +334,7 @@ export default function ChatPage() {
                 className={`flex items-center gap-2 rounded-xl px-4 py-3 transition-all ${
                   isRecording
                     ? "bg-red-500/20 text-red-400"
-                    : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
+                    : "bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700"
                 }`}
               >
                 {isRecording ? (
@@ -360,12 +354,12 @@ export default function ChatPage() {
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={handleKeyPress}
                 rows={1}
-                className="flex-1 resize-none rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-gray-500 backdrop-blur-sm transition-colors focus:border-emerald-500/50 focus:outline-none focus:ring-0"
+                className="flex-1 resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 placeholder-gray-400 transition-colors focus:border-green-500 focus:outline-none focus:ring-0"
               />
               <Button
                 onClick={handleSend}
                 disabled={!inputText.trim() && !audioBlob}
-                className="h-auto rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-5 text-white shadow-lg shadow-emerald-500/20 transition-all hover:shadow-xl hover:shadow-emerald-500/30 disabled:opacity-50"
+                className="h-auto rounded-xl bg-green-600 px-5 text-white transition-all hover:bg-green-700 disabled:opacity-50"
               >
                 <Send className="h-5 w-5" />
               </Button>

@@ -189,22 +189,16 @@ export default function CounselorDashboardPage() {
 
   return (
     <LayoutWrapper>
-      <div className="min-h-screen bg-[#0D1F1D]">
-        {/* Subtle ambient */}
-        <div className="pointer-events-none fixed inset-0 overflow-hidden">
-          <div className="absolute -left-20 top-20 h-72 w-72 rounded-full bg-blue-500/5 blur-[120px]" />
-          <div className="absolute -right-20 bottom-40 h-96 w-96 rounded-full bg-[#2BB5A0]/5 blur-[140px]" />
-        </div>
-
+      <div className="min-h-screen bg-[#F0FDF4]">
         <div className="relative z-10 px-4 py-6 pb-24 md:px-8 md:py-10">
           <div className="mx-auto max-w-5xl">
 
             {/* Header */}
             <div className="mb-8">
-              <h1 className="text-2xl font-bold text-white md:text-3xl">
+              <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
                 {greeting}, {firstName}
               </h1>
-              <p className="mt-1 text-sm text-[#6B8C89]">
+              <p className="mt-1 text-sm text-gray-500">
                 {stats.todaySessions > 0
                   ? `You have ${stats.todaySessions} session${stats.todaySessions > 1 ? "s" : ""} today`
                   : "No sessions scheduled for today"
@@ -213,11 +207,11 @@ export default function CounselorDashboardPage() {
             </div>
 
             {/* Availability Toggle */}
-            <div className="mb-6 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
+            <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-white">Your availability</p>
-                  <p className="mt-0.5 text-xs text-[#6B8C89]">
+                  <p className="text-sm font-medium text-gray-900">Your availability</p>
+                  <p className="mt-0.5 text-xs text-gray-500">
                     {isAvailable
                       ? "Students can see you are available right now"
                       : "You are currently set as unavailable"
@@ -230,11 +224,11 @@ export default function CounselorDashboardPage() {
                   className="flex items-center gap-2 transition-all"
                 >
                   {isAvailable ? (
-                    <ToggleRight className="h-8 w-8 text-[#2BB5A0]" />
+                    <ToggleRight className="h-8 w-8 text-green-600" />
                   ) : (
-                    <ToggleLeft className="h-8 w-8 text-[#6B8C89]" />
+                    <ToggleLeft className="h-8 w-8 text-gray-500" />
                   )}
-                  <span className={`text-sm font-medium ${isAvailable ? "text-[#2BB5A0]" : "text-[#6B8C89]"}`}>
+                  <span className={`text-sm font-medium ${isAvailable ? "text-green-600" : "text-gray-500"}`}>
                     {isAvailable ? "Available" : "Unavailable"}
                   </span>
                 </button>
@@ -243,27 +237,27 @@ export default function CounselorDashboardPage() {
 
             {/* Stats */}
             <div className="mb-6 grid gap-3 grid-cols-3">
-              <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
-                <p className="text-xs text-[#6B8C89]">Students</p>
-                <p className="mt-1 text-2xl font-bold text-white">{stats.totalStudents}</p>
+              <div className="rounded-2xl border border-gray-200 bg-white p-4">
+                <p className="text-xs text-gray-500">Students</p>
+                <p className="mt-1 text-2xl font-bold text-gray-900">{stats.totalStudents}</p>
               </div>
-              <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
-                <p className="text-xs text-[#6B8C89]">Active chats</p>
-                <p className="mt-1 text-2xl font-bold text-white">{stats.activeChats}</p>
+              <div className="rounded-2xl border border-gray-200 bg-white p-4">
+                <p className="text-xs text-gray-500">Active chats</p>
+                <p className="mt-1 text-2xl font-bold text-gray-900">{stats.activeChats}</p>
               </div>
-              <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
-                <p className="text-xs text-[#6B8C89]">Today</p>
-                <p className="mt-1 text-2xl font-bold text-white">{stats.todaySessions}</p>
+              <div className="rounded-2xl border border-gray-200 bg-white p-4">
+                <p className="text-xs text-gray-500">Today</p>
+                <p className="mt-1 text-2xl font-bold text-gray-900">{stats.todaySessions}</p>
               </div>
             </div>
 
             {/* Today's Sessions */}
             <div className="mb-6">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-white">Upcoming sessions</h2>
+                <h2 className="text-sm font-semibold text-gray-900">Upcoming sessions</h2>
                 <button
                   onClick={() => router.push("/counselor/bookings")}
-                  className="text-xs text-[#2BB5A0] hover:text-[#7BD8CA]"
+                  className="text-xs text-green-600 hover:text-green-500"
                 >
                   View all
                 </button>
@@ -272,13 +266,13 @@ export default function CounselorDashboardPage() {
               {loading ? (
                 <div className="space-y-3">
                   {[1, 2].map((i) => (
-                    <div key={i} className="h-20 rounded-xl border border-white/[0.08] bg-white/[0.03] animate-pulse" />
+                    <div key={i} className="h-20 rounded-xl border border-gray-200 bg-white animate-pulse" />
                   ))}
                 </div>
               ) : bookingRequests.length === 0 ? (
-                <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-8 text-center">
-                  <Calendar className="mx-auto mb-2 h-8 w-8 text-[#6B8C89]/40" />
-                  <p className="text-sm text-[#6B8C89]">No upcoming sessions</p>
+                <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
+                  <Calendar className="mx-auto mb-2 h-8 w-8 text-gray-400" />
+                  <p className="text-sm text-gray-500">No upcoming sessions</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -290,33 +284,33 @@ export default function CounselorDashboardPage() {
                         key={booking.id}
                         className={`rounded-xl border p-4 transition-all
                           ${isToday
-                            ? "border-[#2BB5A0]/25 bg-[#2BB5A0]/5"
-                            : "border-white/[0.08] bg-white/[0.03]"
+                            ? "border-green-200 bg-green-50"
+                            : "border-gray-200 bg-white"
                           }`}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <div className={`flex h-10 w-10 items-center justify-center rounded-full
                               text-sm font-bold
-                              ${isToday ? "bg-[#2BB5A0]/20 text-[#2BB5A0]" : "bg-white/[0.06] text-white"}`}>
+                              ${isToday ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-900"}`}>
                               {booking.studentName.split(" ").map(n => n[0]).join("").slice(0, 2)}
                             </div>
                             <div>
-                              <p className="text-sm font-medium text-white">{booking.studentName}</p>
-                              <p className="text-xs text-[#6B8C89]">
+                              <p className="text-sm font-medium text-gray-900">{booking.studentName}</p>
+                              <p className="text-xs text-gray-500">
                                 {bookingDate.toLocaleDateString("en-US", {
                                   weekday: "short", month: "short", day: "numeric",
                                 })} at {booking.startTime} - {booking.endTime}
                               </p>
                               {booking.topic && (
-                                <p className="mt-0.5 text-xs text-[#6B8C89]/70">{booking.topic}</p>
+                                <p className="mt-0.5 text-xs text-gray-400">{booking.topic}</p>
                               )}
                             </div>
                           </div>
                           <button
                             onClick={() => router.push(`/counselor/inbox/${booking.studentId}`)}
-                            className="rounded-full bg-[#2BB5A0] px-4 py-2 text-xs font-medium text-white
-                              transition-all hover:bg-[#2BB5A0]/80 active:scale-[0.95]"
+                            className="rounded-full bg-green-600 px-4 py-2 text-xs font-medium text-white
+                              transition-all hover:bg-green-700 active:scale-[0.95]"
                           >
                             {isToday ? "Start Session" : "Chat"}
                           </button>
@@ -332,35 +326,35 @@ export default function CounselorDashboardPage() {
             <div className="mb-6 grid gap-3 sm:grid-cols-3">
               <button
                 onClick={() => router.push("/counselor/students")}
-                className="flex items-center gap-3 rounded-2xl border border-white/[0.08]
-                  bg-white/[0.03] p-4 text-left transition-all hover:border-white/15 hover:bg-white/[0.05]"
+                className="flex items-center gap-3 rounded-2xl border border-gray-200
+                  bg-white p-4 text-left transition-all hover:border-gray-300 hover:bg-gray-100"
               >
-                <Users className="h-5 w-5 text-blue-400 shrink-0" />
+                <Users className="h-5 w-5 text-blue-600 shrink-0" />
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-white">All Students</p>
-                  <p className="text-xs text-[#6B8C89]">View and manage</p>
+                  <p className="text-sm font-medium text-gray-900">All Students</p>
+                  <p className="text-xs text-gray-500">View and manage</p>
                 </div>
               </button>
               <button
                 onClick={() => router.push("/counselor/inbox")}
-                className="flex items-center gap-3 rounded-2xl border border-white/[0.08]
-                  bg-white/[0.03] p-4 text-left transition-all hover:border-white/15 hover:bg-white/[0.05]"
+                className="flex items-center gap-3 rounded-2xl border border-gray-200
+                  bg-white p-4 text-left transition-all hover:border-gray-300 hover:bg-gray-100"
               >
-                <Mail className="h-5 w-5 text-[#2BB5A0] shrink-0" />
+                <Mail className="h-5 w-5 text-green-600 shrink-0" />
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-white">Inbox</p>
-                  <p className="text-xs text-[#6B8C89]">All conversations</p>
+                  <p className="text-sm font-medium text-gray-900">Inbox</p>
+                  <p className="text-xs text-gray-500">All conversations</p>
                 </div>
               </button>
               <button
                 onClick={() => router.push("/counselor/availability")}
-                className="flex items-center gap-3 rounded-2xl border border-white/[0.08]
-                  bg-white/[0.03] p-4 text-left transition-all hover:border-white/15 hover:bg-white/[0.05]"
+                className="flex items-center gap-3 rounded-2xl border border-gray-200
+                  bg-white p-4 text-left transition-all hover:border-gray-300 hover:bg-gray-100"
               >
                 <Calendar className="h-5 w-5 text-[#F5C842] shrink-0" />
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-white">Availability</p>
-                  <p className="text-xs text-[#6B8C89]">Manage time slots</p>
+                  <p className="text-sm font-medium text-gray-900">Availability</p>
+                  <p className="text-xs text-gray-500">Manage time slots</p>
                 </div>
               </button>
             </div>
@@ -368,10 +362,10 @@ export default function CounselorDashboardPage() {
             {/* Recent Conversations */}
             <div className="mb-6">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-white">Recent conversations</h2>
+                <h2 className="text-sm font-semibold text-gray-900">Recent conversations</h2>
                 <button
                   onClick={() => router.push("/counselor/inbox")}
-                  className="text-xs text-[#2BB5A0] hover:text-[#7BD8CA]"
+                  className="text-xs text-green-600 hover:text-green-500"
                 >
                   View all
                 </button>
@@ -380,14 +374,14 @@ export default function CounselorDashboardPage() {
               {loading ? (
                 <div className="space-y-3">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="h-16 rounded-xl border border-white/[0.08] bg-white/[0.03] animate-pulse" />
+                    <div key={i} className="h-16 rounded-xl border border-gray-200 bg-white animate-pulse" />
                   ))}
                 </div>
               ) : conversations.length === 0 ? (
-                <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-8 text-center">
-                  <MessageCircle className="mx-auto mb-2 h-8 w-8 text-[#6B8C89]/40" />
-                  <p className="text-sm text-[#6B8C89]">No conversations yet</p>
-                  <p className="mt-1 text-xs text-[#6B8C89]/70">Students will reach out to you here</p>
+                <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
+                  <MessageCircle className="mx-auto mb-2 h-8 w-8 text-gray-400" />
+                  <p className="text-sm text-gray-500">No conversations yet</p>
+                  <p className="mt-1 text-xs text-gray-400">Students will reach out to you here</p>
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -395,25 +389,25 @@ export default function CounselorDashboardPage() {
                     <button
                       key={conv.studentId}
                       onClick={() => router.push(`/counselor/inbox/${conv.studentId}`)}
-                      className="flex w-full items-center gap-3 rounded-xl border border-white/[0.08]
-                        bg-white/[0.03] p-3 text-left transition-all hover:border-[#2BB5A0]/20"
+                      className="flex w-full items-center gap-3 rounded-xl border border-gray-200
+                        bg-white p-3 text-left transition-all hover:border-green-200"
                     >
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full
-                        bg-blue-500/20 text-sm font-bold text-blue-400">
+                        bg-blue-100 text-sm font-bold text-blue-600">
                         {conv.studentName.split(" ").map((n) => n[0]).join("").slice(0, 2)}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-white truncate">{conv.studentName}</span>
+                          <span className="text-sm font-medium text-gray-900 truncate">{conv.studentName}</span>
                           {conv.lastMessageTime && (
-                            <span className="ml-2 shrink-0 text-[10px] text-[#6B8C89]">{formatTime(conv.lastMessageTime)}</span>
+                            <span className="ml-2 shrink-0 text-[10px] text-gray-500">{formatTime(conv.lastMessageTime)}</span>
                           )}
                         </div>
                         {conv.lastMessage && (
-                          <p className="mt-0.5 truncate text-xs text-[#6B8C89]">{conv.lastMessage}</p>
+                          <p className="mt-0.5 truncate text-xs text-gray-500">{conv.lastMessage}</p>
                         )}
                       </div>
-                      <ChevronRight className="h-4 w-4 text-[#6B8C89] shrink-0" />
+                      <ChevronRight className="h-4 w-4 text-gray-500 shrink-0" />
                     </button>
                   ))}
                 </div>

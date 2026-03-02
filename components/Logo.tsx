@@ -27,9 +27,9 @@ export function Logo({ className = "", size = "default", iconOnly }: LogoProps) 
     <div className={`flex items-center gap-3 ${className}`}>
       {/* Tinted background box with the brain icon */}
       <div
-        className={`${s.box} flex shrink-0 items-center justify-center rounded-xl bg-primary-400/15`}
+        className={`${s.box} flex shrink-0 items-center justify-center rounded-xl bg-green-100`}
       >
-        <Brain className={`${s.icon} text-primary-400`} strokeWidth={1.8} />
+        <Brain className={`${s.icon} text-green-600`} strokeWidth={1.8} />
       </div>
       {!iconOnly && (
         <span className={`${s.text} font-bold tracking-tight`}>

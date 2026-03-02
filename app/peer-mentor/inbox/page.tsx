@@ -109,13 +109,13 @@ export default function PeerMentorInboxPage() {
 
   return (
     <LayoutWrapper>
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      <div className="min-h-screen bg-[#F0FDF4]">
         <div className="px-4 py-6 pb-24 md:px-8 md:py-10">
           <div className="mx-auto max-w-4xl">
             {/* Header */}
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-white">My Inbox</h1>
-              <p className="mt-2 text-gray-400">All your conversations with students</p>
+              <h1 className="text-3xl font-bold text-gray-900">My Inbox</h1>
+              <p className="mt-2 text-gray-500">All your conversations with students</p>
             </div>
 
             {/* Search */}
@@ -127,7 +127,7 @@ export default function PeerMentorInboxPage() {
                   placeholder="Search conversations..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pl-12 pr-4 text-white placeholder-gray-500 backdrop-blur-sm transition-colors focus:border-emerald-500/50 focus:outline-none"
+                  className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-12 pr-4 text-gray-900 placeholder-gray-500 transition-colors focus:border-green-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -136,13 +136,13 @@ export default function PeerMentorInboxPage() {
             {loading ? (
               <div className="space-y-3">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="h-20 animate-pulse rounded-xl border border-white/10 bg-white/5" />
+                  <div key={i} className="h-20 animate-pulse rounded-xl border border-gray-200 bg-gray-100" />
                 ))}
               </div>
             ) : filteredConversations.length === 0 ? (
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-12 text-center">
-                <MessageCircle className="mx-auto mb-4 h-16 w-16 text-gray-600" />
-                <p className="text-gray-400">
+              <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center">
+                <MessageCircle className="mx-auto mb-4 h-16 w-16 text-gray-400" />
+                <p className="text-gray-500">
                   {searchQuery ? "No conversations found" : "No conversations yet"}
                 </p>
                 <p className="mt-1 text-sm text-gray-500">
@@ -155,15 +155,15 @@ export default function PeerMentorInboxPage() {
                   <button
                     key={conv.studentId}
                     onClick={() => router.push(`/peer-mentor/inbox/${conv.studentId}`)}
-                    className="group w-full rounded-xl border border-white/10 bg-white/5 p-5 text-left transition-all hover:border-emerald-500/30 hover:bg-white/10"
+                    className="group w-full rounded-xl border border-gray-200 bg-white p-5 text-left transition-all hover:border-green-300 hover:bg-gray-50"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-lg font-bold text-white">
+                      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-green-600 text-lg font-bold text-white">
                         {conv.studentName.split(" ").map((n) => n[0]).join("").slice(0, 2)}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
-                          <h3 className="font-semibold text-white truncate">{conv.studentName}</h3>
+                          <h3 className="font-semibold text-gray-900 truncate">{conv.studentName}</h3>
                           {conv.lastMessageTime && (
                             <div className="flex items-center gap-1 text-xs text-gray-500">
                               <Clock className="h-3 w-3" />
@@ -172,7 +172,7 @@ export default function PeerMentorInboxPage() {
                           )}
                         </div>
                         {conv.lastMessage && (
-                          <p className="line-clamp-2 text-sm text-gray-400">{conv.lastMessage}</p>
+                          <p className="line-clamp-2 text-sm text-gray-500">{conv.lastMessage}</p>
                         )}
                       </div>
                     </div>

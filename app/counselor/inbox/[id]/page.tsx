@@ -243,24 +243,24 @@ export default function CounselorChatPage() {
 
   return (
     <LayoutWrapper>
-      <div className="flex h-screen flex-col bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      <div className="flex h-screen flex-col bg-[#F0FDF4]">
         {/* Header */}
-        <div className="relative z-10 border-b border-white/10 bg-black/20 px-4 py-4 backdrop-blur-xl md:px-8">
+        <div className="relative z-10 border-b border-gray-200 bg-white px-4 py-4 md:px-8">
           <div className="flex items-center gap-4">
             <button
               onClick={() => router.back()}
-              className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-white/10 hover:text-white"
+              className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
 
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-lg font-bold text-white">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-lg font-bold text-white">
               {studentDisplayName.split(" ").map((n) => n[0]).join("").slice(0, 2)}
             </div>
 
             <div className="flex-1 min-w-0">
-              <h1 className="font-semibold text-white truncate">{studentDisplayName}</h1>
-              <div className="flex items-center gap-3 text-sm text-gray-400">
+              <h1 className="font-semibold text-gray-900 truncate">{studentDisplayName}</h1>
+              <div className="flex items-center gap-3 text-sm text-gray-500">
                 {student?.school && (
                   <>
                     <div className="flex items-center gap-1">
@@ -274,7 +274,7 @@ export default function CounselorChatPage() {
                 {student?.anonymousEnabled && (
                   <>
                     <span>•</span>
-                    <span className="text-emerald-400">Anonymous Mode</span>
+                    <span className="text-green-600">Anonymous Mode</span>
                   </>
                 )}
               </div>
@@ -292,7 +292,7 @@ export default function CounselorChatPage() {
                   }
                 }}
                 disabled={isInCall}
-                className="flex items-center gap-2 rounded-lg bg-green-500/20 px-3 py-2 text-sm font-medium text-green-400 transition-all hover:bg-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-sm font-medium text-green-600 transition-all hover:bg-green-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Voice call"
               >
                 <Phone className="h-4 w-4" />
@@ -308,7 +308,7 @@ export default function CounselorChatPage() {
                   }
                 }}
                 disabled={isInCall}
-                className="flex items-center gap-2 rounded-lg bg-blue-500/20 px-3 py-2 text-sm font-medium text-blue-400 transition-all hover:bg-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 rounded-lg bg-blue-100 px-3 py-2 text-sm font-medium text-blue-600 transition-all hover:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Video call"
               >
                 <Video className="h-4 w-4" />
@@ -323,9 +323,9 @@ export default function CounselorChatPage() {
         <div className="flex-1 overflow-y-auto px-4 py-6 md:px-8">
           <div className="mx-auto max-w-3xl space-y-4">
             {messages.length === 0 && (
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center">
+              <div className="rounded-2xl border border-gray-200 bg-white p-6 text-center">
                 <MessageCircle className="mx-auto mb-3 h-8 w-8 text-gray-500" />
-                <p className="text-gray-400">No messages yet. Start the conversation!</p>
+                <p className="text-gray-500">No messages yet. Start the conversation!</p>
               </div>
             )}
             {messages.map((msg) => (
@@ -336,8 +336,8 @@ export default function CounselorChatPage() {
                 <div
                   className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                     msg.senderId === profile?.uid
-                      ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white"
-                      : "border border-white/10 bg-white/5 text-gray-100"
+                      ? "bg-green-600 text-white"
+                      : "border border-gray-200 bg-white text-gray-800"
                   }`}
                 >
                   {msg.audioUrl ? (
@@ -357,17 +357,17 @@ export default function CounselorChatPage() {
         </div>
 
         {/* Input */}
-        <div className="border-t border-white/10 bg-black/20 p-4 backdrop-blur-xl md:p-6">
+        <div className="border-t border-gray-200 bg-white p-4 md:p-6">
           <div className="mx-auto max-w-3xl">
             {audioBlob && (
-              <div className="mb-3 flex items-center gap-3 rounded-xl bg-blue-500/10 border border-blue-500/20 px-4 py-3">
-                <Mic className="h-5 w-5 text-blue-400 flex-shrink-0" />
+              <div className="mb-3 flex items-center gap-3 rounded-xl bg-blue-100 border border-blue-200 px-4 py-3">
+                <Mic className="h-5 w-5 text-blue-600 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <audio controls src={URL.createObjectURL(audioBlob)} className="w-full h-8" style={{ maxWidth: '100%' }} />
                 </div>
                 <button 
                   onClick={() => setAudioBlob(null)} 
-                  className="flex-shrink-0 p-1 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                  className="flex-shrink-0 p-1 rounded-full text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -378,7 +378,7 @@ export default function CounselorChatPage() {
                 onClick={isRecording ? stopRecording : startRecording}
                 disabled={sending}
                 className={`flex items-center gap-2 rounded-xl px-4 py-3 transition-all ${
-                  isRecording ? "bg-red-500/20 text-red-400" : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
+                  isRecording ? "bg-red-100 text-red-600" : "bg-white border border-gray-200 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
                 } ${sending ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 {isRecording ? (
@@ -394,12 +394,12 @@ export default function CounselorChatPage() {
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && !sending && sendMessage()}
                 disabled={sending}
-                className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-gray-500 transition-colors focus:border-blue-500/50 focus:outline-none disabled:opacity-50"
+                className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-500 transition-colors focus:border-green-500 focus:outline-none disabled:opacity-50"
               />
               <Button
                 onClick={sendMessage}
                 disabled={(!inputText.trim() && !audioBlob) || sending}
-                className="rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 px-5 min-w-[60px]"
+                className="rounded-xl bg-green-600 px-5 min-w-[60px] hover:bg-green-700"
               >
                 {sending ? (
                   <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

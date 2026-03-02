@@ -93,8 +93,8 @@ export default function PendingApplicationsPage() {
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white">Pending Applications</h1>
-          <p className="mt-2 text-gray-400">Review and approve or reject applications</p>
+          <h1 className="text-3xl font-bold text-gray-900">Pending Applications</h1>
+          <p className="mt-2 text-gray-500">Review and approve or reject applications</p>
         </div>
 
         {/* Filters */}
@@ -106,7 +106,7 @@ export default function PendingApplicationsPage() {
               placeholder="Search by name, email, or specialization..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border-white/10 bg-white/5 pl-12 text-white placeholder-gray-500 focus:border-blue-500/50"
+              className="w-full rounded-xl border-gray-200 bg-white pl-12 text-gray-900 placeholder-gray-500 focus:border-green-500/50"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -117,8 +117,8 @@ export default function PendingApplicationsPage() {
                 onClick={() => setRoleFilter(role)}
                 className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
                   roleFilter === role
-                    ? "bg-blue-500 text-white"
-                    : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
+                    ? "bg-green-600 text-white"
+                    : "bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-900"
                 }`}
               >
                 {role === "all" ? "All" : role === "peer-mentor" ? "Peer Mentors" : "Counselors"}
@@ -131,47 +131,47 @@ export default function PendingApplicationsPage() {
         {loading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-48 animate-pulse rounded-2xl border border-white/10 bg-white/5" />
+              <div key={i} className="h-48 animate-pulse rounded-2xl border border-gray-200 bg-white" />
             ))}
           </div>
         ) : filteredUsers.length === 0 ? (
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-12 text-center">
-            <p className="text-gray-400">No pending applications found.</p>
+          <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center">
+            <p className="text-gray-500">No pending applications found.</p>
           </div>
         ) : (
           <div className="space-y-4">
             {filteredUsers.map((user) => (
-              <div key={user.uid} className="rounded-2xl border border-white/10 bg-white/5 p-6">
+              <div key={user.uid} className="rounded-2xl border border-gray-200 bg-white p-6">
                 <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                   {/* User Info */}
                   <div className="flex-1 space-y-4">
                     <div>
                       <div className="flex items-center gap-3">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-lg font-bold text-white">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-600 text-lg font-bold text-white">
                           {user.fullName?.split(" ").map((n) => n[0]).join("").slice(0, 2) || "U"}
                         </div>
                         <div>
-                          <h3 className="font-semibold text-white">{user.fullName || "—"}</h3>
-                          <p className="text-sm text-gray-400 capitalize">{user.role?.replace("-", " ")}</p>
+                          <h3 className="font-semibold text-gray-900">{user.fullName || "—"}</h3>
+                          <p className="text-sm text-gray-500 capitalize">{user.role?.replace("-", " ")}</p>
                         </div>
                       </div>
                     </div>
 
                     <div className="grid gap-3 sm:grid-cols-2">
                       {user.email && (
-                        <div className="flex items-center gap-2 text-sm text-gray-400">
+                        <div className="flex items-center gap-2 text-sm text-gray-500">
                           <Mail className="h-4 w-4" />
                           <span>{user.email}</span>
                         </div>
                       )}
                       {user.specialization && (
-                        <div className="flex items-center gap-2 text-sm text-gray-400">
+                        <div className="flex items-center gap-2 text-sm text-gray-500">
                           <User className="h-4 w-4" />
                           <span>{user.specialization}</span>
                         </div>
                       )}
                       {user.school && (
-                        <div className="flex items-center gap-2 text-sm text-gray-400">
+                        <div className="flex items-center gap-2 text-sm text-gray-500">
                           <GraduationCap className="h-4 w-4" />
                           <span>{user.school}</span>
                         </div>
@@ -179,8 +179,8 @@ export default function PendingApplicationsPage() {
                     </div>
 
                     {user.about && (
-                      <div className="rounded-lg bg-white/5 p-4">
-                        <p className="text-sm text-gray-300">{user.about}</p>
+                      <div className="rounded-lg bg-gray-50 p-4">
+                        <p className="text-sm text-gray-700">{user.about}</p>
                       </div>
                     )}
 
@@ -196,14 +196,14 @@ export default function PendingApplicationsPage() {
                     <Button
                       onClick={() => handleAction(user.uid, "reject")}
                       variant="outline"
-                      className="flex-1 border-red-500/30 text-red-400 hover:bg-red-500/10 lg:flex-none"
+                      className="flex-1 border-red-500/30 text-red-600 hover:bg-red-100 lg:flex-none"
                     >
                       <XCircle className="mr-2 h-4 w-4" />
                       Reject
                     </Button>
                     <Button
                       onClick={() => handleAction(user.uid, "approve")}
-                      className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 lg:flex-none"
+                      className="flex-1 bg-green-600 lg:flex-none"
                     >
                       <CheckCircle className="mr-2 h-4 w-4" />
                       Approve

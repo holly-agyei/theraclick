@@ -146,19 +146,13 @@ export default function PeerMentorsPage() {
 
   return (
     <LayoutWrapper>
-      <div className="min-h-screen bg-[#0D1F1D]">
-        {/* Subtle ambient */}
-        <div className="pointer-events-none fixed inset-0 overflow-hidden">
-          <div className="absolute -left-20 top-20 h-72 w-72 rounded-full bg-[#2BB5A0]/8 blur-[120px]" />
-          <div className="absolute -right-20 bottom-40 h-96 w-96 rounded-full bg-[#1A7A6E]/8 blur-[140px]" />
-        </div>
-
-        <div className="relative z-10 px-4 py-6 pb-24 md:px-8 md:py-10">
+      <div className="min-h-screen bg-[#F0FDF4]">
+        <div className="px-4 py-6 pb-24 md:px-8 md:py-10">
           <div className="mx-auto max-w-5xl">
             {/* Header */}
             <div className="mb-8">
-              <h1 className="text-2xl font-bold text-white md:text-3xl">Talk to a peer mentor</h1>
-              <p className="mt-2 text-sm text-[#6B8C89]">
+              <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">Talk to a peer mentor</h1>
+              <p className="mt-2 text-sm text-gray-500">
                 Connect with students who have been through it and truly understand.
               </p>
             </div>
@@ -166,15 +160,15 @@ export default function PeerMentorsPage() {
             {/* Search + Filter */}
             <div className="mb-6 flex flex-col gap-4 sm:flex-row">
               <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B8C89]" />
+                <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                 <input
                   type="text"
                   placeholder="Search mentors..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-xl border border-white/[0.08] bg-white/[0.04] py-3 pl-11 pr-4
-                    text-sm text-white placeholder-[#6B8C89] transition-colors
-                    focus:border-[#2BB5A0]/50 focus:outline-none"
+                  className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-11 pr-4
+                    text-sm text-gray-900 placeholder-gray-400 transition-colors
+                    focus:border-green-500 focus:outline-none"
                 />
               </div>
               <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 no-scrollbar">
@@ -184,8 +178,8 @@ export default function PeerMentorsPage() {
                     onClick={() => setSelectedSpec(spec)}
                     className={`shrink-0 rounded-full border px-4 py-2 text-sm font-medium transition-all
                       ${selectedSpec === spec
-                        ? "border-[#2BB5A0] bg-[#2BB5A0] text-white"
-                        : "border-white/[0.12] text-white/60 hover:border-white/20 hover:text-white"
+                        ? "border-green-600 bg-green-600 text-white"
+                        : "border-gray-200 text-gray-600 hover:border-gray-300 hover:text-gray-900"
                       }`}
                   >
                     {spec}
@@ -198,29 +192,29 @@ export default function PeerMentorsPage() {
             {loading ? (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div key={i} className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
+                  <div key={i} className="rounded-2xl border border-gray-200 bg-white p-5">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="h-12 w-12 rounded-full bg-white/[0.06] animate-[shimmer_1.5s_infinite]" />
+                      <div className="h-12 w-12 rounded-full bg-gray-100 animate-[shimmer_1.5s_infinite]" />
                       <div className="flex-1 space-y-2">
-                        <div className="h-4 w-24 rounded bg-white/[0.06]" />
-                        <div className="h-3 w-32 rounded bg-white/[0.06]" />
+                        <div className="h-4 w-24 rounded bg-gray-100" />
+                        <div className="h-3 w-32 rounded bg-gray-100" />
                       </div>
                     </div>
-                    <div className="h-10 rounded bg-white/[0.04]" />
+                    <div className="h-10 rounded bg-gray-50" />
                   </div>
                 ))}
               </div>
             ) : filteredMentors.length === 0 ? (
-              <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-12 text-center">
-                <Calendar className="mx-auto mb-3 h-10 w-10 text-[#6B8C89]/40" />
-                <h3 className="text-lg font-semibold text-white">No mentors available right now</h3>
-                <p className="mt-2 text-sm text-[#6B8C89] max-w-sm mx-auto">
+              <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center">
+                <Calendar className="mx-auto mb-3 h-10 w-10 text-gray-300" />
+                <h3 className="text-lg font-semibold text-gray-900">No mentors available right now</h3>
+                <p className="mt-2 text-sm text-gray-500 max-w-sm mx-auto">
                   Our peer mentors are volunteers with their own schedules. Check back soon, or book a session with a counselor.
                 </p>
                 <button
                   onClick={() => router.push("/student/counselors")}
-                  className="mt-5 rounded-full bg-[#2BB5A0] px-6 py-2.5 text-sm font-medium text-white
-                    transition-all hover:bg-[#2BB5A0]/80"
+                  className="mt-5 rounded-full bg-green-600 px-6 py-2.5 text-sm font-medium text-white
+                    transition-all hover:bg-green-700"
                 >
                   Talk to a Counselor instead
                 </button>
@@ -230,8 +224,8 @@ export default function PeerMentorsPage() {
                 {filteredMentors.map((mentor) => (
                   <div
                     key={mentor.uid}
-                    className="group rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5
-                      transition-all duration-250 hover:border-[#2BB5A0]/25 hover:-translate-y-1"
+                    className="group rounded-2xl border border-gray-200 bg-white shadow-sm p-5
+                      transition-all duration-250 hover:border-green-300 hover:shadow-md hover:-translate-y-1"
                   >
                     {/* Header: Avatar + Name + Status */}
                     <div className="flex items-start gap-3 mb-3">
@@ -240,24 +234,24 @@ export default function PeerMentorsPage() {
                           <img
                             src={mentor.avatar}
                             alt={mentor.fullName}
-                            className="h-12 w-12 shrink-0 rounded-full object-cover border-2 border-white/[0.12]"
+                            className="h-12 w-12 shrink-0 rounded-full object-cover border-2 border-gray-200"
                           />
                         ) : (
                           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full
-                            bg-[#2BB5A0]/20 text-sm font-bold text-[#2BB5A0]">
+                            bg-green-100 text-sm font-bold text-green-600">
                             {mentor.fullName.split(" ").map(n => n[0]).join("")}
                           </div>
                         )}
                         {/* Online dot */}
                         {mentor.isOnline && (
                           <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2
-                            border-[#0D1F1D] bg-emerald-400" />
+                            border-white bg-emerald-400" />
                         )}
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-semibold text-white truncate">{mentor.fullName}</h3>
-                        <div className="flex items-center gap-1 text-xs text-[#6B8C89] mt-0.5">
+                        <h3 className="text-sm font-semibold text-gray-900 truncate">{mentor.fullName}</h3>
+                        <div className="flex items-center gap-1 text-xs text-gray-500 mt-0.5">
                           <GraduationCap className="h-3 w-3 shrink-0" />
                           <span className="truncate">{mentor.school}</span>
                         </div>
@@ -266,8 +260,8 @@ export default function PeerMentorsPage() {
                       {/* Availability badge */}
                       <span className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-medium
                         ${mentor.isOnline
-                          ? "bg-emerald-400/15 text-emerald-400"
-                          : "bg-white/[0.06] text-[#6B8C89]"
+                          ? "bg-green-100 text-green-600"
+                          : "bg-gray-100 text-gray-500"
                         }`}>
                         {mentor.isOnline ? "Available" : "Offline"}
                       </span>
@@ -276,26 +270,26 @@ export default function PeerMentorsPage() {
                     {/* Specialization tag */}
                     {mentor.specialization && (
                       <div className="mb-3">
-                        <span className="rounded-full bg-[#2BB5A0]/10 px-2.5 py-1 text-xs font-medium text-[#2BB5A0]">
+                        <span className="rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">
                           {mentor.specialization}
                         </span>
                       </div>
                     )}
 
                     {/* Bio */}
-                    <p className="mb-4 line-clamp-2 text-sm text-gray-400 leading-relaxed">
+                    <p className="mb-4 line-clamp-2 text-sm text-gray-500 leading-relaxed">
                       {mentor.about}
                     </p>
 
                     {/* Footer: Stats + CTA */}
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-[#6B8C89]">
+                      <span className="text-xs text-gray-500">
                         {mentor.conversationsCount || 0} sessions completed
                       </span>
                       <button
                         onClick={() => router.push(`/student/peer-mentors/${mentor.uid}`)}
-                        className="rounded-full bg-[#2BB5A0] px-4 py-2 text-xs font-semibold text-white
-                          transition-all hover:bg-[#2BB5A0]/80 active:scale-[0.95]"
+                        className="rounded-full bg-green-600 px-4 py-2 text-xs font-semibold text-white
+                          transition-all hover:bg-green-700 active:scale-[0.95]"
                       >
                         Start Chat
                       </button>

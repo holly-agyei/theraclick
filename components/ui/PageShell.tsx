@@ -15,7 +15,7 @@ export function PageShell({
   className?: string;
 }) {
   return (
-    <div className={cn("relative min-h-screen", className)}>
+    <div className={cn("relative min-h-screen bg-[#F0FDF4]", className)}>
       <AnimatedBackdrop imageSrc={imageSrc} overlay={overlay} />
       <div className="mx-auto w-full max-w-6xl px-4 py-10 md:px-8">
         {children}
@@ -34,12 +34,10 @@ export function GlassCard({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-3xl border border-white/30 bg-white/80 shadow-xl shadow-gray-200/60 backdrop-blur-md",
-        "tk-shimmer",
+        "relative overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-md",
         className
       )}
     >
-      <div className="absolute inset-0 bg-gradient-to-b from-white/70 to-white/40" />
       <div className="relative">{children}</div>
     </div>
   );

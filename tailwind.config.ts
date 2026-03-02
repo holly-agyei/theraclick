@@ -10,32 +10,19 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // ── Brand teal mapped onto "primary" so existing classes auto-update ──
         primary: {
-          DEFAULT: "#2BB5A0",
-          50: "#EEFBF8",
-          100: "#D5F5EF",
-          200: "#AEE9DF",
-          300: "#7BD8CA",
-          400: "#2BB5A0",
-          500: "#2BB5A0",
-          600: "#1A7A6E",
-          700: "#0F4F47",
-          800: "#0D3D37",
-          900: "#0D1F1D",
+          DEFAULT: "#16A34A",
+          50: "#F0FDF4",
+          100: "#DCFCE7",
+          200: "#BBF7D0",
+          300: "#86EFAC",
+          400: "#4ADE80",
+          500: "#22C55E",
+          600: "#16A34A",
+          700: "#15803D",
+          800: "#166534",
+          900: "#14532D",
         },
-        // ── Brand gold accent ──
-        gold: {
-          DEFAULT: "#F5C842",
-          50: "#FFFDF0",
-          100: "#FFF8D6",
-          200: "#FFEFAD",
-          300: "#FFE480",
-          400: "#F5C842",
-          500: "#E8A800",
-          600: "#C48E00",
-        },
-        // ── Shadcn CSS-variable hooks (unchanged) ──
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {

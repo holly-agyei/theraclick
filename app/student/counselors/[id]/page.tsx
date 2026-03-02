@@ -421,8 +421,8 @@ export default function CounselorProfilePage() {
   if (loading) {
     return (
       <LayoutWrapper>
-        <div className="flex min-h-screen items-center justify-center bg-gray-900">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+        <div className="flex min-h-screen items-center justify-center bg-[#F0FDF4]">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-green-500 border-t-transparent" />
         </div>
       </LayoutWrapper>
     );
@@ -431,7 +431,7 @@ export default function CounselorProfilePage() {
   if (!counselor) {
     return (
       <LayoutWrapper>
-        <div className="flex min-h-screen flex-col items-center justify-center bg-gray-900 text-white">
+        <div className="flex min-h-screen flex-col items-center justify-center bg-[#F0FDF4] text-gray-900">
           <p>Counselor not found</p>
           <Button onClick={() => router.back()} className="mt-4">
             Go back
@@ -443,13 +443,13 @@ export default function CounselorProfilePage() {
 
   return (
     <LayoutWrapper>
-      <div className="flex h-screen flex-col bg-[#0D1F1D]">
+      <div className="flex h-screen flex-col bg-[#F0FDF4]">
         {/* Header */}
-        <div className="relative z-10 border-b border-white/[0.06] bg-[#0D1F1D]/90 px-4 py-3 backdrop-blur-xl md:px-8">
+        <div className="relative z-10 border-b border-gray-200 bg-white px-4 py-3 shadow-sm md:px-8">
           <div className="flex items-center gap-4">
             <button
               onClick={() => router.back()}
-              className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-white/10 hover:text-white"
+              className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-900"
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
@@ -458,22 +458,22 @@ export default function CounselorProfilePage() {
               <img
                 src={counselor.avatar}
                 alt={counselor.fullName}
-                className="h-10 w-10 rounded-full object-cover border-2 border-white/[0.12]"
+                className="h-10 w-10 rounded-full object-cover border-2 border-gray-200"
               />
             ) : (
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2BB5A0]/20 text-sm font-bold text-[#2BB5A0]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-sm font-bold text-green-600">
                 {counselor.fullName.split(" ").map((n) => n[0]).join("")}
               </div>
             )}
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <h1 className="text-sm font-semibold text-white truncate">{counselor.fullName}</h1>
+                <h1 className="text-sm font-semibold text-gray-900 truncate">{counselor.fullName}</h1>
                 {counselor.isOnline && (
                   <span className="h-2 w-2 rounded-full bg-emerald-400 shrink-0" />
                 )}
               </div>
-              <p className="text-xs text-[#2BB5A0]">{counselor.specialization}</p>
+              <p className="text-xs text-green-600">{counselor.specialization}</p>
             </div>
 
             {/* Call buttons */}
@@ -488,7 +488,7 @@ export default function CounselorProfilePage() {
                   }
                 }}
                 disabled={isInCall}
-                className="flex items-center gap-2 rounded-lg bg-green-500/20 px-3 py-2 text-sm font-medium text-green-400 transition-all hover:bg-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 rounded-lg bg-green-50 px-3 py-2 text-sm font-medium text-green-600 transition-all hover:bg-green-100 disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Voice call"
               >
                 <Phone className="h-4 w-4" />
@@ -504,7 +504,7 @@ export default function CounselorProfilePage() {
                   }
                 }}
                 disabled={isInCall}
-                className="flex items-center gap-2 rounded-lg bg-blue-500/20 px-3 py-2 text-sm font-medium text-blue-400 transition-all hover:bg-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-2 text-sm font-medium text-blue-600 transition-all hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Video call"
               >
                 <Video className="h-4 w-4" />
@@ -520,8 +520,8 @@ export default function CounselorProfilePage() {
               onClick={() => setActiveTab("chat")}
               className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
                 activeTab === "chat"
-                  ? "bg-blue-500 text-white"
-                  : "bg-white/5 text-gray-400 hover:bg-white/10"
+                  ? "bg-green-600 text-white"
+                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
               }`}
             >
               <MessageCircle className="h-4 w-4" />
@@ -531,8 +531,8 @@ export default function CounselorProfilePage() {
               onClick={() => setActiveTab("book")}
               className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
                 activeTab === "book"
-                  ? "bg-purple-500 text-white"
-                  : "bg-white/5 text-gray-400 hover:bg-white/10"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
               }`}
             >
               <Calendar className="h-4 w-4" />
@@ -548,9 +548,9 @@ export default function CounselorProfilePage() {
             <div className="flex-1 overflow-y-auto px-4 py-6 md:px-8">
               <div className="mx-auto max-w-3xl space-y-4">
                 {messages.length === 0 && (
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center">
+                  <div className="rounded-2xl border border-gray-200 bg-white p-6 text-center">
                     <MessageCircle className="mx-auto mb-3 h-8 w-8 text-gray-500" />
-                    <p className="text-gray-400">No messages yet. Start the conversation!</p>
+                    <p className="text-gray-500">No messages yet. Start the conversation!</p>
                     <p className="mt-1 text-sm text-gray-500">
                       Your messages are private and confidential.
                     </p>
@@ -567,7 +567,7 @@ export default function CounselorProfilePage() {
                     <div key={msg.id}>
                       {showTimestamp && (
                         <div className="my-3 text-center">
-                          <span className="rounded-full bg-white/[0.05] px-3 py-1 text-[10px] text-[#6B8C89] uppercase">
+                          <span className="rounded-full bg-gray-100 px-3 py-1 text-[10px] text-gray-500 uppercase">
                             {msg.createdAt.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
                           </span>
                         </div>
@@ -576,8 +576,8 @@ export default function CounselorProfilePage() {
                         <div
                           className={`max-w-[70%] px-3.5 py-2.5 text-[15px] leading-relaxed
                             ${isOwn
-                              ? "rounded-[18px_18px_4px_18px] bg-[#2BB5A0] text-white"
-                              : "rounded-[18px_18px_18px_4px] bg-white/[0.08] text-white/90"
+                              ? "rounded-[18px_18px_4px_18px] bg-green-600 text-white"
+                              : "rounded-[18px_18px_18px_4px] bg-white border border-gray-200 text-gray-800"
                             }`}
                           style={{ wordBreak: "break-word" }}
                         >
@@ -602,16 +602,16 @@ export default function CounselorProfilePage() {
             </div>
 
             {/* Input bar — sticky, mobile-safe */}
-            <div className="border-t border-white/[0.06] bg-[#0D1F1D]/90 backdrop-blur-xl"
+            <div className="border-t border-gray-200 bg-white"
               style={{ padding: "12px 16px", paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
               <div className="mx-auto max-w-3xl">
                 {/* Audio preview */}
                 {audioBlob && (
-                  <div className="mb-2 flex items-center gap-3 rounded-xl border border-[#2BB5A0]/20 bg-[#2BB5A0]/5 px-4 py-2.5">
-                    <Mic className="h-4 w-4 text-[#2BB5A0] shrink-0" />
+                  <div className="mb-2 flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-2.5">
+                    <Mic className="h-4 w-4 text-green-600 shrink-0" />
                     <audio controls src={URL.createObjectURL(audioBlob)} className="flex-1 h-8" />
                     <button onClick={() => setAudioBlob(null)}
-                      className="shrink-0 p-1 rounded-full text-[#6B8C89] hover:text-white">
+                      className="shrink-0 p-1 rounded-full text-gray-400 hover:text-gray-700">
                       <X className="h-4 w-4" />
                     </button>
                   </div>
@@ -623,15 +623,15 @@ export default function CounselorProfilePage() {
                     disabled={sending}
                     className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all
                       ${isRecording
-                        ? "bg-red-500/20 text-red-400"
-                        : "text-[#6B8C89] hover:bg-white/10 hover:text-white"
+                        ? "bg-red-50 text-red-500"
+                        : "text-gray-400 hover:bg-gray-100 hover:text-gray-700"
                       } ${sending ? "opacity-40" : ""}`}
                   >
                     {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
                   </button>
 
                   {isRecording && (
-                    <span className="shrink-0 text-xs text-red-400 font-medium">{formatRecordingTime(recordingTime)}</span>
+                    <span className="shrink-0 text-xs text-red-500 font-medium">{formatRecordingTime(recordingTime)}</span>
                   )}
 
                   {/* Text input */}
@@ -642,9 +642,9 @@ export default function CounselorProfilePage() {
                     onChange={(e) => setInputText(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && !sending && sendMessage()}
                     disabled={sending}
-                    className="flex-1 rounded-[20px] border border-white/[0.10] bg-white/[0.05] px-4 py-2.5
-                      text-[15px] text-white placeholder-white/30 transition-colors
-                      focus:border-[#2BB5A0]/50 focus:outline-none disabled:opacity-40"
+                    className="flex-1 rounded-[20px] border border-gray-200 bg-gray-50 px-4 py-2.5
+                      text-[15px] text-gray-900 placeholder-gray-400 transition-colors
+                      focus:border-green-500 focus:outline-none disabled:opacity-40"
                   />
 
                   {/* Send button — only when there's content */}
@@ -653,7 +653,7 @@ export default function CounselorProfilePage() {
                       onClick={sendMessage}
                       disabled={sending}
                       className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full
-                        bg-[#2BB5A0] text-white transition-all active:scale-[0.88]
+                        bg-green-600 text-white transition-all active:scale-[0.88]
                         disabled:opacity-40"
                     >
                       {sending ? (
@@ -672,19 +672,19 @@ export default function CounselorProfilePage() {
           <div className="flex-1 overflow-y-auto px-4 py-6 md:px-8">
             <div className="mx-auto max-w-2xl">
               {/* About */}
-              <div className="mb-6 rounded-2xl border border-white/10 bg-white/5 p-5">
-                <h3 className="mb-2 font-medium text-white">About</h3>
-                <p className="text-sm leading-relaxed text-gray-400">{counselor.about}</p>
+              <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-5">
+                <h3 className="mb-2 font-medium text-gray-900">About</h3>
+                <p className="text-sm leading-relaxed text-gray-600">{counselor.about}</p>
               </div>
 
               {/* Existing Request */}
               {existingRequest && (
-                <div className="mb-6 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-5">
+                <div className="mb-6 rounded-2xl border border-amber-300 bg-amber-50 p-5">
                   <div className="flex items-start gap-3">
-                    <AlertCircle className="mt-0.5 h-5 w-5 text-amber-400" />
+                    <AlertCircle className="mt-0.5 h-5 w-5 text-amber-600" />
                     <div>
-                      <p className="font-medium text-amber-200">Request Pending</p>
-                      <p className="mt-1 text-sm text-amber-200/70">
+                      <p className="font-medium text-amber-800">Request Pending</p>
+                      <p className="mt-1 text-sm text-amber-700">
                         You already have a pending request. {counselor.fullName} will respond soon.
                       </p>
                     </div>
@@ -693,20 +693,20 @@ export default function CounselorProfilePage() {
               )}
 
               {bookingStatus === "sent" ? (
-                <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-8 text-center">
-                  <CheckCircle className="mx-auto mb-3 h-12 w-12 text-emerald-400" />
-                  <h3 className="text-xl font-semibold text-white">Request Sent!</h3>
-                  <p className="mt-2 text-gray-400">
+                <div className="rounded-2xl border border-green-300 bg-green-50 p-8 text-center">
+                  <CheckCircle className="mx-auto mb-3 h-12 w-12 text-green-600" />
+                  <h3 className="text-xl font-semibold text-gray-900">Request Sent!</h3>
+                  <p className="mt-2 text-gray-500">
                     {counselor.fullName} will review your request and get back to you via chat.
                   </p>
                 </div>
               ) : (
                 <>
                   {/* Availability */}
-                  <div className="mb-6 rounded-2xl border border-white/10 bg-white/5 p-5">
+                  <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-5">
                     <div className="mb-4 flex items-center gap-2">
-                      <Clock className="h-5 w-5 text-purple-400" />
-                      <h3 className="font-medium text-white">Available Time Slots</h3>
+                      <Clock className="h-5 w-5 text-green-600" />
+                      <h3 className="font-medium text-gray-900">Available Time Slots</h3>
                     </div>
 
                     {availabilitySlots.length > 0 ? (
@@ -717,8 +717,8 @@ export default function CounselorProfilePage() {
                             onClick={() => setSelectedSlot(slot.id)}
                             className={`rounded-xl border px-4 py-3 text-left transition-all ${
                               selectedSlot === slot.id
-                                ? "border-purple-500 bg-purple-500/20 text-purple-300"
-                                : "border-white/10 bg-white/5 text-gray-400 hover:border-white/20"
+                                ? "border-green-500 bg-green-50 text-green-700"
+                                : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
                             }`}
                           >
                             <p className="font-medium">{formatSlotDate(slot.date, slot.startTime)}</p>
@@ -729,8 +729,8 @@ export default function CounselorProfilePage() {
                         ))}
                       </div>
                     ) : (
-                      <div className="rounded-xl bg-amber-500/10 p-4">
-                        <p className="text-sm text-amber-300">
+                      <div className="rounded-xl bg-amber-50 p-4">
+                        <p className="text-sm text-amber-700">
                           {counselor.fullName} hasn't added available times yet. 
                           You can still request a session — they'll reach out to coordinate.
                         </p>
@@ -740,7 +740,7 @@ export default function CounselorProfilePage() {
 
                   {/* Message */}
                   <div className="mb-6">
-                    <label className="mb-2 block text-sm font-medium text-gray-300">
+                    <label className="mb-2 block text-sm font-medium text-gray-700">
                       Add a message (optional)
                     </label>
                     <textarea
@@ -748,7 +748,7 @@ export default function CounselorProfilePage() {
                       value={bookingMessage}
                       onChange={(e) => setBookingMessage(e.target.value)}
                       rows={3}
-                      className="w-full resize-none rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-gray-500 focus:border-purple-500/50 focus:outline-none"
+                      className="w-full resize-none rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-green-500 focus:outline-none"
                     />
                   </div>
 
@@ -756,7 +756,7 @@ export default function CounselorProfilePage() {
                   <Button
                     onClick={submitBookingRequest}
                     disabled={!selectedSlot || bookingStatus === "sending" || !!existingRequest}
-                    className="w-full rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 py-6 text-base font-semibold"
+                    className="w-full rounded-xl bg-green-600 hover:bg-green-700 text-white py-6 text-base font-semibold"
                   >
                     {bookingStatus === "sending" ? "Booking..." : selectedSlot ? "Book This Slot" : "Select a Time Slot"}
                   </Button>

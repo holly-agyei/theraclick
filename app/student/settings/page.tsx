@@ -43,50 +43,50 @@ export default function StudentSettingsPage() {
 
   return (
     <LayoutWrapper>
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+        <div className="min-h-screen bg-[#F0FDF4]">
         <div className="px-4 py-6 pb-24 md:px-8 md:py-10">
           <div className="mx-auto max-w-3xl">
             {/* Header */}
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-white">Settings</h1>
-              <p className="mt-2 text-gray-400">Manage your account and preferences</p>
+              <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
+              <p className="mt-2 text-gray-500">Manage your account and preferences</p>
             </div>
 
             {/* Account Info */}
-            <div className="mb-6 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+            <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
               <div className="mb-4 flex items-center gap-3">
-                <div className="rounded-lg bg-blue-500/20 p-2">
-                  <User className="h-5 w-5 text-blue-400" />
+                <div className="rounded-lg bg-blue-100 p-2">
+                  <User className="h-5 w-5 text-blue-600" />
                 </div>
-                <h2 className="text-lg font-semibold text-white">Account Information</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Account Information</h2>
               </div>
               <div className="space-y-3">
                 <div>
-                  <p className="text-sm text-gray-400">Full Name</p>
-                  <p className="mt-1 text-white">{profile?.fullName || "—"}</p>
+                  <p className="text-sm text-gray-500">Full Name</p>
+                  <p className="mt-1 text-gray-900">{profile?.fullName || "—"}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-400">Email</p>
-                  <p className="mt-1 text-white">{profile?.email || "—"}</p>
+                  <p className="text-sm text-gray-500">Email</p>
+                  <p className="mt-1 text-gray-900">{profile?.email || "—"}</p>
                 </div>
               </div>
             </div>
 
             {/* Student Profile */}
             {isStudent && (
-              <div className="mb-6 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+              <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
                 <div className="mb-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="rounded-lg bg-emerald-500/20 p-2">
-                      <School className="h-5 w-5 text-emerald-400" />
+                    <div className="rounded-lg bg-green-100 p-2">
+                      <School className="h-5 w-5 text-green-600" />
                     </div>
-                    <h2 className="text-lg font-semibold text-white">Student Profile</h2>
+                    <h2 className="text-lg font-semibold text-gray-900">Student Profile</h2>
                   </div>
                   {!editing && (
                     <Button
                       onClick={() => setEditing(true)}
                       variant="outline"
-                      className="border-white/10 text-gray-300 hover:bg-white/10"
+                      className="border-gray-200 text-gray-700 hover:bg-gray-100"
                     >
                       Edit
                     </Button>
@@ -95,28 +95,28 @@ export default function StudentSettingsPage() {
                 {editing ? (
                   <div className="space-y-4">
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-gray-300">School</label>
+                      <label className="mb-2 block text-sm font-medium text-gray-700">School</label>
                       <Input
                         value={school}
                         onChange={(e) => setSchool(e.target.value)}
                         placeholder="Your school name"
-                        className="border-white/10 bg-white/5 text-white"
+                        className="border-gray-200 bg-white text-gray-900"
                       />
                     </div>
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-gray-300">Education Level</label>
+                      <label className="mb-2 block text-sm font-medium text-gray-700">Education Level</label>
                       <Input
                         value={educationLevel}
                         onChange={(e) => setEducationLevel(e.target.value)}
                         placeholder="e.g., High School, University"
-                        className="border-white/10 bg-white/5 text-white"
+                        className="border-gray-200 bg-white text-gray-900"
                       />
                     </div>
                     <div className="flex gap-3">
                       <Button
                         onClick={handleSaveProfile}
                         disabled={saving}
-                        className="bg-gradient-to-r from-emerald-500 to-teal-600"
+                        className="bg-green-600 hover:bg-green-700 text-white"
                       >
                         <Save className="mr-2 h-4 w-4" />
                         {saving ? "Saving..." : "Save Changes"}
@@ -128,7 +128,7 @@ export default function StudentSettingsPage() {
                           setEducationLevel(profile?.student?.educationLevel || "");
                         }}
                         variant="outline"
-                        className="border-white/10 text-gray-300"
+                        className="border-gray-200 text-gray-700"
                       >
                         Cancel
                       </Button>
@@ -137,12 +137,12 @@ export default function StudentSettingsPage() {
                 ) : (
                   <div className="space-y-3">
                     <div>
-                      <p className="text-sm text-gray-400">School</p>
-                      <p className="mt-1 text-white">{profile?.student?.school || "Not set"}</p>
+                      <p className="text-sm text-gray-500">School</p>
+                      <p className="mt-1 text-gray-900">{profile?.student?.school || "Not set"}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-400">Education Level</p>
-                      <p className="mt-1 text-white">{profile?.student?.educationLevel || "Not set"}</p>
+                      <p className="text-sm text-gray-500">Education Level</p>
+                      <p className="mt-1 text-gray-900">{profile?.student?.educationLevel || "Not set"}</p>
                     </div>
                   </div>
                 )}
@@ -151,27 +151,27 @@ export default function StudentSettingsPage() {
 
             {/* Anonymous Mode */}
             {isStudent && (
-              <div className="mb-6 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-6 backdrop-blur-sm">
+              <div className="mb-6 rounded-2xl border border-green-200 bg-green-50 p-6">
                 <div className="mb-4 flex items-center gap-3">
-                  <div className="rounded-lg bg-emerald-500/20 p-2">
-                    <EyeOff className="h-5 w-5 text-emerald-400" />
+                  <div className="rounded-lg bg-green-100 p-2">
+                    <EyeOff className="h-5 w-5 text-green-600" />
                   </div>
-                  <h2 className="text-lg font-semibold text-white">Anonymous Mode</h2>
+                  <h2 className="text-lg font-semibold text-gray-900">Anonymous Mode</h2>
                 </div>
-                <p className="mb-4 text-sm text-gray-400">
+                <p className="mb-4 text-sm text-gray-500">
                   When enabled, your display name becomes an anonymous ID across the app. Your real identity remains private.
                 </p>
-                <div className="mb-4 rounded-lg bg-white/5 p-4">
-                  <p className="text-sm text-gray-300">
+                <div className="mb-4 rounded-lg bg-white border border-gray-100 p-4">
+                  <p className="text-sm text-gray-700">
                     <span className="font-semibold">Status:</span>{" "}
-                    <span className={anonEnabled ? "text-emerald-400" : "text-gray-400"}>
+                    <span className={anonEnabled ? "text-green-600" : "text-gray-500"}>
                       {anonEnabled ? "Enabled" : "Disabled"}
                     </span>
                   </p>
                   {anonEnabled && anonId && (
-                    <p className="mt-2 text-sm text-gray-300">
+                    <p className="mt-2 text-sm text-gray-700">
                       <span className="font-semibold">Your Anonymous ID:</span>{" "}
-                      <span className="font-mono text-emerald-400">{anonId}</span>
+                      <span className="font-mono text-green-600">{anonId}</span>
                     </p>
                   )}
                 </div>
@@ -179,8 +179,8 @@ export default function StudentSettingsPage() {
                   onClick={() => void setStudentAnonymousEnabled(!anonEnabled)}
                   className={`w-full sm:w-auto ${
                     anonEnabled
-                      ? "bg-red-500/20 text-red-400 hover:bg-red-500/30"
-                      : "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+                      ? "bg-red-50 text-red-600 hover:bg-red-100"
+                      : "bg-green-50 text-green-600 hover:bg-green-100"
                   }`}
                 >
                   {anonEnabled ? "Turn Off Anonymous Mode" : "Turn On Anonymous Mode"}
@@ -189,19 +189,19 @@ export default function StudentSettingsPage() {
             )}
 
             {/* Logout */}
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+            <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
               <div className="flex items-center gap-3">
-                <div className="rounded-lg bg-red-500/20 p-2">
-                  <LogOut className="h-5 w-5 text-red-400" />
+                <div className="rounded-lg bg-red-100 p-2">
+                  <LogOut className="h-5 w-5 text-red-600" />
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-lg font-semibold text-white">Sign Out</h2>
-                  <p className="mt-1 text-sm text-gray-400">You'll be returned to the home screen</p>
+                  <h2 className="text-lg font-semibold text-gray-900">Sign Out</h2>
+                  <p className="mt-1 text-sm text-gray-500">You'll be returned to the home screen</p>
                 </div>
                 <Button
                   onClick={() => void logout()}
                   variant="outline"
-                  className="border-red-500/50 text-red-400 hover:bg-red-500/10"
+                  className="border-red-300 text-red-600 hover:bg-red-50"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
                   Log Out

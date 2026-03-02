@@ -64,8 +64,8 @@ export default function RejectedUsersPage() {
     <AdminLayout>
       <div className="mx-auto max-w-7xl">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white">Rejected Users</h1>
-          <p className="mt-2 text-gray-400">View rejected applications</p>
+          <h1 className="text-3xl font-bold text-gray-900">Rejected Users</h1>
+          <p className="mt-2 text-gray-500">View rejected applications</p>
         </div>
 
         {/* Filters */}
@@ -77,7 +77,7 @@ export default function RejectedUsersPage() {
               placeholder="Search by name, email, or specialization..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border-white/10 bg-white/5 pl-12 text-white placeholder-gray-500 focus:border-blue-500/50"
+              className="w-full rounded-xl border-gray-200 bg-white pl-12 text-gray-900 placeholder-gray-500 focus:border-green-500/50"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -89,7 +89,7 @@ export default function RejectedUsersPage() {
                 className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
                   roleFilter === role
                     ? "bg-red-500 text-white"
-                    : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
+                    : "bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-900"
                 }`}
               >
                 {role === "all" ? "All" : role === "peer-mentor" ? "Peer Mentors" : "Counselors"}
@@ -102,29 +102,29 @@ export default function RejectedUsersPage() {
         {loading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-32 animate-pulse rounded-2xl border border-white/10 bg-white/5" />
+              <div key={i} className="h-32 animate-pulse rounded-2xl border border-gray-200 bg-white" />
             ))}
           </div>
         ) : filteredUsers.length === 0 ? (
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-12 text-center">
-            <p className="text-gray-400">No rejected users found.</p>
+          <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center">
+            <p className="text-gray-500">No rejected users found.</p>
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredUsers.map((user) => (
-              <div key={user.uid} className="rounded-2xl border border-white/10 bg-white/5 p-5">
+              <div key={user.uid} className="rounded-2xl border border-gray-200 bg-white p-5">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-pink-600 text-lg font-bold text-white">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-500 text-lg font-bold text-white">
                     {user.fullName?.split(" ").map((n) => n[0]).join("").slice(0, 2) || "U"}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-white truncate">{user.fullName || "—"}</h3>
-                    <p className="text-sm text-red-400 capitalize">{user.role?.replace("-", " ")}</p>
+                    <h3 className="font-semibold text-gray-900 truncate">{user.fullName || "—"}</h3>
+                    <p className="text-sm text-red-600 capitalize">{user.role?.replace("-", " ")}</p>
                   </div>
-                  <XCircle className="h-5 w-5 text-red-400 shrink-0" />
+                  <XCircle className="h-5 w-5 text-red-600 shrink-0" />
                 </div>
 
-                <div className="space-y-2 text-sm text-gray-400">
+                <div className="space-y-2 text-sm text-gray-500">
                   {user.email && (
                     <div className="flex items-center gap-2">
                       <Mail className="h-4 w-4" />

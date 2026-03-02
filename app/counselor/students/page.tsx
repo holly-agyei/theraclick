@@ -67,13 +67,13 @@ export default function CounselorStudentsPage() {
 
   return (
     <LayoutWrapper>
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      <div className="min-h-screen bg-[#F0FDF4]">
         <div className="px-4 py-6 pb-24 md:px-8 md:py-10">
           <div className="mx-auto max-w-6xl">
             {/* Header */}
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-white">All Students</h1>
-              <p className="mt-2 text-gray-400">View and manage all registered students</p>
+              <h1 className="text-3xl font-bold text-gray-900">All Students</h1>
+              <p className="mt-2 text-gray-500">View and manage all registered students</p>
             </div>
 
             {/* Search */}
@@ -85,7 +85,7 @@ export default function CounselorStudentsPage() {
                   placeholder="Search by name, email, school..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pl-12 pr-4 text-white placeholder-gray-500 backdrop-blur-sm transition-colors focus:border-blue-500/50 focus:outline-none"
+                  className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-12 pr-4 text-gray-900 placeholder-gray-500 transition-colors focus:border-green-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -94,13 +94,13 @@ export default function CounselorStudentsPage() {
             {loading ? (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div key={i} className="h-32 animate-pulse rounded-xl border border-white/10 bg-white/5" />
+                  <div key={i} className="h-32 animate-pulse rounded-xl border border-gray-200 bg-white" />
                 ))}
               </div>
             ) : filteredStudents.length === 0 ? (
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-12 text-center">
-                <Users className="mx-auto mb-4 h-16 w-16 text-gray-600" />
-                <p className="text-gray-400">
+              <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center">
+                <Users className="mx-auto mb-4 h-16 w-16 text-gray-400" />
+                <p className="text-gray-500">
                   {searchQuery ? "No students found" : "No students registered yet"}
                 </p>
               </div>
@@ -114,30 +114,30 @@ export default function CounselorStudentsPage() {
                   return (
                     <div
                       key={student.uid}
-                      className="group cursor-pointer rounded-xl border border-white/10 bg-white/5 p-5 transition-all hover:border-blue-500/30 hover:bg-white/10"
+                      className="group cursor-pointer rounded-xl border border-gray-200 bg-white p-5 transition-all hover:border-green-300 hover:bg-gray-100"
                       onClick={() => router.push(`/counselor/inbox/${student.uid}`)}
                     >
                       <div className="mb-4 flex items-center gap-4">
-                        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-lg font-bold text-white">
+                        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-lg font-bold text-white">
                           {displayName.split(" ").map((n) => n[0]).join("").slice(0, 2)}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="truncate font-semibold text-white">{displayName}</h3>
+                          <h3 className="truncate font-semibold text-gray-900">{displayName}</h3>
                           {student.anonymousEnabled && (
-                            <p className="text-xs text-emerald-400">Anonymous Mode</p>
+                            <p className="text-xs text-green-600">Anonymous Mode</p>
                           )}
                         </div>
                       </div>
                       
                       <div className="space-y-2 text-sm">
                         {student.school && (
-                          <div className="flex items-center gap-2 text-gray-400">
+                          <div className="flex items-center gap-2 text-gray-500">
                             <GraduationCap className="h-4 w-4" />
                             <span className="truncate">{student.school}</span>
                           </div>
                         )}
                         {student.educationLevel && (
-                          <div className="flex items-center gap-2 text-gray-400">
+                          <div className="flex items-center gap-2 text-gray-500">
                             <User className="h-4 w-4" />
                             <span>{student.educationLevel}</span>
                           </div>
@@ -149,7 +149,7 @@ export default function CounselorStudentsPage() {
                           e.stopPropagation();
                           router.push(`/counselor/inbox/${student.uid}`);
                         }}
-                        className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-blue-500/20 px-4 py-2 text-sm font-medium text-blue-400 transition-colors hover:bg-blue-500/30"
+                        className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-blue-100 px-4 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-200"
                       >
                         <MessageCircle className="h-4 w-4" />
                         Open Chat

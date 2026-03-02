@@ -298,8 +298,8 @@ export default function PeerMentorChatPage() {
   if (loading) {
     return (
       <LayoutWrapper>
-        <div className="flex min-h-screen items-center justify-center bg-gray-900">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+        <div className="flex min-h-screen items-center justify-center bg-[#F0FDF4]">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-green-500 border-t-transparent" />
         </div>
       </LayoutWrapper>
     );
@@ -308,7 +308,7 @@ export default function PeerMentorChatPage() {
   if (!mentor) {
     return (
       <LayoutWrapper>
-        <div className="flex min-h-screen flex-col items-center justify-center bg-gray-900 text-white">
+        <div className="flex min-h-screen flex-col items-center justify-center bg-[#F0FDF4] text-gray-900">
           <p>Peer mentor not found</p>
           <Button onClick={() => router.back()} className="mt-4">
             Go back
@@ -320,13 +320,13 @@ export default function PeerMentorChatPage() {
 
   return (
     <LayoutWrapper>
-      <div className="flex h-screen flex-col bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      <div className="flex h-screen flex-col bg-[#F0FDF4]">
         {/* Header */}
-        <div className="relative z-10 border-b border-white/10 bg-black/20 px-4 py-4 backdrop-blur-xl md:px-8">
+        <div className="relative z-10 border-b border-gray-200 bg-white px-4 py-4 shadow-sm md:px-8">
           <div className="flex items-center gap-4">
             <button
               onClick={() => router.back()}
-              className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-white/10 hover:text-white"
+              className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-900"
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
@@ -335,23 +335,23 @@ export default function PeerMentorChatPage() {
               <img
                 src={mentor.avatar}
                 alt={mentor.fullName}
-                className="h-12 w-12 rounded-full object-cover border-2 border-white/20"
+                className="h-12 w-12 rounded-full object-cover border-2 border-gray-200"
               />
             ) : (
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-lg font-bold text-white">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-lg font-bold text-green-600">
                 {mentor.fullName.split(" ").map((n) => n[0]).join("")}
               </div>
             )}
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <h1 className="font-semibold text-white truncate">{mentor.fullName}</h1>
+                <h1 className="font-semibold text-gray-900 truncate">{mentor.fullName}</h1>
                 {mentor.isOnline && (
                   <span className="h-2 w-2 rounded-full bg-emerald-400" />
                 )}
               </div>
               <div className="flex items-center gap-2 text-sm">
-                <span className="text-emerald-400">{mentor.specialization}</span>
+                <span className="text-green-600">{mentor.specialization}</span>
                 <span className="text-gray-600">•</span>
                 <span className="flex items-center gap-1 text-gray-500">
                   <GraduationCap className="h-3 w-3" />
@@ -372,7 +372,7 @@ export default function PeerMentorChatPage() {
                   }
                 }}
                 disabled={isInCall}
-                className="flex items-center gap-2 rounded-lg bg-green-500/20 px-3 py-2 text-sm font-medium text-green-400 transition-all hover:bg-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 rounded-lg bg-green-50 px-3 py-2 text-sm font-medium text-green-600 transition-all hover:bg-green-100 disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Voice call"
               >
                 <Phone className="h-4 w-4" />
@@ -388,7 +388,7 @@ export default function PeerMentorChatPage() {
                   }
                 }}
                 disabled={isInCall}
-                className="flex items-center gap-2 rounded-lg bg-blue-500/20 px-3 py-2 text-sm font-medium text-blue-400 transition-all hover:bg-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-2 text-sm font-medium text-blue-600 transition-all hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Video call"
               >
                 <Video className="h-4 w-4" />
@@ -404,16 +404,16 @@ export default function PeerMentorChatPage() {
           <div className="mx-auto max-w-3xl space-y-4">
             {/* About card (at top) */}
             {messages.length === 0 && (
-              <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5">
-                <p className="mb-2 text-sm font-medium text-emerald-400">About {mentor.fullName.split(" ")[0]}</p>
-                <p className="text-sm text-gray-400">{mentor.about}</p>
+              <div className="rounded-2xl border border-green-200 bg-green-50 p-5">
+                <p className="mb-2 text-sm font-medium text-green-600">About {mentor.fullName.split(" ")[0]}</p>
+                <p className="text-sm text-gray-600">{mentor.about}</p>
               </div>
             )}
 
             {messages.length === 0 && (
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center">
+              <div className="rounded-2xl border border-gray-200 bg-white p-6 text-center">
                 <MessageCircle className="mx-auto mb-3 h-8 w-8 text-gray-500" />
-                <p className="text-gray-400">Start the conversation!</p>
+                <p className="text-gray-500">Start the conversation!</p>
                 <p className="mt-1 text-sm text-gray-500">
                   {mentor.fullName.split(" ")[0]} is here to listen and support you.
                 </p>
@@ -428,8 +428,8 @@ export default function PeerMentorChatPage() {
                 <div
                   className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                     msg.senderId === profile?.uid
-                      ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white"
-                      : "border border-white/10 bg-white/5 text-gray-100"
+                      ? "bg-green-600 text-white"
+                      : "border border-gray-200 bg-white text-gray-800"
                   }`}
                 >
                   {msg.audioUrl ? (
@@ -449,18 +449,18 @@ export default function PeerMentorChatPage() {
         </div>
 
         {/* Input */}
-        <div className="border-t border-white/10 bg-black/20 p-4 backdrop-blur-xl md:p-6">
+        <div className="border-t border-gray-200 bg-white p-4 shadow-sm md:p-6">
           <div className="mx-auto max-w-3xl">
             {/* Audio preview */}
             {audioBlob && (
-              <div className="mb-3 flex items-center gap-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-3">
-                <Mic className="h-5 w-5 text-emerald-400 flex-shrink-0" />
+              <div className="mb-3 flex items-center gap-3 rounded-xl bg-green-50 border border-green-200 px-4 py-3">
+                <Mic className="h-5 w-5 text-green-600 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <audio controls src={URL.createObjectURL(audioBlob)} className="w-full h-8" />
                 </div>
                 <button 
                   onClick={() => setAudioBlob(null)} 
-                  className="flex-shrink-0 p-1 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                  className="flex-shrink-0 p-1 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -471,7 +471,7 @@ export default function PeerMentorChatPage() {
                 onClick={isRecording ? stopRecording : startRecording}
                 disabled={sending}
                 className={`flex items-center gap-2 rounded-xl px-4 py-3 transition-all ${
-                  isRecording ? "bg-red-500/20 text-red-400" : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
+                  isRecording ? "bg-red-50 text-red-500" : "bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
                 } ${sending ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 {isRecording ? (
@@ -487,12 +487,12 @@ export default function PeerMentorChatPage() {
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && !sending && sendMessage()}
                 disabled={sending}
-                className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-gray-500 transition-colors focus:border-emerald-500/50 focus:outline-none disabled:opacity-50"
+                className="flex-1 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 placeholder-gray-400 transition-colors focus:border-green-500 focus:outline-none disabled:opacity-50"
               />
               <Button
                 onClick={sendMessage}
                 disabled={(!inputText.trim() && !audioBlob) || sending}
-                className="rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-5 min-w-[60px]"
+                className="rounded-xl bg-green-600 hover:bg-green-700 text-white px-5 min-w-[60px]"
               >
                 {sending ? (
                   <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

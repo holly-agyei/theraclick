@@ -121,13 +121,13 @@ export default function StudentInboxPage() {
 
   return (
     <LayoutWrapper>
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      <div className="min-h-screen bg-[#F0FDF4]">
         <div className="px-4 py-6 pb-24 md:px-8 md:py-10">
           <div className="mx-auto max-w-4xl">
             {/* Header */}
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-white">My Inbox</h1>
-              <p className="mt-2 text-gray-400">All your conversations with counselors and peer mentors</p>
+              <h1 className="text-3xl font-bold text-gray-900">My Inbox</h1>
+              <p className="mt-2 text-gray-500">All your conversations with counselors and peer mentors</p>
             </div>
 
             {/* Search */}
@@ -139,7 +139,7 @@ export default function StudentInboxPage() {
                   placeholder="Search conversations..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pl-12 pr-4 text-white placeholder-gray-500 backdrop-blur-sm transition-colors focus:border-emerald-500/50 focus:outline-none"
+                  className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-12 pr-4 text-gray-900 placeholder-gray-400 transition-colors focus:border-green-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -148,13 +148,13 @@ export default function StudentInboxPage() {
             {loading ? (
               <div className="space-y-3">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="h-20 animate-pulse rounded-xl border border-white/10 bg-white/5" />
+                  <div key={i} className="h-20 animate-pulse rounded-xl border border-gray-200 bg-gray-100" />
                 ))}
               </div>
             ) : filteredConversations.length === 0 ? (
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-12 text-center backdrop-blur-sm">
-                <MessageCircle className="mx-auto mb-4 h-16 w-16 text-gray-600" />
-                <p className="text-gray-400">
+              <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center">
+                <MessageCircle className="mx-auto mb-4 h-16 w-16 text-gray-300" />
+                <p className="text-gray-500">
                   {searchQuery ? "No conversations found" : "No conversations yet"}
                 </p>
                 <p className="mt-1 text-sm text-gray-500">
@@ -164,13 +164,13 @@ export default function StudentInboxPage() {
                   <div className="mt-6 flex gap-4 justify-center">
                     <button
                       onClick={() => router.push("/student/counselors")}
-                      className="rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-2 text-sm font-medium text-white transition-all hover:from-blue-400 hover:to-indigo-500"
+                      className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white transition-all hover:bg-blue-700"
                     >
                       Find a Counselor
                     </button>
                     <button
                       onClick={() => router.push("/student/peer-mentors")}
-                      className="rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 px-6 py-2 text-sm font-medium text-white transition-all hover:from-emerald-400 hover:to-teal-500"
+                      className="rounded-lg bg-green-600 px-6 py-2 text-sm font-medium text-white transition-all hover:bg-green-700"
                     >
                       Find a Peer Mentor
                     </button>
@@ -187,7 +187,7 @@ export default function StudentInboxPage() {
                         ? `/student/counselors/${conv.otherUserId || conv.id}`
                         : `/student/peer-mentors/${conv.otherUserId || conv.id}`
                     )}
-                    className="group w-full rounded-xl border border-white/10 bg-white/5 p-5 text-left transition-all hover:border-emerald-500/30 hover:bg-white/10 backdrop-blur-sm"
+                    className="group w-full rounded-xl border border-gray-200 bg-white shadow-sm p-5 text-left transition-all hover:border-green-300 hover:shadow-md"
                   >
                     <div className="flex items-center gap-4">
                       {/* Avatar */}
@@ -196,19 +196,19 @@ export default function StudentInboxPage() {
                           <img
                             src={conv.avatar}
                             alt={conv.name}
-                            className="h-14 w-14 rounded-full object-cover border-2 border-white/20"
+                            className="h-14 w-14 rounded-full object-cover border-2 border-gray-200"
                           />
                         ) : (
                           <div className={`flex h-14 w-14 items-center justify-center rounded-full text-lg font-bold text-white ${
                             conv.type === "counselor" 
-                              ? "bg-gradient-to-br from-blue-500 to-indigo-600"
-                              : "bg-gradient-to-br from-emerald-500 to-teal-600"
+                              ? "bg-blue-500"
+                              : "bg-green-500"
                           }`}>
                             {conv.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
                           </div>
                         )}
                         {/* Online indicator */}
-                        <div className={`absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-gray-900 ${
+                        <div className={`absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-white ${
                           conv.type === "counselor" ? "bg-blue-400" : "bg-emerald-400"
                         }`} />
                       </div>
@@ -216,7 +216,7 @@ export default function StudentInboxPage() {
                       {/* Content */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
-                          <h3 className="font-semibold text-white truncate">{conv.name}</h3>
+                          <h3 className="font-semibold text-gray-900 truncate">{conv.name}</h3>
                           {conv.lastMessageTime && (
                             <div className="flex items-center gap-1 text-xs text-gray-500 shrink-0 ml-2">
                               <Clock className="h-3 w-3" />
@@ -227,19 +227,19 @@ export default function StudentInboxPage() {
                         <div className="flex items-center gap-2 mb-1">
                           <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
                             conv.type === "counselor"
-                              ? "bg-blue-500/20 text-blue-400"
-                              : "bg-emerald-500/20 text-emerald-400"
+                              ? "bg-blue-100 text-blue-600"
+                              : "bg-green-100 text-green-600"
                           }`}>
                             {conv.type === "counselor" ? "Counselor" : "Peer Mentor"}
                           </span>
                         </div>
                         {conv.lastMessage && (
-                          <p className="line-clamp-2 text-sm text-gray-400">{conv.lastMessage}</p>
+                          <p className="line-clamp-2 text-sm text-gray-500">{conv.lastMessage}</p>
                         )}
                       </div>
 
                       {/* Arrow */}
-                      <Mail className="h-5 w-5 text-gray-600 transition-all group-hover:translate-x-1 group-hover:text-emerald-400 shrink-0" />
+                      <Mail className="h-5 w-5 text-gray-400 transition-all group-hover:translate-x-1 group-hover:text-green-600 shrink-0" />
                     </div>
                   </button>
                 ))}

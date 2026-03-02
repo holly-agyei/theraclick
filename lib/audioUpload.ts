@@ -71,9 +71,10 @@ function blobToBase64(blob: Blob): Promise<string> {
     reader.onloadend = () => {
       const result = reader.result as string;
       if (result && result.length > 0) {
-        // Check size - Firestore has limits
-        if (result.length > 900000) {
-          reject(new Error("Audio too large for base64 storage"));
+        // Firestore document limit is ~1MB. Allow up to 800KB for the audio data
+        // (leaves room for other fields in the document)
+        if (result.length > 800000) {
+          reject(new Error("Audio too large for base64 storage. Try a shorter recording."));
           return;
         }
         resolve(result);

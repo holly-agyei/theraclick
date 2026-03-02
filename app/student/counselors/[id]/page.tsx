@@ -244,64 +244,46 @@ export default function CounselorProfilePage() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       
-      // Get supported mime type
-      // Find supported mime type
       let mimeType = "";
-      const types = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus", "audio/ogg", ""];
-      for (const type of types) {
-        if (type === "" || MediaRecorder.isTypeSupported(type)) {
-          mimeType = type;
-          break;
-        }
+      for (const t of ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus", "audio/ogg"]) {
+        if (MediaRecorder.isTypeSupported(t)) { mimeType = t; break; }
       }
-      console.log("Using mime type:", mimeType || "default");
       
-      const options = mimeType ? { mimeType } : {};
-      const mediaRecorder = new MediaRecorder(stream, options);
+      const mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
       
       mediaRecorder.ondataavailable = (e) => {
-        console.log("Audio chunk:", e.data.size, "bytes");
-        if (e.data.size > 0) {
-          audioChunksRef.current.push(e.data);
-        }
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
       };
-      
       mediaRecorder.onstop = () => {
-        console.log("Recording stopped, chunks:", audioChunksRef.current.length);
-        if (audioChunksRef.current.length === 0) {
-          alert("No audio was recorded. Please try again.");
-          stream.getTracks().forEach((t) => t.stop());
-          return;
-        }
-        const blob = new Blob(audioChunksRef.current, { type: mimeType || "audio/webm" });
-        console.log("Created blob:", blob.size, "bytes");
-        setAudioBlob(blob);
+        const finalType = mimeType || mediaRecorder.mimeType || "audio/webm";
+        const blob = new Blob(audioChunksRef.current, { type: finalType });
+        setAudioBlob(blob.size > 0 ? blob : null);
         stream.getTracks().forEach((t) => t.stop());
       };
-      
-      mediaRecorder.onerror = (e: any) => {
-        console.error("MediaRecorder error:", e?.error || e);
+      mediaRecorder.onerror = () => {
         setIsRecording(false);
         stream.getTracks().forEach((t) => t.stop());
-        alert("Recording error. Please try again.");
       };
       
-      mediaRecorder.start(250);
+      // timeslice=1000 ensures ondataavailable fires every second (cross-browser reliable)
+      mediaRecorder.start(1000);
       setIsRecording(true);
       setRecordingTime(0);
       timerRef.current = setInterval(() => setRecordingTime((t) => t + 1), 1000);
-      console.log("Recording started");
     } catch (e: any) {
       console.error("Mic access error:", e);
-      alert(`Could not access microphone: ${e?.message || 'Unknown error'}\n\nPlease allow microphone access and try again.`);
+      alert("Could not access microphone.\n\nPlease allow microphone access and try again.");
     }
   };
 
   const stopRecording = () => {
-    console.log("Stopping recording...");
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      // Flush remaining audio data before stopping
+      if (mediaRecorderRef.current.state === "recording") {
+        try { mediaRecorderRef.current.requestData(); } catch { /* some browsers don't support */ }
+      }
       mediaRecorderRef.current.stop();
     }
     setIsRecording(false);
@@ -461,9 +443,9 @@ export default function CounselorProfilePage() {
 
   return (
     <LayoutWrapper>
-      <div className="flex h-screen flex-col bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      <div className="flex h-screen flex-col bg-[#0D1F1D]">
         {/* Header */}
-        <div className="relative z-10 border-b border-white/10 bg-black/20 px-4 py-4 backdrop-blur-xl md:px-8">
+        <div className="relative z-10 border-b border-white/[0.06] bg-[#0D1F1D]/90 px-4 py-3 backdrop-blur-xl md:px-8">
           <div className="flex items-center gap-4">
             <button
               onClick={() => router.back()}
@@ -476,22 +458,22 @@ export default function CounselorProfilePage() {
               <img
                 src={counselor.avatar}
                 alt={counselor.fullName}
-                className="h-12 w-12 rounded-full object-cover border-2 border-white/20"
+                className="h-10 w-10 rounded-full object-cover border-2 border-white/[0.12]"
               />
             ) : (
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-lg font-bold text-white">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2BB5A0]/20 text-sm font-bold text-[#2BB5A0]">
                 {counselor.fullName.split(" ").map((n) => n[0]).join("")}
               </div>
             )}
 
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <h1 className="font-semibold text-white">{counselor.fullName}</h1>
+                <h1 className="text-sm font-semibold text-white truncate">{counselor.fullName}</h1>
                 {counselor.isOnline && (
-                  <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                  <span className="h-2 w-2 rounded-full bg-emerald-400 shrink-0" />
                 )}
               </div>
-              <p className="text-sm text-blue-400">{counselor.specialization}</p>
+              <p className="text-xs text-[#2BB5A0]">{counselor.specialization}</p>
             </div>
 
             {/* Call buttons */}
@@ -574,86 +556,113 @@ export default function CounselorProfilePage() {
                     </p>
                   </div>
                 )}
-                {messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`flex ${msg.senderId === profile?.uid ? "justify-end" : "justify-start"}`}
-                  >
-                    <div
-                      className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                        msg.senderId === profile?.uid
-                          ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white"
-                          : "border border-white/10 bg-white/5 text-gray-100"
-                      }`}
-                    >
-                      {msg.audioUrl ? (
-                        <div className="mb-2">
-                          <VoiceMessage 
-                            audioUrl={msg.audioUrl} 
-                            isOwnMessage={msg.senderId === profile?.uid}
-                          />
+                {messages.map((msg, idx) => {
+                  const isOwn = msg.senderId === profile?.uid;
+                  // Show timestamp if gap > 5 min from previous message
+                  const prevMsg = idx > 0 ? messages[idx - 1] : null;
+                  const showTimestamp = !prevMsg ||
+                    (msg.createdAt.getTime() - prevMsg.createdAt.getTime() > 5 * 60 * 1000);
+
+                  return (
+                    <div key={msg.id}>
+                      {showTimestamp && (
+                        <div className="my-3 text-center">
+                          <span className="rounded-full bg-white/[0.05] px-3 py-1 text-[10px] text-[#6B8C89] uppercase">
+                            {msg.createdAt.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+                          </span>
                         </div>
-                      ) : null}
-                      {msg.text && <p className={`text-sm ${msg.audioUrl ? "mt-2" : ""}`}>{msg.text}</p>}
+                      )}
+                      <div className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
+                        <div
+                          className={`max-w-[70%] px-3.5 py-2.5 text-[15px] leading-relaxed
+                            ${isOwn
+                              ? "rounded-[18px_18px_4px_18px] bg-[#2BB5A0] text-white"
+                              : "rounded-[18px_18px_18px_4px] bg-white/[0.08] text-white/90"
+                            }`}
+                          style={{ wordBreak: "break-word" }}
+                        >
+                          {msg.audioUrl && (
+                            <div className="mb-1.5">
+                              <VoiceMessage
+                                audioUrl={msg.audioUrl}
+                                isOwnMessage={isOwn}
+                              />
+                            </div>
+                          )}
+                          {msg.text && msg.text !== "🎤 Voice message" && (
+                            <p className={`text-sm ${msg.audioUrl ? "mt-1.5" : ""}`}>{msg.text}</p>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
                 <div ref={messagesEndRef} />
               </div>
             </div>
 
-            {/* Input */}
-            <div className="border-t border-white/10 bg-black/20 p-4 backdrop-blur-xl md:p-6">
+            {/* Input bar — sticky, mobile-safe */}
+            <div className="border-t border-white/[0.06] bg-[#0D1F1D]/90 backdrop-blur-xl"
+              style={{ padding: "12px 16px", paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
               <div className="mx-auto max-w-3xl">
                 {/* Audio preview */}
                 {audioBlob && (
-                  <div className="mb-3 flex items-center gap-3 rounded-xl bg-blue-500/10 border border-blue-500/20 px-4 py-3">
-                    <Mic className="h-5 w-5 text-blue-400 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <audio controls src={URL.createObjectURL(audioBlob)} className="w-full h-8" />
-                    </div>
-                    <button 
-                      onClick={() => setAudioBlob(null)} 
-                      className="flex-shrink-0 p-1 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
-                    >
-                      <X className="h-5 w-5" />
+                  <div className="mb-2 flex items-center gap-3 rounded-xl border border-[#2BB5A0]/20 bg-[#2BB5A0]/5 px-4 py-2.5">
+                    <Mic className="h-4 w-4 text-[#2BB5A0] shrink-0" />
+                    <audio controls src={URL.createObjectURL(audioBlob)} className="flex-1 h-8" />
+                    <button onClick={() => setAudioBlob(null)}
+                      className="shrink-0 p-1 rounded-full text-[#6B8C89] hover:text-white">
+                      <X className="h-4 w-4" />
                     </button>
                   </div>
                 )}
-                <div className="flex gap-3">
+                <div className="flex items-end gap-2">
+                  {/* Mic button */}
                   <button
                     onClick={isRecording ? stopRecording : startRecording}
                     disabled={sending}
-                    className={`flex items-center gap-2 rounded-xl px-4 py-3 transition-all ${
-                      isRecording ? "bg-red-500/20 text-red-400" : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
-                    } ${sending ? "opacity-50 cursor-not-allowed" : ""}`}
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all
+                      ${isRecording
+                        ? "bg-red-500/20 text-red-400"
+                        : "text-[#6B8C89] hover:bg-white/10 hover:text-white"
+                      } ${sending ? "opacity-40" : ""}`}
                   >
-                    {isRecording ? (
-                      <><MicOff className="h-5 w-5" /><span className="text-sm">{formatRecordingTime(recordingTime)}</span></>
-                    ) : (
-                      <Mic className="h-5 w-5" />
-                    )}
+                    {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
                   </button>
+
+                  {isRecording && (
+                    <span className="shrink-0 text-xs text-red-400 font-medium">{formatRecordingTime(recordingTime)}</span>
+                  )}
+
+                  {/* Text input */}
                   <input
                     type="text"
-                    placeholder="Type or record a message..."
+                    placeholder="Message..."
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && !sending && sendMessage()}
                     disabled={sending}
-                    className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-gray-500 transition-colors focus:border-blue-500/50 focus:outline-none disabled:opacity-50"
+                    className="flex-1 rounded-[20px] border border-white/[0.10] bg-white/[0.05] px-4 py-2.5
+                      text-[15px] text-white placeholder-white/30 transition-colors
+                      focus:border-[#2BB5A0]/50 focus:outline-none disabled:opacity-40"
                   />
-                  <Button
-                    onClick={sendMessage}
-                    disabled={(!inputText.trim() && !audioBlob) || sending}
-                    className="rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 px-5 min-w-[60px]"
-                  >
-                    {sending ? (
-                      <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    ) : (
-                      <Send className="h-5 w-5" />
-                    )}
-                  </Button>
+
+                  {/* Send button — only when there's content */}
+                  {(inputText.trim() || audioBlob) ? (
+                    <button
+                      onClick={sendMessage}
+                      disabled={sending}
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full
+                        bg-[#2BB5A0] text-white transition-all active:scale-[0.88]
+                        disabled:opacity-40"
+                    >
+                      {sending ? (
+                        <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <Send className="h-4 w-4" />
+                      )}
+                    </button>
+                  ) : null}
                 </div>
               </div>
             </div>

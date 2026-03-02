@@ -1,5 +1,11 @@
 "use client";
 
+/**
+ * FORUMS — Community conversations.
+ * Auto-selects the first forum on desktop. No dead empty states.
+ * Forum icons are Lucide SVGs, not emojis.
+ */
+
 import { useState, useEffect, useRef } from "react";
 import { LayoutWrapper } from "@/components/LayoutWrapper";
 import {
@@ -16,12 +22,14 @@ import {
   Reply,
   Mic,
   MicOff,
-  Paperclip,
-  Play,
-  Pause,
   ChevronDown,
+  BookOpen,
+  Heart,
+  GraduationCap,
+  Shield,
+  Sparkles,
+  Leaf,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth";
 import { 
   collection, 
@@ -42,9 +50,9 @@ interface Forum {
   id: string;
   name: string;
   description: string;
-  icon: string;
+  icon: React.ElementType;
   memberCount: number;
-  color: string;
+  lastPost?: string;
 }
 
 interface ForumMessage {
@@ -65,27 +73,23 @@ interface ForumMessage {
   threadCount?: number;
 }
 
-// Extended emoji list for mental health support
-const emojiCategories = {
-  "Reactions": ["❤️", "👍", "👎", "🙏", "💪", "🤗", "😢", "😭", "🥺", "😊", "😌", "🥰"],
-  "Support": ["💕", "🌟", "✨", "🌈", "🦋", "🌸", "🍀", "☀️", "🌙", "💫", "🕊️", "🤍"],
-  "Feelings": ["😔", "😞", "😟", "😰", "😥", "🤯", "😤", "😮‍💨", "🫂", "💔", "🩹", "❤️‍🩹"],
-};
+const reactionEmojis = ["❤️", "👍", "🙏", "💪", "🤗"];
 
-// Demo forums
+// Forums with SVG icons instead of emojis
 const demoForums: Forum[] = [
-  { id: "general", name: "General", description: "A place for everyone to connect", icon: "💬", memberCount: 342, color: "from-blue-500 to-indigo-600" },
-  { id: "exam-stress", name: "Exam Stress", description: "Support through exam season", icon: "📚", memberCount: 189, color: "from-amber-500 to-orange-600" },
-  { id: "anxiety-support", name: "Anxiety Support", description: "A safe space to share", icon: "🌿", memberCount: 156, color: "from-emerald-500 to-teal-600" },
-  { id: "relationships", name: "Relationships", description: "Navigate friendships & family", icon: "💜", memberCount: 98, color: "from-purple-500 to-pink-600" },
-  { id: "first-year", name: "First Year Life", description: "For freshers navigating uni", icon: "🎓", memberCount: 234, color: "from-cyan-500 to-blue-600" },
-  { id: "self-care", name: "Self Care Corner", description: "Tips for taking care of yourself", icon: "🌸", memberCount: 178, color: "from-pink-500 to-rose-600" },
+  { id: "general", name: "General", description: "A place for everyone to connect", icon: MessageSquare, memberCount: 342, lastPost: "Welcome! We're all here to support each other." },
+  { id: "exam-stress", name: "Exam Stress", description: "Support through exam season", icon: BookOpen, memberCount: 189, lastPost: "Finals week is here. How is everyone coping?" },
+  { id: "anxiety-support", name: "Anxiety Support", description: "A safe space to share", icon: Leaf, memberCount: 156, lastPost: "Breathing exercises that actually help." },
+  { id: "relationships", name: "Relationships", description: "Navigate friendships and family", icon: Heart, memberCount: 98, lastPost: "How do you set boundaries with people you love?" },
+  { id: "first-year", name: "First Year Life", description: "For freshers navigating uni", icon: GraduationCap, memberCount: 234, lastPost: "Anyone else feeling lost in their first semester?" },
+  { id: "self-care", name: "Self Care Corner", description: "Tips for taking care of yourself", icon: Shield, memberCount: 178, lastPost: "Small daily habits that changed my wellbeing." },
 ];
 
 export default function ForumsPage() {
   const { profile } = useAuth();
   const [forums] = useState<Forum[]>(demoForums);
-  const [selectedForum, setSelectedForum] = useState<Forum | null>(null);
+  // Auto-select first forum instead of null
+  const [selectedForum, setSelectedForum] = useState<Forum | null>(demoForums[0]);
   const [messages, setMessages] = useState<ForumMessage[]>([]);
   const [inputText, setInputText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -105,12 +109,12 @@ export default function ForumsPage() {
   // Demo messages
   const [demoMessages] = useState<Record<string, ForumMessage[]>>({
     general: [
-      { id: "1", text: "Hey everyone! Just joined Theraklick. Feeling a bit overwhelmed but hoping to find some support here 🙏", senderId: "user1", senderName: "Anonymous Owl", createdAt: new Date(Date.now() - 3600000 * 2), reactions: { "❤️": ["user2", "user3"], "🤗": ["user4"] }, isAnonymous: true, threadCount: 2 },
+      { id: "1", text: "Hey everyone! Just joined Theraklick. Feeling a bit overwhelmed but hoping to find some support here.", senderId: "user1", senderName: "Anonymous Owl", createdAt: new Date(Date.now() - 3600000 * 2), reactions: { "❤️": ["user2", "user3"], "🤗": ["user4"] }, isAnonymous: true, threadCount: 2 },
       { id: "2", text: "Welcome! You're in the right place. We're all here to support each other. What's been on your mind?", senderId: "user2", senderName: "Peaceful Bear", createdAt: new Date(Date.now() - 3600000 * 1.5), reactions: { "👍": ["user1"] }, isAnonymous: true },
-      { id: "3", text: "Same here! Just started my second year and the pressure is real. But talking about it helps 💪", senderId: "user3", senderName: "Brave Lion", createdAt: new Date(Date.now() - 3600000), reactions: { "💪": ["user1", "user2"], "🌟": ["user4"] }, isAnonymous: true },
+      { id: "3", text: "Same here! Just started my second year and the pressure is real. But talking about it helps.", senderId: "user3", senderName: "Brave Lion", createdAt: new Date(Date.now() - 3600000), reactions: { "💪": ["user1", "user2"] }, isAnonymous: true },
     ],
     "exam-stress": [
-      { id: "1", text: "Finals week is killing me 😭 Anyone else feeling completely unprepared?", senderId: "user5", senderName: "Tired Phoenix", createdAt: new Date(Date.now() - 7200000), reactions: { "😢": ["user6", "user7", "user8"], "🤗": ["user9"] }, isAnonymous: true, threadCount: 5 },
+      { id: "1", text: "Finals week is really getting to me. Anyone else feeling completely unprepared?", senderId: "user5", senderName: "Tired Phoenix", createdAt: new Date(Date.now() - 7200000), reactions: { "🤗": ["user9"] }, isAnonymous: true, threadCount: 5 },
       { id: "2", text: "You got this! Remember: one exam at a time. What subject is stressing you most?", senderId: "user6", senderName: "Calm Eagle", createdAt: new Date(Date.now() - 3600000), reactions: { "❤️": ["user5"] }, isAnonymous: true },
     ],
   });
@@ -136,9 +140,7 @@ export default function ForumsPage() {
             isAnonymous: d.data().isAnonymous || false,
           })) as ForumMessage[]);
         }
-      }, (error) => {
-        console.error("Error loading forum messages:", error);
-        // Fallback to demo messages on error
+      }, () => {
         setMessages(demoMessages[selectedForum.id] || []);
       });
       return () => unsub();
@@ -162,10 +164,7 @@ export default function ForumsPage() {
         reactions: d.data().reactions || {},
         isAnonymous: d.data().isAnonymous || false,
       })) as ForumMessage[]);
-    }, (error) => {
-      console.error("Error loading thread replies:", error);
-      setThreadReplies([]);
-    });
+    }, () => setThreadReplies([]));
     return () => unsub();
   }, [selectedThread, selectedForum]);
 
@@ -183,7 +182,7 @@ export default function ForumsPage() {
     const newMessage: Partial<ForumMessage> = {
       text: inputText.trim(),
       senderId: profile.uid,
-      senderName: displayName || "Anonymous",
+      senderName: displayName,
       createdAt: new Date(),
       reactions: {},
       isAnonymous: profile.anonymousEnabled || false,
@@ -222,10 +221,8 @@ export default function ForumsPage() {
         }
       } catch (e) { 
         console.error("Error sending forum message:", e);
-        alert("Failed to send message. Please try again.");
       }
     } else {
-      // Fallback for demo mode
       if (isThreadReply) {
         setThreadReplies((prev) => [...prev, { id: Date.now().toString(), ...newMessage, createdAt: new Date() } as ForumMessage]);
       } else {
@@ -287,61 +284,56 @@ export default function ForumsPage() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       
-      // Get supported mime type
-      let mimeType = "audio/webm";
-      if (!MediaRecorder.isTypeSupported("audio/webm")) {
-        if (MediaRecorder.isTypeSupported("audio/mp4")) {
-          mimeType = "audio/mp4";
-        } else if (MediaRecorder.isTypeSupported("audio/ogg")) {
-          mimeType = "audio/ogg";
-        } else {
-          mimeType = ""; // Use default
-        }
+      let mimeType = "";
+      for (const t of ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus", "audio/ogg"]) {
+        if (MediaRecorder.isTypeSupported(t)) { mimeType = t; break; }
       }
       
-      const options = mimeType ? { mimeType } : {};
-      const mediaRecorder = new MediaRecorder(stream, options);
+      const mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
       
       mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          audioChunksRef.current.push(e.data);
-        }
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
       };
-      
       mediaRecorder.onstop = () => {
-        const blob = new Blob(audioChunksRef.current, { type: mimeType || "audio/webm" });
-        setAudioBlob(blob);
+        const finalType = mimeType || mediaRecorder.mimeType || "audio/webm";
+        const blob = new Blob(audioChunksRef.current, { type: finalType });
+        setAudioBlob(blob.size > 0 ? blob : null);
         stream.getTracks().forEach((t) => t.stop());
       };
-      
-      mediaRecorder.onerror = (e) => {
-        console.error("MediaRecorder error:", e);
+      mediaRecorder.onerror = () => {
         setIsRecording(false);
         stream.getTracks().forEach((t) => t.stop());
       };
       
-      mediaRecorder.start(100); // Collect data every 100ms
+      mediaRecorder.start(1000); // 1s timeslice for cross-browser reliability
       setIsRecording(true);
     } catch (e) {
       console.error("Mic access denied:", e);
-      alert("Could not access microphone.\n\nPlease:\n1. Click the lock icon in your browser's address bar\n2. Allow microphone access\n3. Refresh the page and try again");
     }
   };
 
   const stopRecording = () => {
-    mediaRecorderRef.current?.stop();
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      if (mediaRecorderRef.current.state === "recording") {
+        try { mediaRecorderRef.current.requestData(); } catch { /* ok */ }
+      }
+      mediaRecorderRef.current.stop();
+    }
     setIsRecording(false);
   };
 
   const formatTime = (date: Date) => {
     const diff = Date.now() - date.getTime();
     const mins = Math.floor(diff / 60000);
+    if (mins < 1) return "Just now";
     if (mins < 60) return `${mins}m ago`;
     const hours = Math.floor(mins / 60);
-    if (hours < 24) return `${hours}h ago`;
-    return date.toLocaleDateString();
+    if (hours < 24) return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+    const days = Math.floor(hours / 24);
+    if (days === 1) return "Yesterday";
+    return date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
   };
 
   const filteredForums = forums.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -349,25 +341,28 @@ export default function ForumsPage() {
   const MessageComponent = ({ msg, isThread = false }: { msg: ForumMessage; isThread?: boolean }) => (
     <div className="group">
       <div className="flex gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-gray-700 to-gray-800 text-sm font-medium text-white">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full
+          bg-[#2BB5A0]/20 text-xs font-bold text-[#2BB5A0]">
           {msg.senderName.split(" ").map((n) => n[0]).join("").slice(0, 2)}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-2 flex-wrap">
-            <span className="font-medium text-white">{msg.senderName}</span>
-            {msg.isAnonymous && <span className="rounded bg-gray-700 px-1.5 py-0.5 text-[10px] text-gray-400">Anonymous</span>}
-            <span className="text-xs text-gray-500">{formatTime(msg.createdAt)}</span>
+            <span className="text-sm font-medium text-white">{msg.senderName}</span>
+            {msg.isAnonymous && (
+              <span className="rounded bg-white/10 px-1.5 py-0.5 text-[10px] text-[#6B8C89]">Anonymous</span>
+            )}
+            <span className="text-[11px] text-[#6B8C89]">{formatTime(msg.createdAt)}</span>
           </div>
 
           {msg.replyTo && (
-            <div className="mt-1 flex items-center gap-2 rounded-lg bg-white/5 px-3 py-1.5 text-sm">
-              <Reply className="h-3 w-3 text-gray-500" />
-              <span className="text-gray-500">Replying to</span>
-              <span className="text-gray-400 truncate">{msg.replyTo.senderName}: {msg.replyTo.text}</span>
+            <div className="mt-1.5 flex items-center gap-2 rounded-lg border border-white/[0.06]
+              bg-white/[0.03] px-3 py-1.5 text-sm">
+              <Reply className="h-3 w-3 text-[#6B8C89]" />
+              <span className="text-[#6B8C89] truncate">{msg.replyTo.senderName}: {msg.replyTo.text}</span>
             </div>
           )}
 
-          <p className="mt-1 text-gray-300 whitespace-pre-wrap">{msg.text}</p>
+          <p className="mt-1 text-sm text-gray-300 whitespace-pre-wrap">{msg.text}</p>
 
           {msg.imageUrl && <img src={msg.imageUrl} alt="Shared" className="mt-2 max-h-64 rounded-lg" />}
           {msg.audioUrl && (
@@ -381,46 +376,54 @@ export default function ForumsPage() {
             {Object.entries(msg.reactions).map(([emoji, users]) => {
               const hasReacted = profile?.uid && users.includes(profile.uid);
               return (
-                <button key={emoji} onClick={() => toggleReaction(msg.id, emoji, isThread)} className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-sm transition-all ${hasReacted ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400" : "border-white/10 bg-white/5 text-gray-400 hover:border-white/20"}`}>
+                <button key={emoji} onClick={() => toggleReaction(msg.id, emoji, isThread)}
+                  className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-sm transition-all
+                    ${hasReacted
+                      ? "border-[#2BB5A0]/40 bg-[#2BB5A0]/10 text-[#2BB5A0]"
+                      : "border-white/[0.08] bg-white/[0.03] text-[#6B8C89] hover:border-white/15"
+                    }`}>
                   <span>{emoji}</span><span className="text-xs">{users.length}</span>
                 </button>
               );
             })}
 
-            {/* Actions */}
+            {/* Quick react */}
             <div className="relative">
-              <button onClick={() => setShowEmojiPicker(showEmojiPicker === msg.id ? null : msg.id)} className="rounded-full p-1 text-gray-500 opacity-0 transition-all hover:bg-white/10 hover:text-white group-hover:opacity-100">
+              <button onClick={() => setShowEmojiPicker(showEmojiPicker === msg.id ? null : msg.id)}
+                className="rounded-full p-1 text-[#6B8C89] opacity-0 transition-all hover:bg-white/10
+                  hover:text-white group-hover:opacity-100">
                 <Smile className="h-4 w-4" />
               </button>
               {showEmojiPicker === msg.id && (
-                <div className="absolute bottom-full left-0 z-20 mb-2 w-64 rounded-xl border border-white/10 bg-gray-800 p-3 shadow-xl">
-                  {Object.entries(emojiCategories).map(([cat, emojis]) => (
-                    <div key={cat} className="mb-2">
-                      <p className="mb-1 text-[10px] font-medium uppercase text-gray-500">{cat}</p>
-                      <div className="flex flex-wrap gap-1">
-                        {emojis.map((emoji) => (
-                          <button key={emoji} onClick={() => toggleReaction(msg.id, emoji, isThread)} className="rounded p-1 text-lg hover:bg-white/10">{emoji}</button>
-                        ))}
-                      </div>
-                    </div>
+                <div className="absolute bottom-full left-0 z-20 mb-2 flex gap-1 rounded-xl
+                  border border-white/10 bg-[#0D1F1D] p-2 shadow-xl">
+                  {reactionEmojis.map((emoji) => (
+                    <button key={emoji} onClick={() => toggleReaction(msg.id, emoji, isThread)}
+                      className="rounded p-1.5 text-lg hover:bg-white/10">{emoji}</button>
                   ))}
                 </div>
               )}
             </div>
 
             {!isThread && (
-              <button onClick={() => setSelectedThread(msg)} className="flex items-center gap-1 rounded-full p-1 text-gray-500 opacity-0 transition-all hover:bg-white/10 hover:text-white group-hover:opacity-100">
+              <button onClick={() => setSelectedThread(msg)}
+                className="flex items-center gap-1 rounded-full p-1 text-[#6B8C89] opacity-0
+                  transition-all hover:bg-white/10 hover:text-white group-hover:opacity-100">
                 <MessageSquare className="h-4 w-4" />
                 {msg.threadCount && msg.threadCount > 0 && <span className="text-xs">{msg.threadCount}</span>}
               </button>
             )}
 
-            <button onClick={() => setReplyingTo(msg)} className="rounded-full p-1 text-gray-500 opacity-0 transition-all hover:bg-white/10 hover:text-white group-hover:opacity-100">
+            <button onClick={() => setReplyingTo(msg)}
+              className="rounded-full p-1 text-[#6B8C89] opacity-0 transition-all hover:bg-white/10
+                hover:text-white group-hover:opacity-100">
               <Reply className="h-4 w-4" />
             </button>
 
             {msg.senderId === profile?.uid && (
-              <button onClick={() => deleteMessage(msg.id, isThread)} className="rounded-full p-1 text-gray-500 opacity-0 transition-all hover:bg-red-500/10 hover:text-red-400 group-hover:opacity-100">
+              <button onClick={() => deleteMessage(msg.id, isThread)}
+                className="rounded-full p-1 text-[#6B8C89] opacity-0 transition-all hover:bg-red-500/10
+                  hover:text-red-400 group-hover:opacity-100">
                 <Trash2 className="h-4 w-4" />
               </button>
             )}
@@ -432,69 +435,97 @@ export default function ForumsPage() {
 
   return (
     <LayoutWrapper>
-      <div className="flex h-screen bg-gray-900">
-        {/* Sidebar */}
-        <div className={`${showMobileForums ? "flex" : "hidden"} w-full flex-col border-r border-white/10 bg-gray-900 md:flex md:w-72`}>
-          <div className="border-b border-white/10 p-4">
+      <div className="flex h-screen bg-[#0D1F1D]">
+        {/* Forum list sidebar */}
+        <div className={`${showMobileForums ? "flex" : "hidden"} w-full flex-col border-r border-white/[0.06] bg-[#0D1F1D] md:flex md:w-72`}>
+          <div className="border-b border-white/[0.06] p-4">
             <h1 className="text-lg font-semibold text-white">Forums</h1>
-            <p className="text-sm text-gray-500">Connect with your community</p>
+            <p className="text-sm text-[#6B8C89]">Connect with your community</p>
           </div>
           <div className="p-3">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-              <input type="text" placeholder="Search forums..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full rounded-lg border border-white/10 bg-white/5 py-2 pl-10 pr-4 text-sm text-white placeholder-gray-500 focus:border-emerald-500/50 focus:outline-none" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B8C89]" />
+              <input type="text" placeholder="Search forums..." value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] py-2 pl-10 pr-4
+                  text-sm text-white placeholder-[#6B8C89] focus:border-[#2BB5A0]/50 focus:outline-none" />
             </div>
           </div>
           <div className="flex-1 overflow-y-auto px-2 pb-20">
-            {filteredForums.map((forum) => (
-              <button key={forum.id} onClick={() => { setSelectedForum(forum); setShowMobileForums(false); setSelectedThread(null); }} className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-all ${selectedForum?.id === forum.id ? "bg-white/10 text-white" : "text-gray-400 hover:bg-white/5 hover:text-white"}`}>
-                <span className="text-xl">{forum.icon}</span>
+            {filteredForums.map((forum) => {
+              const Icon = forum.icon;
+              return (
+                <button key={forum.id}
+                  onClick={() => { setSelectedForum(forum); setShowMobileForums(false); setSelectedThread(null); }}
+                  className={`mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-all
+                    ${selectedForum?.id === forum.id
+                      ? "bg-[#2BB5A0]/10 border border-[#2BB5A0]/20"
+                      : "border border-transparent hover:bg-white/[0.04]"
+                    }`}>
+                  <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg
+                    ${selectedForum?.id === forum.id ? "bg-[#2BB5A0]/20" : "bg-white/[0.06]"}`}>
+                    <Icon className={`h-4 w-4 ${selectedForum?.id === forum.id ? "text-[#2BB5A0]" : "text-[#6B8C89]"}`} />
+                  </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">{forum.name}</p>
-                  <p className="text-xs text-gray-500 truncate">{forum.memberCount} members</p>
+                    <p className={`text-sm font-medium truncate
+                      ${selectedForum?.id === forum.id ? "text-white" : "text-gray-300"}`}>
+                      {forum.name}
+                    </p>
+                    {forum.lastPost && (
+                      <p className="text-xs text-[#6B8C89] truncate mt-0.5">{forum.lastPost}</p>
+                    )}
                 </div>
-                <ChevronRight className="h-4 w-4 text-gray-600 md:hidden" />
+                  <ChevronRight className="h-4 w-4 text-[#6B8C89] md:hidden shrink-0" />
               </button>
-            ))}
+              );
+            })}
           </div>
         </div>
 
-        {/* Main Content */}
+        {/* Main content */}
         <div className={`${showMobileForums ? "hidden" : "flex"} flex-1 flex-col md:flex`}>
           {selectedForum ? (
             <>
               {/* Header */}
-              <div className="flex items-center gap-3 border-b border-white/10 bg-gray-900/80 px-4 py-3 backdrop-blur-xl">
-                <button onClick={() => { setShowMobileForums(true); setSelectedThread(null); }} className="rounded-lg p-2 text-gray-400 hover:bg-white/10 md:hidden">
+              <div className="flex items-center gap-3 border-b border-white/[0.06] bg-[#0D1F1D]/80 px-4 py-3 backdrop-blur-xl">
+                <button onClick={() => { setShowMobileForums(true); setSelectedThread(null); }}
+                  className="rounded-lg p-2 text-[#6B8C89] hover:bg-white/10 md:hidden">
                   <ChevronRight className="h-5 w-5 rotate-180" />
                 </button>
-                <div className={`flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br ${selectedForum.color} text-lg`}>{selectedForum.icon}</div>
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#2BB5A0]/15">
+                  <selectedForum.icon className="h-4 w-4 text-[#2BB5A0]" />
+                </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <Hash className="h-4 w-4 text-gray-500" />
-                    <h2 className="font-semibold text-white">{selectedThread ? `Thread in #${selectedForum.name}` : selectedForum.name}</h2>
+                    <Hash className="h-3.5 w-3.5 text-[#6B8C89]" />
+                    <h2 className="text-sm font-semibold text-white">
+                      {selectedThread ? `Thread in ${selectedForum.name}` : selectedForum.name}
+                    </h2>
                   </div>
-                  <p className="text-xs text-gray-500">{selectedThread ? `Replying to ${selectedThread.senderName}` : selectedForum.description}</p>
+                  <p className="text-xs text-[#6B8C89]">
+                    {selectedThread ? `Replying to ${selectedThread.senderName}` : selectedForum.description}
+                  </p>
                 </div>
                 {selectedThread && (
-                  <button onClick={() => setSelectedThread(null)} className="rounded-lg p-2 text-gray-400 hover:bg-white/10">
+                  <button onClick={() => setSelectedThread(null)}
+                    className="rounded-lg p-2 text-[#6B8C89] hover:bg-white/10">
                     <X className="h-5 w-5" />
                   </button>
                 )}
-                <div className="flex items-center gap-2 text-gray-500">
-                  <Users className="h-4 w-4" /><span className="text-sm">{selectedForum.memberCount}</span>
+                <div className="flex items-center gap-1.5 text-[#6B8C89]">
+                  <Users className="h-4 w-4" /><span className="text-xs">{selectedForum.memberCount}</span>
                 </div>
               </div>
 
-              {/* Messages / Thread */}
+              {/* Messages */}
               <div className="flex-1 overflow-y-auto px-4 py-4 md:px-6">
-                <div className="mx-auto max-w-3xl space-y-4">
+                <div className="mx-auto max-w-3xl space-y-5">
                   {selectedThread ? (
                     <>
-                      <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                      <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4">
                         <MessageComponent msg={selectedThread} />
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
+                      <div className="flex items-center gap-2 text-xs text-[#6B8C89]">
                         <ChevronDown className="h-4 w-4" />
                         <span>{threadReplies.length} {threadReplies.length === 1 ? "reply" : "replies"}</span>
                       </div>
@@ -504,8 +535,8 @@ export default function ForumsPage() {
                     <>
                       {messages.length === 0 && (
                         <div className="py-12 text-center">
-                          <MessageSquare className="mx-auto mb-3 h-12 w-12 text-gray-600" />
-                          <p className="text-gray-400">No messages yet. Be the first to share!</p>
+                          <MessageSquare className="mx-auto mb-3 h-10 w-10 text-[#6B8C89]/40" />
+                          <p className="text-sm text-[#6B8C89]">No messages yet. Be the first to share.</p>
                         </div>
                       )}
                       {messages.map((msg) => <MessageComponent key={msg.id} msg={msg} />)}
@@ -516,44 +547,53 @@ export default function ForumsPage() {
               </div>
 
               {/* Input */}
-              <div className="border-t border-white/10 bg-gray-900/80 p-4 backdrop-blur-xl">
+              <div className="border-t border-white/[0.06] bg-[#0D1F1D]/80 p-4 backdrop-blur-xl"
+                style={{ paddingBottom: "max(16px, env(safe-area-inset-bottom))" }}>
                 <div className="mx-auto max-w-3xl">
-                  {/* Reply indicator */}
                   {replyingTo && (
-                    <div className="mb-2 flex items-center justify-between rounded-lg bg-white/5 px-3 py-2">
+                    <div className="mb-2 flex items-center justify-between rounded-lg border border-white/[0.06]
+                      bg-white/[0.03] px-3 py-2">
                       <div className="flex items-center gap-2 text-sm">
-                        <Reply className="h-4 w-4 text-emerald-400" />
-                        <span className="text-gray-400">Replying to</span>
+                        <Reply className="h-4 w-4 text-[#2BB5A0]" />
+                        <span className="text-[#6B8C89]">Replying to</span>
                         <span className="font-medium text-white">{replyingTo.senderName}</span>
                       </div>
-                      <button onClick={() => setReplyingTo(null)} className="text-gray-500 hover:text-white"><X className="h-4 w-4" /></button>
+                      <button onClick={() => setReplyingTo(null)} className="text-[#6B8C89] hover:text-white">
+                        <X className="h-4 w-4" />
+                      </button>
                     </div>
                   )}
 
-                  {/* Image preview */}
                   {selectedImage && (
                     <div className="relative mb-2 inline-block">
                       <img src={selectedImage} alt="Preview" className="h-20 rounded-lg" />
-                      <button onClick={() => setSelectedImage(null)} className="absolute -right-2 -top-2 rounded-full bg-gray-800 p-1 text-white hover:bg-gray-700"><X className="h-3 w-3" /></button>
+                      <button onClick={() => setSelectedImage(null)}
+                        className="absolute -right-2 -top-2 rounded-full bg-[#0D1F1D] p-1 text-white hover:bg-white/20">
+                        <X className="h-3 w-3" />
+                      </button>
                     </div>
                   )}
 
-                  {/* Audio preview */}
                   {audioBlob && (
-                    <div className="mb-2 flex items-center gap-2 rounded-lg bg-white/5 px-3 py-2">
+                    <div className="mb-2 flex items-center gap-2 rounded-lg border border-white/[0.06]
+                      bg-white/[0.03] px-3 py-2">
                       <audio controls src={URL.createObjectURL(audioBlob)} className="h-8 flex-1" />
-                      <button onClick={() => setAudioBlob(null)} className="text-gray-500 hover:text-white"><X className="h-4 w-4" /></button>
+                      <button onClick={() => setAudioBlob(null)} className="text-[#6B8C89] hover:text-white">
+                        <X className="h-4 w-4" />
+                      </button>
                     </div>
                   )}
 
                   <div className="flex gap-2">
                     <input type="file" ref={fileInputRef} accept="image/*" onChange={handleImageSelect} className="hidden" />
                     
-                    <button onClick={() => fileInputRef.current?.click()} className="rounded-lg p-2.5 text-gray-500 hover:bg-white/10 hover:text-white">
+                    <button onClick={() => fileInputRef.current?.click()}
+                      className="rounded-lg p-2.5 text-[#6B8C89] hover:bg-white/10 hover:text-white">
                       <ImageIcon className="h-5 w-5" />
                     </button>
 
-                    <button onClick={isRecording ? stopRecording : startRecording} className={`rounded-lg p-2.5 transition-colors ${isRecording ? "bg-red-500/20 text-red-400" : "text-gray-500 hover:bg-white/10 hover:text-white"}`}>
+                    <button onClick={isRecording ? stopRecording : startRecording}
+                      className={`rounded-lg p-2.5 transition-colors ${isRecording ? "bg-red-500/20 text-red-400" : "text-[#6B8C89] hover:bg-white/10 hover:text-white"}`}>
                       {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
                     </button>
 
@@ -563,22 +603,28 @@ export default function ForumsPage() {
                       value={inputText}
                       onChange={(e) => setInputText(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && sendMessage(!!selectedThread)}
-                      className="flex-1 rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white placeholder-gray-500 transition-colors focus:border-emerald-500/50 focus:outline-none"
+                      className="flex-1 rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-2.5
+                        text-sm text-white placeholder-[#6B8C89] transition-colors
+                        focus:border-[#2BB5A0]/50 focus:outline-none"
                     />
                     
-                    <Button onClick={() => sendMessage(!!selectedThread)} disabled={!inputText.trim() && !audioBlob && !selectedImage} className="rounded-lg bg-emerald-500 px-4 hover:bg-emerald-400">
+                    <button onClick={() => sendMessage(!!selectedThread)}
+                      disabled={!inputText.trim() && !audioBlob && !selectedImage}
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full
+                        bg-[#2BB5A0] text-white transition-all hover:bg-[#2BB5A0]/80
+                        disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.92]">
                       <Send className="h-4 w-4" />
-                    </Button>
+                    </button>
                   </div>
                 </div>
               </div>
             </>
           ) : (
+            /* This should never show now since we auto-select, but as fallback: */
             <div className="hidden flex-1 items-center justify-center md:flex">
               <div className="text-center">
-                <MessageSquare className="mx-auto mb-4 h-16 w-16 text-gray-600" />
-                <h2 className="text-xl font-semibold text-white">Select a forum</h2>
-                <p className="mt-2 text-gray-500">Choose a community to join the conversation</p>
+                <MessageSquare className="mx-auto mb-3 h-10 w-10 text-[#6B8C89]/40" />
+                <p className="text-sm text-[#6B8C89]">Select a forum to get started</p>
               </div>
             </div>
           )}

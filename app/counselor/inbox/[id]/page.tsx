@@ -49,7 +49,7 @@ export default function CounselorChatPage() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const audioUrlMapRef = useRef<Map<string, string>>(new Map());
+  // audioUrlMapRef removed — audioUrl is read directly from Firestore data
 
   useEffect(() => {
     async function loadStudent() {
@@ -78,13 +78,11 @@ export default function CounselorChatPage() {
     const unsub = onSnapshot(q, (snap) => {
       const msgs: Message[] = snap.docs.map((d) => {
         const data = d.data();
-        const msgId = d.id;
-        const audioUrl = audioUrlMapRef.current.get(msgId);
         return {
-          id: msgId,
+          id: d.id,
           ...data,
           createdAt: data.createdAt?.toDate() || new Date(),
-          audioUrl: audioUrl || undefined,
+          audioUrl: data.audioUrl || undefined,
         } as Message;
       });
       setMessages(msgs);
@@ -99,68 +97,49 @@ export default function CounselorChatPage() {
 
   const startRecording = async () => {
     try {
-      console.log("Starting audio recording...");
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       
-      // Find supported mime type
+      // Pick first supported mime
       let mimeType = "";
-      const types = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus", "audio/ogg", ""];
-      for (const type of types) {
-        if (type === "" || MediaRecorder.isTypeSupported(type)) {
-          mimeType = type;
-          break;
-        }
+      for (const t of ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus", "audio/ogg"]) {
+        if (MediaRecorder.isTypeSupported(t)) { mimeType = t; break; }
       }
-      console.log("Using mime type:", mimeType || "default");
       
-      const options = mimeType ? { mimeType } : {};
-      const mediaRecorder = new MediaRecorder(stream, options);
+      const mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
       
       mediaRecorder.ondataavailable = (e) => {
-        console.log("Audio data chunk:", e.data.size, "bytes");
-        if (e.data.size > 0) {
-          audioChunksRef.current.push(e.data);
-        }
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
       };
       
       mediaRecorder.onstop = () => {
-        console.log("Recording stopped, chunks:", audioChunksRef.current.length);
-        if (audioChunksRef.current.length === 0) {
-          console.error("No audio chunks recorded!");
-          alert("No audio was recorded. Please try again.");
-          stream.getTracks().forEach((t) => t.stop());
-          return;
-        }
-        const blob = new Blob(audioChunksRef.current, { type: mimeType || "audio/webm" });
-        console.log("Created blob:", blob.size, "bytes, type:", blob.type);
-        setAudioBlob(blob);
+        const finalType = mimeType || mediaRecorder.mimeType || "audio/webm";
+        const blob = new Blob(audioChunksRef.current, { type: finalType });
+        setAudioBlob(blob.size > 0 ? blob : null);
         stream.getTracks().forEach((t) => t.stop());
       };
       
-      mediaRecorder.onerror = (e: any) => {
-        console.error("MediaRecorder error:", e?.error || e);
+      mediaRecorder.onerror = () => {
         setIsRecording(false);
         stream.getTracks().forEach((t) => t.stop());
-        alert("Recording error. Please try again.");
       };
       
-      // Start recording - request data every 250ms for better compatibility
-      mediaRecorder.start(250);
+      mediaRecorder.start(1000); // 1s timeslice for cross-browser reliability
       setIsRecording(true);
       setRecordingTime(0);
       timerRef.current = setInterval(() => setRecordingTime((t) => t + 1), 1000);
-      console.log("Recording started");
     } catch (e: any) {
       console.error("Mic access error:", e);
-      alert(`Could not access microphone: ${e?.message || 'Unknown error'}\n\nPlease:\n1. Click the lock icon in your browser's address bar\n2. Allow microphone access\n3. Refresh the page and try again`);
+      alert(`Could not access microphone.\n\nPlease allow microphone access and try again.`);
     }
   };
 
   const stopRecording = () => {
-    console.log("Stopping recording...");
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      if (mediaRecorderRef.current.state === "recording") {
+        try { mediaRecorderRef.current.requestData(); } catch { /* ok */ }
+      }
       mediaRecorderRef.current.stop();
     }
     setIsRecording(false);
@@ -362,14 +341,14 @@ export default function CounselorChatPage() {
                   }`}
                 >
                   {msg.audioUrl ? (
-                    <div className="mb-2">
-                      <VoiceMessage 
-                        audioUrl={msg.audioUrl} 
-                        isOwnMessage={msg.senderId === profile?.uid}
-                      />
-                    </div>
+                    <VoiceMessage 
+                      audioUrl={msg.audioUrl} 
+                      isOwnMessage={msg.senderId === profile?.uid}
+                    />
                   ) : null}
-                  {msg.text && <p className={`text-sm ${msg.audioUrl ? "mt-2" : ""}`}>{msg.text}</p>}
+                  {msg.text && msg.text !== "🎤 Voice message" && (
+                    <p className={`text-sm ${msg.audioUrl ? "mt-2" : ""}`}>{msg.text}</p>
+                  )}
                 </div>
               </div>
             ))}

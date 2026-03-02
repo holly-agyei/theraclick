@@ -1,8 +1,13 @@
 "use client";
 
+/**
+ * BOTTOM NAV — Mobile navigation bar.
+ * Fixed at bottom, 64px tall, teal-dark with teal active state.
+ */
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Stethoscope, Users, Bot, MessageSquare, Mail, Calendar } from "lucide-react";
+import { Home, Stethoscope, Users, Bot, Calendar, Mail, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth";
 
@@ -30,18 +35,19 @@ const counselorNavItems = [
 export function BottomNav() {
   const pathname = usePathname();
   const { profile } = useAuth();
-  
+
   const getNavItems = () => {
     if (!profile) return studentNavItems;
     if (profile.role === "peer-mentor") return peerMentorNavItems;
     if (profile.role === "counselor") return counselorNavItems;
     return studentNavItems;
   };
-  
+
   const navItems = getNavItems();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-800 bg-gray-900/95 backdrop-blur-xl md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/[0.06]
+      bg-[#0D1F1D]/95 backdrop-blur-xl md:hidden">
       <div className="mx-auto flex max-w-md justify-around">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -51,12 +57,16 @@ export function BottomNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-1 flex-col items-center gap-1 py-3 transition-colors",
-                isActive ? "text-emerald-400" : "text-gray-500"
+                "flex flex-1 flex-col items-center gap-1 py-3 transition-colors duration-200",
+                isActive ? "text-[#2BB5A0]" : "text-[#6B8C89]"
               )}
             >
               <Icon className="h-5 w-5" />
               <span className="text-[10px] font-medium">{item.label}</span>
+              {/* Active indicator dot */}
+              {isActive && (
+                <div className="absolute bottom-1 h-1 w-1 rounded-full bg-[#2BB5A0] tk-pulse-badge" />
+              )}
             </Link>
           );
         })}

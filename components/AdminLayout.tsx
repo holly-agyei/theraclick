@@ -3,7 +3,7 @@
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { useAdminAuth } from "@/context/adminAuth";
-import { Shield, Users, CheckCircle, XCircle, BarChart3, LogOut, Menu, X } from "lucide-react";
+import { Shield, Users, CheckCircle, XCircle, BarChart3, LogOut, Menu, X, Flag } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 
@@ -36,6 +36,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     { href: "/admin/pending", icon: Users, label: "Pending Applications" },
     { href: "/admin/approved", icon: CheckCircle, label: "Approved Users" },
     { href: "/admin/rejected", icon: XCircle, label: "Rejected Users" },
+    { href: "/admin/reports", icon: Flag, label: "User Reports" },
   ];
 
   return (

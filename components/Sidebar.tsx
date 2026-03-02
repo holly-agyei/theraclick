@@ -1,18 +1,23 @@
 "use client";
 
+/**
+ * SIDEBAR — Desktop navigation.
+ * Shows first name + role (or school) instead of raw username.
+ * Clean Lucide icons, no emojis.
+ */
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  Home, 
-  Stethoscope, 
-  Users, 
-  Bot, 
-  MessageSquare, 
-  Settings, 
+import {
+  Home,
+  Stethoscope,
+  Users,
+  Bot,
+  MessageSquare,
+  Settings,
   LogOut,
   Mail,
   Calendar,
-  MessageCircle
 } from "lucide-react";
 import { Logo } from "./Logo";
 import { cn } from "@/lib/utils";
@@ -47,32 +52,54 @@ const counselorNavItems = [
 export function Sidebar() {
   const pathname = usePathname();
   const { logout, profile, loading } = useAuth();
-  
+
   const getNavItems = () => {
     if (!profile) return studentNavItems;
     if (profile.role === "peer-mentor") return peerMentorNavItems;
     if (profile.role === "counselor") return counselorNavItems;
     return studentNavItems;
   };
-  
+
   const navItems = getNavItems();
 
+  // Derive display name: first name preferred, then anonymous ID, then "there"
+  const displayName = (() => {
+    if (loading) return "...";
+    if (!profile) return "";
+    if (profile.role === "student" && profile.anonymousEnabled && profile.anonymousId) {
+      return profile.anonymousId;
+    }
+    return profile.fullName || "Complete your profile";
+  })();
+
+  // Role label or school
+  const roleLabel = (() => {
+    if (!profile) return "";
+    if (profile.role === "counselor") return "Counselor";
+    if (profile.role === "peer-mentor") return "Peer Mentor";
+    return "Student";
+  })();
+
   return (
-    <aside className="hidden h-screen w-64 shrink-0 border-r border-gray-800/50 bg-gray-900 md:flex md:flex-col">
-      <div className="flex h-16 items-center border-b border-gray-800/50 px-6">
+    <aside className="hidden h-screen w-64 shrink-0 border-r border-white/[0.06] bg-[#0D1F1D] md:flex md:flex-col">
+      {/* Brand */}
+      <div className="flex h-16 items-center border-b border-white/[0.06] px-6">
         <Logo className="text-white" />
       </div>
-      <div className="border-b border-gray-800/50 px-6 py-4">
-        <p className="text-xs font-medium text-gray-500">Signed in as</p>
-        <p className="mt-1 truncate text-sm font-semibold text-white">
-          {loading
-            ? "…"
-            : profile?.role === "student" && profile.anonymousEnabled && profile.anonymousId
-              ? profile.anonymousId
-              : profile?.fullName || "—"}
-        </p>
+
+      {/* User info — name + role, not "Signed in as" */}
+      <div className="border-b border-white/[0.06] px-6 py-4">
+        <p className="truncate text-sm font-semibold text-white">{displayName}</p>
+        <p className="mt-0.5 text-xs text-[#6B8C89]">{roleLabel}</p>
+        {profile && !profile.fullName && profile.role === "student" && (
+          <Link href="/student/settings" className="mt-1 block text-xs text-[#2BB5A0] hover:underline">
+            Add your name
+          </Link>
+        )}
       </div>
-      <nav className="flex-1 space-y-1 px-3 py-4">
+
+      {/* Navigation */}
+      <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
@@ -81,10 +108,10 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all",
+                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
                 isActive
-                  ? "bg-gradient-to-r from-emerald-500/20 to-teal-500/10 text-emerald-400"
-                  : "text-gray-400 hover:bg-white/5 hover:text-white"
+                  ? "bg-[#2BB5A0]/15 text-[#2BB5A0]"
+                  : "text-[#6B8C89] hover:bg-white/5 hover:text-white"
               )}
             >
               <Icon className="h-5 w-5" />
@@ -93,10 +120,13 @@ export function Sidebar() {
           );
         })}
       </nav>
-      <div className="border-t border-gray-800/50 p-4">
+
+      {/* Logout */}
+      <div className="border-t border-white/[0.06] p-4">
         <button
           onClick={() => void logout()}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-400 transition-colors hover:bg-white/5 hover:text-white"
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium
+            text-[#6B8C89] transition-colors hover:bg-white/5 hover:text-white"
         >
           <LogOut className="h-5 w-5" />
           <span>Logout</span>

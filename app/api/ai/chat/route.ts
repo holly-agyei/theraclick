@@ -104,15 +104,15 @@ function buildSystemPrompt(ctx?: UserContext) {
 }
 
 async function callGemini(messages: ChatMessage[], ctx?: UserContext) {
-  // Use env key or fallback to provided key
-  const apiKey = process.env.GEMINI_API_KEY || "AIzaSyCwJYQ60NW7orX4YTiWNz7bY28WHUz9dLw";
+  // Read from .env.local — never hardcode API keys in source code
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     console.log("Gemini: No API key configured");
     return null;
   }
 
-  // Try gemini-pro which has separate quota from flash models
-  const model = "gemini-pro";
+  // gemini-2.0-flash: free tier, fast, good quality — replaces deprecated gemini-pro
+  const model = "gemini-2.0-flash";
   console.log(`Gemini: Using model ${model}`);
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(
@@ -175,13 +175,13 @@ export async function POST(req: Request) {
       });
     }
 
-    // Skip Gemini (quota exhausted), use Cogen AI
-    // const geminiText = await callGemini(messages, userContext);
-    // if (geminiText) {
-    //   return NextResponse.json({ ok: true, mode: "gemini", message: geminiText });
-    // }
+    // PRIMARY: Gemini 2.0 Flash (free tier, fast)
+    const geminiText = await callGemini(messages, userContext);
+    if (geminiText) {
+      return NextResponse.json({ ok: true, mode: "gemini", message: geminiText });
+    }
 
-    // Fallback: OpenAI-compatible (Cogen AI)
+    // FALLBACK: OpenAI-compatible (Cogen AI) — only reached if Gemini fails
     const apiKey = process.env.OPENAI_API_KEY || "sk-qZJyPuRxRCPzH0mwOBX6_A";
     const baseUrl = process.env.OPENAI_BASE_URL || "https://api.cogenai.kalavai.net/v1";
     const model = process.env.OPENAI_MODEL || "gpt-4o-mini";

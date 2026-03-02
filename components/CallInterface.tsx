@@ -137,6 +137,7 @@ export function CallInterface() {
     endCall,
     toggleMute,
     toggleVideo,
+    replaceVideoTrack,
   } = useCall();
 
   const localVideoRef = useRef<HTMLVideoElement>(null);
@@ -168,20 +169,29 @@ export function CallInterface() {
   }, [isRinging, isCaller, ringtone]);
 
   // Handle local video
+  // WHY: We depend on both localStream AND isVideoOff so the video element
+  // re-attaches and plays when video is toggled back on. Without isVideoOff
+  // in the deps, toggling video off then on leaves the preview frozen because
+  // the stream reference didn't change — only the track's enabled state did.
   useEffect(() => {
     const video = localVideoRef.current;
     if (!video || !localStream) return;
 
-    video.srcObject = localStream;
-    video.muted = true;
-    video.play().catch(console.error);
+    if (!isVideoOff) {
+      video.srcObject = localStream;
+      video.muted = true;
+      video.play().catch(console.error);
+    }
 
     return () => {
       video.srcObject = null;
     };
-  }, [localStream]);
+  }, [localStream, isVideoOff]);
 
-  // Handle remote video/audio - CRITICAL FIX
+  // Handle remote video/audio
+  // WHY: We need to monitor the remote stream AND individual track mute/unmute events.
+  // When the remote user toggles their video, WebRTC fires mute/unmute on the track.
+  // Without this, hasRemoteVideo goes stale and the UI shows black frames instead of avatar.
   useEffect(() => {
     const video = remoteVideoRef.current;
     const audio = remoteAudioRef.current;
@@ -197,26 +207,77 @@ export function CallInterface() {
       active: remoteStream.active
     });
 
-    // Check if there are video tracks
+    // Helper: check if remote video is actually available
+    // WHY: We intentionally do NOT check !t.muted here. Remote WebRTC tracks
+    // start as muted:true until media data physically arrives from the network —
+    // even though the remote camera IS on. Checking !t.muted would block the
+    // video display during ICE negotiation. The mute/unmute event listeners
+    // below handle dynamic toggling (remote user turns camera on/off).
+    const checkVideoState = () => {
+      const videoTracks = remoteStream.getVideoTracks();
+      const hasLiveVideo = videoTracks.length > 0 && videoTracks.some(
+        t => t.enabled && t.readyState === 'live'
+      );
+      console.log("Remote video state check:", {
+        hasLiveVideo,
+        tracks: videoTracks.map(t => ({ kind: t.kind, enabled: t.enabled, muted: t.muted, readyState: t.readyState }))
+      });
+      setHasRemoteVideo(hasLiveVideo);
+    };
+
+    checkVideoState();
+
+    // Periodic safety net: re-check every 2s in case we missed an unmute event
+    // WHY: React batching + WebRTC event timing can cause missed track events.
+    // This ensures we catch video availability within a few seconds max.
+    const pollId = setInterval(checkVideoState, 2000);
+
+    // Listen for mute/unmute on EACH remote video track
+    // WHY: When remote user toggles video off, the track fires 'mute'.
+    // When they toggle it back on, it fires 'unmute'. This is how we
+    // know to swap between showing video vs avatar placeholder.
     const videoTracks = remoteStream.getVideoTracks();
-    setHasRemoteVideo(videoTracks.length > 0 && videoTracks.some(t => t.enabled && t.readyState === 'live'));
+    const trackHandlers: Array<{ track: MediaStreamTrack; onMute: () => void; onUnmute: () => void; onEnded: () => void }> = [];
+
+    videoTracks.forEach(track => {
+      const onMute = () => {
+        console.log("Remote video track muted (camera off)");
+        setHasRemoteVideo(false);
+      };
+      const onUnmute = () => {
+        console.log("Remote video track unmuted (camera on)");
+        setHasRemoteVideo(true);
+        // Re-attach and play video element to ensure it resumes
+        if (video) {
+          video.srcObject = remoteStream;
+          video.play().catch(() => {});
+        }
+      };
+      const onEnded = () => {
+        console.log("Remote video track ended");
+        checkVideoState();
+      };
+
+      track.addEventListener('mute', onMute);
+      track.addEventListener('unmute', onUnmute);
+      track.addEventListener('ended', onEnded);
+      trackHandlers.push({ track, onMute, onUnmute, onEnded });
+    });
 
     // Set up video element
     if (video && isVideoCall) {
       video.srcObject = remoteStream;
       
-      // Listen for video track changes
       video.onloadedmetadata = () => {
         console.log("Remote video metadata loaded");
         video.play().then(() => {
           console.log("Remote video playing successfully");
-          setHasRemoteVideo(true);
+          checkVideoState();
         }).catch(err => {
           console.error("Error playing remote video:", err);
         });
       };
 
-      // Also try to play immediately
       video.play().catch(() => {});
     }
 
@@ -226,10 +287,26 @@ export function CallInterface() {
       audio.play().catch(console.error);
     }
 
-    // Monitor track events
-    remoteStream.onaddtrack = (e) => {
-      console.log("Track added:", e.track.kind);
+    // Monitor new tracks being added to the stream
+    const onAddTrack = (e: MediaStreamTrackEvent) => {
+      console.log("Track added to remote stream:", e.track.kind);
       if (e.track.kind === 'video') {
+        // Listen for mute/unmute on newly added video tracks too
+        const onMute = () => setHasRemoteVideo(false);
+        const onUnmute = () => {
+          setHasRemoteVideo(true);
+          if (video) {
+            video.srcObject = remoteStream;
+            video.play().catch(() => {});
+          }
+        };
+        const onEnded = () => checkVideoState();
+
+        e.track.addEventListener('mute', onMute);
+        e.track.addEventListener('unmute', onUnmute);
+        e.track.addEventListener('ended', onEnded);
+        trackHandlers.push({ track: e.track, onMute, onUnmute, onEnded });
+
         setHasRemoteVideo(true);
         if (video) {
           video.srcObject = remoteStream;
@@ -238,11 +315,41 @@ export function CallInterface() {
       }
     };
 
+    const onRemoveTrack = (e: MediaStreamTrackEvent) => {
+      console.log("Track removed from remote stream:", e.track.kind);
+      if (e.track.kind === 'video') {
+        checkVideoState();
+      }
+    };
+
+    remoteStream.addEventListener('addtrack', onAddTrack);
+    remoteStream.addEventListener('removetrack', onRemoveTrack);
+
     return () => {
+      clearInterval(pollId);
+      // Clean up all track event listeners
+      trackHandlers.forEach(({ track, onMute, onUnmute, onEnded }) => {
+        track.removeEventListener('mute', onMute);
+        track.removeEventListener('unmute', onUnmute);
+        track.removeEventListener('ended', onEnded);
+      });
+      remoteStream.removeEventListener('addtrack', onAddTrack);
+      remoteStream.removeEventListener('removetrack', onRemoveTrack);
       if (video) video.srcObject = null;
       if (audio) audio.srcObject = null;
     };
   }, [remoteStream, isVideoCall]);
+
+  // Ensure video element plays when remote video becomes available
+  // WHY: When hasRemoteVideo was false, the video element had display:none (Tailwind "hidden").
+  // Some browsers skip decoding for hidden videos. When it becomes visible,
+  // we must explicitly re-attach srcObject and call play() to resume rendering.
+  useEffect(() => {
+    if (hasRemoteVideo && remoteVideoRef.current && remoteStream) {
+      remoteVideoRef.current.srcObject = remoteStream;
+      remoteVideoRef.current.play().catch(() => {});
+    }
+  }, [hasRemoteVideo, remoteStream]);
 
   // Call duration timer
   useEffect(() => {
@@ -301,6 +408,10 @@ export function CallInterface() {
     }
   };
 
+  // Switch between front/back camera
+  // WHY: We use replaceVideoTrack which updates BOTH the local stream AND
+  // the peer connection sender. Without updating the sender, the remote user
+  // would still see the old camera's (now stopped) track.
   const switchCamera = async () => {
     if (!localStream) return;
     
@@ -312,19 +423,23 @@ export function CallInterface() {
       });
       
       const newTrack = newStream.getVideoTracks()[0];
-      const oldTrack = localStream.getVideoTracks()[0];
+      if (!newTrack) return;
+
+      // Replace track in both localStream AND peer connection sender
+      const result = await replaceVideoTrack(newTrack);
       
-      if (oldTrack && newTrack) {
-        oldTrack.stop();
-        localStream.removeTrack(oldTrack);
-        localStream.addTrack(newTrack);
-        
+      if (result) {
+        // Update local preview
         if (localVideoRef.current) {
           localVideoRef.current.srcObject = localStream;
         }
+        setFacingMode(newMode);
+        console.log("✓ Camera switched to:", newMode);
+      } else {
+        // Fallback: at least update local preview
+        newTrack.stop();
+        console.warn("Failed to replace video track in peer connection");
       }
-      
-      setFacingMode(newMode);
     } catch (err) {
       console.error("Error switching camera:", err);
     }

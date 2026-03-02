@@ -2,6 +2,20 @@
 
 A student mental health platform focused on Africa (starting with Ghana), providing fast, anonymous, layered mental health support.
 
+## ⚠️ Quick Setup
+
+**First time setup?** You need to configure Firebase:
+
+1. Clone the repo: `git clone <your-repo-url>`
+2. Install dependencies: `npm install`
+3. Copy environment file: `cp env.example .env.local`
+4. **Follow the complete setup guide:** See [`LLM_SETUP_GUIDE.md`](./LLM_SETUP_GUIDE.md) for detailed step-by-step instructions with all keys and configuration needed
+5. Run: `npm run dev`
+
+**Without Firebase config, the app runs in demo mode** (limited functionality).
+
+> 💡 **For LLM-assisted setup:** Share [`LLM_SETUP_GUIDE.md`](./LLM_SETUP_GUIDE.md) with your LLM - it contains everything needed!
+
 ## Tech Stack
 
 - **Next.js 16** (App Router)
@@ -20,8 +34,55 @@ npm install
 
 2. Configure environment variables:
 
-- Copy `env.example` → `.env.local` and fill in values.
-- If you leave Firebase keys empty, the app runs in **demo mode** (local-only session + local chat history).
+**Step 1:** Copy `env.example` to `.env.local`:
+```bash
+cp env.example .env.local
+```
+
+**Step 2:** Get Firebase credentials:
+- Go to [Firebase Console](https://console.firebase.google.com/)
+- Create a new project (or select existing one)
+- Go to Project Settings (gear icon) → General tab
+- Scroll down to "Your apps" → Click the Web icon (`</>`) to add a web app
+- Copy the Firebase config values into `.env.local`:
+  ```
+  NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
+  NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+  NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+  NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+  NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
+  ```
+
+**Step 3:** Enable Firebase services:
+- **Authentication**: Go to Authentication → Sign-in method → Enable Email/Password
+- **Firestore**: Go to Firestore Database → Create database → Start in test mode (then update rules)
+- **Storage**: Go to Storage → Get started → Start in test mode (then update rules)
+
+**Step 4:** Install Firebase CLI (if not already installed):
+```bash
+npm install -g firebase-tools
+firebase login
+firebase init
+# Select: Firestore, Storage
+# Use existing project (select your Firebase project)
+```
+
+**Step 5:** Deploy Firestore rules:
+```bash
+firebase deploy --only firestore:rules
+```
+
+**Step 6:** Deploy Storage rules:
+```bash
+firebase deploy --only storage
+```
+
+**Note:** If you don't deploy the rules, you'll get permission errors. The rules files are already in the repo (`firestore.rules` and `storage.rules`).
+
+**Note:** If you leave Firebase keys empty, the app runs in **demo mode** (local-only session + local chat history).
+
+**Optional:**
 - AI uses **Gemini** if `GEMINI_API_KEY` is set; otherwise falls back to OpenAI-compatible; otherwise uses **safe demo responses**.
 - For admin approvals, also set `ADMIN_API_KEY` + Firebase Admin service account env vars (see below).
 

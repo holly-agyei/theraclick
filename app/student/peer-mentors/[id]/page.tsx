@@ -111,7 +111,7 @@ export default function PeerMentorChatPage() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const audioUrlMapRef = useRef<Map<string, string>>(new Map()); // Store audio URLs by message ID
+  // audioUrlMapRef removed — audioUrl is read directly from Firestore data
 
   // Load mentor
   useEffect(() => {
@@ -158,14 +158,11 @@ export default function PeerMentorChatPage() {
     const unsub = onSnapshot(q, (snap) => {
       const msgs: Message[] = snap.docs.map((d) => {
         const data = d.data();
-        const msgId = d.id;
-        // Preserve audio URL if we have it stored locally
-        const audioUrl = audioUrlMapRef.current.get(msgId);
         return {
-          id: msgId,
+          id: d.id,
           ...data,
           createdAt: data.createdAt?.toDate() || new Date(),
-          audioUrl: audioUrl || (data.hasAudio ? undefined : undefined), // Keep stored URL or check hasAudio
+          audioUrl: data.audioUrl || undefined,
         } as Message;
       });
       setMessages(msgs);
@@ -183,55 +180,51 @@ export default function PeerMentorChatPage() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       
-      // Get supported mime type
-      let mimeType = "audio/webm";
-      if (!MediaRecorder.isTypeSupported("audio/webm")) {
-        if (MediaRecorder.isTypeSupported("audio/mp4")) {
-          mimeType = "audio/mp4";
-        } else if (MediaRecorder.isTypeSupported("audio/ogg")) {
-          mimeType = "audio/ogg";
-        } else {
-          mimeType = ""; // Use default
-        }
+      let mimeType = "";
+      for (const t of ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus", "audio/ogg"]) {
+        if (MediaRecorder.isTypeSupported(t)) { mimeType = t; break; }
       }
       
-      const options = mimeType ? { mimeType } : {};
-      const mediaRecorder = new MediaRecorder(stream, options);
+      const mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
       
       mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          audioChunksRef.current.push(e.data);
-        }
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
       };
-      
       mediaRecorder.onstop = () => {
-        const blob = new Blob(audioChunksRef.current, { type: mimeType || "audio/webm" });
-        setAudioBlob(blob);
+        const finalType = mimeType || mediaRecorder.mimeType || "audio/webm";
+        const blob = new Blob(audioChunksRef.current, { type: finalType });
+        setAudioBlob(blob.size > 0 ? blob : null);
         stream.getTracks().forEach((t) => t.stop());
       };
-      
-      mediaRecorder.onerror = (e) => {
-        console.error("MediaRecorder error:", e);
+      mediaRecorder.onerror = () => {
         setIsRecording(false);
         stream.getTracks().forEach((t) => t.stop());
       };
       
-      mediaRecorder.start(100); // Collect data every 100ms
+      mediaRecorder.start(1000); // 1s timeslice for cross-browser reliability
       setIsRecording(true);
       setRecordingTime(0);
       timerRef.current = setInterval(() => setRecordingTime((t) => t + 1), 1000);
     } catch (e) {
       console.error("Mic access denied:", e);
-      alert("Could not access microphone.\n\nPlease:\n1. Click the lock icon in your browser's address bar\n2. Allow microphone access\n3. Refresh the page and try again");
+      alert("Could not access microphone.\n\nPlease allow microphone access and try again.");
     }
   };
 
   const stopRecording = () => {
-    mediaRecorderRef.current?.stop();
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      if (mediaRecorderRef.current.state === "recording") {
+        try { mediaRecorderRef.current.requestData(); } catch { /* ok */ }
+      }
+      mediaRecorderRef.current.stop();
+    }
     setIsRecording(false);
-    if (timerRef.current) clearInterval(timerRef.current);
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
   };
 
   const formatRecordingTime = (seconds: number) => {
@@ -440,14 +433,14 @@ export default function PeerMentorChatPage() {
                   }`}
                 >
                   {msg.audioUrl ? (
-                    <div className="mb-2">
-                      <VoiceMessage 
-                        audioUrl={msg.audioUrl} 
-                        isOwnMessage={msg.senderId === profile?.uid}
-                      />
-                    </div>
+                    <VoiceMessage 
+                      audioUrl={msg.audioUrl} 
+                      isOwnMessage={msg.senderId === profile?.uid}
+                    />
                   ) : null}
-                  {msg.text && <p className={`text-sm ${msg.audioUrl ? "mt-2" : ""}`}>{msg.text}</p>}
+                  {msg.text && msg.text !== "🎤 Voice message" && (
+                    <p className={`text-sm ${msg.audioUrl ? "mt-2" : ""}`}>{msg.text}</p>
+                  )}
                 </div>
               </div>
             ))}

@@ -56,7 +56,14 @@ export class WebRTCCallManager {
   private isCleaningUp: boolean = false;
   private hasReceivedOffer: boolean = false;
 
+  // Reconnection state for resilient disconnect handling
+  private reconnectAttempts: number = 0;
+  private maxReconnectAttempts: number = 3;
+  private disconnectTimer: NodeJS.Timeout | null = null;
+
   // STUN/TURN servers configuration
+  // WHY: STUN alone only works for simple NATs. Long-distance calls often traverse
+  // symmetric NATs (mobile carriers, corporate firewalls) which REQUIRE TURN relay.
   private getRTCConfig(): RTCConfiguration {
     const iceServers: RTCIceServer[] = [];
 
@@ -73,17 +80,17 @@ export class WebRTCCallManager {
       ? (window as any).__TURN_CREDENTIAL__ || process.env.NEXT_PUBLIC_TURN_CREDENTIAL
       : process.env.NEXT_PUBLIC_TURN_CREDENTIAL;
 
-    // Add STUN servers FIRST for quick discovery
+    // Add STUN servers FIRST for quick discovery (direct P2P when possible)
     iceServers.push(
       { urls: "stun:stun.l.google.com:19302" },
       { urls: "stun:stun1.l.google.com:19302" },
       { urls: "stun:stun2.l.google.com:19302" },
       { urls: "stun:stun3.l.google.com:19302" },
       { urls: "stun:stun4.l.google.com:19302" },
-      { urls: "stun:stun.stunprotocol.org:3478" }
+      { urls: "stun:global.stun.twilio.com:3478" }
     );
 
-    // Add configured TURN server (if provided)
+    // Add configured TURN server (if provided via env)
     if (turnServerUrl) {
       const turnConfig: RTCIceServer = {
         urls: turnServerUrl,
@@ -92,32 +99,42 @@ export class WebRTCCallManager {
       if (turnCredential) turnConfig.credential = turnCredential;
       iceServers.push(turnConfig);
       console.log("Using custom TURN server:", turnServerUrl);
-    } else {
-      // Add free public TURN servers as fallback
-      // Note: These are free servers and may have rate limits or be unavailable
-      iceServers.push(
-        // Metered.ca free TURN (may require signup for reliable access)
-        { 
-          urls: [
-            "turn:a.relay.metered.ca:80",
-            "turn:a.relay.metered.ca:80?transport=tcp",
-            "turn:a.relay.metered.ca:443",
-            "turn:a.relay.metered.ca:443?transport=tcp"
-          ],
-          username: "83eebabf8b4cce9d5dbcb649",
-          credential: "2D7JvfkOQtBdYW3R"
-        },
-        // Twilio free STUN (no auth needed)
-        { urls: "stun:global.stun.twilio.com:3478" }
-      );
-      console.log("Using free public TURN servers");
     }
 
-    // Always use "all" policy to try both direct and relayed connections
-    // This gives the best chance of connecting
+    // ALWAYS add free Open Relay TURN servers as fallback
+    // WHY: These are the most reliable free TURN servers available.
+    // They support UDP, TCP, and TLS — critical for users behind strict firewalls.
+    // Without TURN, calls across different networks (long distance) WILL fail.
+    iceServers.push(
+      {
+        urls: "turn:openrelay.metered.ca:80",
+        username: "openrelayproject",
+        credential: "openrelayproject",
+      },
+      {
+        urls: "turn:openrelay.metered.ca:443",
+        username: "openrelayproject",
+        credential: "openrelayproject",
+      },
+      {
+        urls: "turn:openrelay.metered.ca:443?transport=tcp",
+        username: "openrelayproject",
+        credential: "openrelayproject",
+      },
+      // Additional free TURN from Metered (TCP fallback for strict firewalls)
+      {
+        urls: "turns:openrelay.metered.ca:443?transport=tcp",
+        username: "openrelayproject",
+        credential: "openrelayproject",
+      }
+    );
+    console.log("TURN relay servers configured for long-distance connectivity");
+
+    // "all" policy = try direct (STUN) first, fall back to relay (TURN)
     return { 
       iceServers,
       iceTransportPolicy: "all",
+      // Pre-allocate ICE candidate pool for faster connection setup
       iceCandidatePoolSize: 10,
       bundlePolicy: "max-bundle",
       rtcpMuxPolicy: "require"
@@ -179,6 +196,8 @@ export class WebRTCCallManager {
     this.pendingIceCandidates = [];
     this.isCleaningUp = false;
     this.hasReceivedOffer = false;
+    this.reconnectAttempts = 0;
+    this.clearDisconnectTimer();
   }
 
   /**
@@ -246,75 +265,39 @@ export class WebRTCCallManager {
         }
       });
 
-      // Handle remote stream - improved for video display
+      // Handle remote stream
+      // WHY: We create our OWN MediaStream instead of using event.streams[0].
+      // event.streams[0] is browser-managed and may already contain tracks before
+      // our React effect listeners are set up → missed addtrack events.
+      // By managing our own stream, we control exactly when tracks are added.
       this.peerConnection.ontrack = (event) => {
         console.log("=== CALLER: REMOTE TRACK ===");
-        console.log("Track kind:", event.track.kind);
-        console.log("Track enabled:", event.track.enabled);
-        console.log("Streams count:", event.streams.length);
+        console.log("Track kind:", event.track.kind, "enabled:", event.track.enabled, "muted:", event.track.muted, "readyState:", event.track.readyState);
         
-        // Use existing remote stream or create new one
         if (!this.remoteStream) {
-          this.remoteStream = event.streams[0] || new MediaStream();
+          this.remoteStream = new MediaStream();
         }
         
-        // Add the track if not already present
-        const existingTrack = this.remoteStream.getTracks().find(t => t.id === event.track.id);
-        if (!existingTrack) {
+        // Add track if not already present
+        if (!this.remoteStream.getTracks().find(t => t.id === event.track.id)) {
           this.remoteStream.addTrack(event.track);
-          console.log("Caller: Added track to remote stream:", event.track.kind);
+          console.log("Caller: Added remote track:", event.track.kind, "| Total tracks:", this.remoteStream.getTracks().length);
         }
         
-        // Notify about updated remote stream
+        // Notify — callback MUST create a new reference for React to detect changes
         if (this.onRemoteStream) {
           this.onRemoteStream(this.remoteStream);
         }
       };
 
-      // Handle ICE connection state changes
+      // Handle ICE connection state changes — resilient to temporary network drops
       this.peerConnection.oniceconnectionstatechange = () => {
-        const state = this.peerConnection?.iceConnectionState;
-        console.log("ICE Connection State:", state);
-        
-        if (state === "failed") {
-          console.error("ICE connection failed, attempting to restart");
-          // Try to restart ICE
-          if (this.peerConnection) {
-            try {
-              this.peerConnection.restartIce();
-            } catch (e) {
-              console.error("Failed to restart ICE:", e);
-              // If restart fails, end the call
-              this.updateStatus("ended");
-              this.cleanup();
-            }
-          }
-        } else if (state === "disconnected") {
-          console.warn("ICE connection disconnected");
-          // Wait a bit before ending, might reconnect
-          setTimeout(() => {
-            if (this.peerConnection?.iceConnectionState === "disconnected") {
-              this.updateStatus("ended");
-              this.cleanup();
-            }
-          }, 5000);
-        } else if (state === "connected" || state === "completed") {
-          this.updateStatus("active");
-        }
+        this.handleIceConnectionStateChange("caller");
       };
 
       // Handle connection state changes
       this.peerConnection.onconnectionstatechange = () => {
-        const state = this.peerConnection?.connectionState;
-        console.log("Connection State:", state);
-        
-        if (state === "failed") {
-          console.error("Peer connection failed");
-          this.updateStatus("ended");
-          this.cleanup();
-        } else if (state === "connected") {
-          this.updateStatus("active");
-        }
+        this.handleConnectionStateChange();
       };
 
       // Handle ICE candidates - send immediately
@@ -388,18 +371,19 @@ export class WebRTCCallManager {
 
       this.updateStatus("ringing");
 
-      // Set timeout for connection (30 seconds for ringing, then 20 seconds for connecting)
+      // Set timeout for ringing phase (45s — allows more time for TURN relay negotiation
+      // over long distances or slow networks)
       this.connectionTimeout = setTimeout(() => {
         if (this.callStatus === "ringing") {
-          console.warn("Call timeout - no answer received (30s)");
+          console.warn("Call timeout - no answer received (45s)");
           this.updateStatus("missed");
           this.cleanup();
         } else if (this.callStatus === "connecting") {
-          console.warn("Call connection timeout - failed to establish connection (30s)");
+          console.warn("Call connection timeout - failed to establish connection (45s)");
           this.updateStatus("ended");
           this.cleanup();
         }
-      }, 30000);
+      }, 45000);
 
       return this.callId;
     } catch (error: any) {
@@ -453,82 +437,33 @@ export class WebRTCCallManager {
         }
       });
 
-      // Handle remote stream - improved for video display
+      // Handle remote stream (same pattern as caller — see comment above)
       this.peerConnection.ontrack = (event) => {
         console.log("=== RECEIVER: REMOTE TRACK ===");
-        console.log("Track kind:", event.track.kind);
-        console.log("Track enabled:", event.track.enabled);
-        console.log("Streams count:", event.streams.length);
+        console.log("Track kind:", event.track.kind, "enabled:", event.track.enabled, "muted:", event.track.muted, "readyState:", event.track.readyState);
         
-        // Use existing remote stream or create new one
         if (!this.remoteStream) {
-          this.remoteStream = event.streams[0] || new MediaStream();
+          this.remoteStream = new MediaStream();
         }
         
-        // Add the track if not already present
-        const existingTrack = this.remoteStream.getTracks().find(t => t.id === event.track.id);
-        if (!existingTrack) {
+        if (!this.remoteStream.getTracks().find(t => t.id === event.track.id)) {
           this.remoteStream.addTrack(event.track);
-          console.log("Receiver: Added track to remote stream:", event.track.kind);
+          console.log("Receiver: Added remote track:", event.track.kind, "| Total tracks:", this.remoteStream.getTracks().length);
         }
         
-        // Notify about updated remote stream
         if (this.onRemoteStream) {
           this.onRemoteStream(this.remoteStream);
         }
       };
 
-      // Handle ICE connection state changes
+      // Handle ICE connection state changes — resilient to temporary network drops
       this.peerConnection.oniceconnectionstatechange = () => {
-        const state = this.peerConnection?.iceConnectionState;
-        console.log("ICE Connection State:", state);
-        
-        if (state === "failed") {
-          console.error("ICE connection failed, attempting restart");
-          if (this.peerConnection) {
-            try {
-              this.peerConnection.restartIce();
-              console.log("ICE restart initiated");
-            } catch (e) {
-              console.error("Failed to restart ICE:", e);
-              setTimeout(() => {
-                if (this.peerConnection?.iceConnectionState === "failed") {
-                  console.error("ICE connection still failed after restart");
-                  this.updateStatus("ended");
-                  this.cleanup();
-                }
-              }, 5000);
-            }
-          }
-        } else if (state === "disconnected") {
-          console.warn("ICE connection disconnected, waiting for reconnection...");
-          setTimeout(() => {
-            if (this.peerConnection?.iceConnectionState === "disconnected") {
-              console.error("ICE connection did not reconnect");
-              this.updateStatus("ended");
-              this.cleanup();
-            }
-          }, 10000);
-        } else if (state === "connected" || state === "completed") {
-          console.log("ICE connection established successfully");
-          this.updateStatus("active");
-        } else if (state === "checking") {
-          console.log("ICE connection checking...");
-        }
+        this.handleIceConnectionStateChange("receiver");
       };
 
       // Handle connection state changes
       this.peerConnection.onconnectionstatechange = () => {
-        const state = this.peerConnection?.connectionState;
-        console.log("Connection State:", state);
-        
-        if (state === "failed") {
-          console.error("Peer connection failed");
-          this.updateStatus("ended");
-          this.cleanup();
-        } else if (state === "connected") {
-          this.updateStatus("active");
-        }
+        this.handleConnectionStateChange();
       };
 
       // Handle ICE candidates
@@ -579,6 +514,127 @@ export class WebRTCCallManager {
       console.error("Error accepting call:", error);
       await this.rejectCall(callId, callerId);
       throw new Error(error.message || "Failed to accept call");
+    }
+  }
+
+  /**
+   * Shared ICE connection state handler — called by both caller and receiver.
+   * WHY: Long-distance calls are prone to transient "disconnected" states due to
+   * network jitter, route changes, or mobile network handoffs. Instead of killing
+   * the call immediately, we attempt progressive recovery:
+   *   1. Wait 15s for auto-recovery (WebRTC often self-heals)
+   *   2. If still disconnected, restart ICE to find a new path (e.g. switch to TURN relay)
+   *   3. After max retries, gracefully end the call
+   */
+  private handleIceConnectionStateChange(role: "caller" | "receiver"): void {
+    const state = this.peerConnection?.iceConnectionState;
+    console.log(`[${role}] ICE Connection State:`, state);
+
+    if (state === "connected" || state === "completed") {
+      // Connection established — reset reconnect state
+      this.reconnectAttempts = 0;
+      this.clearDisconnectTimer();
+      this.updateStatus("active");
+    } else if (state === "checking") {
+      console.log(`[${role}] ICE checking — negotiating connection path...`);
+    } else if (state === "disconnected") {
+      // IMPORTANT: "disconnected" is often TRANSIENT. Don't kill the call yet.
+      console.warn(`[${role}] ICE disconnected — attempting recovery (attempt ${this.reconnectAttempts + 1}/${this.maxReconnectAttempts})`);
+      this.attemptReconnection(role);
+    } else if (state === "failed") {
+      console.error(`[${role}] ICE connection failed`);
+      this.attemptReconnection(role);
+    }
+  }
+
+  /**
+   * Shared connection state handler for peer connection lifecycle.
+   */
+  private handleConnectionStateChange(): void {
+    const state = this.peerConnection?.connectionState;
+    console.log("Connection State:", state);
+
+    if (state === "connected") {
+      this.reconnectAttempts = 0;
+      this.clearDisconnectTimer();
+      this.updateStatus("active");
+    } else if (state === "failed") {
+      // Peer connection failed — try ICE restart before giving up
+      if (this.reconnectAttempts < this.maxReconnectAttempts) {
+        console.warn("Peer connection failed, attempting ICE restart...");
+        this.tryIceRestart();
+      } else {
+        console.error("Peer connection failed after all reconnect attempts");
+        this.updateStatus("ended");
+        this.cleanup();
+      }
+    }
+  }
+
+  /**
+   * Progressive reconnection: wait for auto-recovery, then try ICE restart.
+   * WHY: WebRTC's ICE agent can often recover on its own if given time.
+   * Only if it doesn't recover do we force an ICE restart to discover new paths
+   * (e.g. switching from a direct P2P path to a TURN relay).
+   */
+  private attemptReconnection(role: string): void {
+    this.clearDisconnectTimer();
+
+    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+      console.error(`[${role}] Max reconnect attempts (${this.maxReconnectAttempts}) reached — ending call`);
+      this.updateStatus("ended");
+      this.cleanup();
+      return;
+    }
+
+    // Progressive backoff: 15s → 20s → 25s
+    // WHY: First wait gives WebRTC time to self-heal. Longer waits for subsequent
+    // attempts because if the first didn't work, the network issue is more serious.
+    const waitTime = 15000 + (this.reconnectAttempts * 5000);
+    
+    console.log(`[${role}] Waiting ${waitTime / 1000}s for auto-recovery before ICE restart...`);
+
+    this.disconnectTimer = setTimeout(() => {
+      const currentState = this.peerConnection?.iceConnectionState;
+      
+      if (currentState === "disconnected" || currentState === "failed") {
+        console.warn(`[${role}] Still ${currentState} after ${waitTime / 1000}s — forcing ICE restart`);
+        this.reconnectAttempts++;
+        this.tryIceRestart();
+      } else if (currentState === "connected" || currentState === "completed") {
+        console.log(`[${role}] Connection recovered on its own`);
+        this.reconnectAttempts = 0;
+      }
+    }, waitTime);
+  }
+
+  /**
+   * Attempt ICE restart — tells the browser to re-gather ICE candidates
+   * and try new network paths (including TURN relay if direct failed).
+   */
+  private tryIceRestart(): void {
+    if (!this.peerConnection) return;
+
+    try {
+      this.peerConnection.restartIce();
+      console.log("✓ ICE restart initiated — gathering new candidates...");
+    } catch (e) {
+      console.error("Failed to restart ICE:", e);
+      // If we can't even restart ICE, the peer connection is dead
+      if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+        this.updateStatus("ended");
+        this.cleanup();
+      }
+    }
+  }
+
+  /**
+   * Clear any pending disconnect timer
+   */
+  private clearDisconnectTimer(): void {
+    if (this.disconnectTimer) {
+      clearTimeout(this.disconnectTimer);
+      this.disconnectTimer = null;
     }
   }
 
@@ -1035,6 +1091,60 @@ export class WebRTCCallManager {
   }
 
   /**
+   * Replace the video track in BOTH localStream and the peer connection sender.
+   * WHY: When switching cameras, the new track must be sent to the peer connection's
+   * RTCRtpSender. Just swapping in localStream only updates the local preview —
+   * the remote user would still see the old (now stopped) track without this.
+   * @returns the new track, or null if replacement failed
+   */
+  async replaceVideoTrack(newTrack: MediaStreamTrack): Promise<MediaStreamTrack | null> {
+    if (!this.localStream) return null;
+
+    try {
+      // Remove old video track from local stream
+      const oldTrack = this.localStream.getVideoTracks()[0];
+      if (oldTrack) {
+        oldTrack.stop();
+        this.localStream.removeTrack(oldTrack);
+      }
+
+      // Add new track to local stream
+      this.localStream.addTrack(newTrack);
+
+      // CRITICAL: Update the peer connection sender so remote peer gets the new track
+      if (this.peerConnection) {
+        const senders = this.peerConnection.getSenders();
+        const videoSender = senders.find(s => s.track?.kind === 'video' || s.track === oldTrack);
+        if (videoSender) {
+          await videoSender.replaceTrack(newTrack);
+          console.log("✓ Video track replaced in peer connection sender");
+        } else {
+          // No existing video sender — add as new track
+          this.peerConnection.addTrack(newTrack, this.localStream);
+          console.log("✓ Video track added as new sender");
+        }
+      }
+
+      // Notify about updated local stream
+      if (this.onLocalStream) {
+        this.onLocalStream(this.localStream);
+      }
+
+      return newTrack;
+    } catch (error) {
+      console.error("Error replacing video track:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Get the peer connection (needed for advanced operations like sender replacement)
+   */
+  getPeerConnection(): RTCPeerConnection | null {
+    return this.peerConnection;
+  }
+
+  /**
    * Get local stream
    */
   getLocalStream(): MediaStream | null {
@@ -1096,6 +1206,10 @@ export class WebRTCCallManager {
         clearTimeout(this.connectionTimeout);
         this.connectionTimeout = null;
       }
+
+      // Clear disconnect recovery timer
+      this.clearDisconnectTimer();
+      this.reconnectAttempts = 0;
 
       // Stop all tracks
       if (this.localStream) {

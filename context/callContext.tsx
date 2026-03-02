@@ -31,6 +31,7 @@ interface CallContextValue {
   endCall: () => Promise<void>;
   toggleMute: () => void;
   toggleVideo: () => void;
+  replaceVideoTrack: (newTrack: MediaStreamTrack) => Promise<MediaStreamTrack | null>;
   
   // Incoming call
   incomingCall: {
@@ -62,6 +63,9 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
   const callManagerRef = useRef<WebRTCCallManager | null>(null);
   const incomingCallListenerRef = useRef<(() => void) | null>(null);
   const incomingCallDocListenerRef = useRef<(() => void) | null>(null);
+  // Ref to track isInCall without causing re-subscriptions in the Firestore listener
+  const isInCallRef = useRef(false);
+  isInCallRef.current = isInCall;
 
   // Initialize call manager
   useEffect(() => {
@@ -79,8 +83,13 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
           setLocalStream(stream);
         },
         onRemoteStream: (stream) => {
-          console.log("Remote stream received via callback");
-          setRemoteStream(stream);
+          console.log("Remote stream received via callback, tracks:", stream.getTracks().map(t => t.kind).join(", "));
+          // CRITICAL: Create a NEW MediaStream wrapping the same tracks.
+          // WHY: React uses reference equality (Object.is). If we pass the same
+          // MediaStream object, React skips re-render. But ontrack fires once per
+          // track (audio, then video) — if React skips the 2nd, the UI never
+          // learns about the video track and the remote user sees nothing.
+          setRemoteStream(new MediaStream(stream.getTracks()));
         },
         onCallEnd: () => {
           console.log("Call ended");
@@ -189,10 +198,18 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
       }
       
       const callData = snapshot.data();
-      if (callData?.status === "ended" || callData?.status === "rejected" || callData?.status === "missed") {
-        // Call was ended/rejected/missed
-        console.log("Incoming call ended with status:", callData?.status);
-        setIncomingCall(null);
+      // Dismiss incoming call notification if:
+      // - Call was ended/rejected/missed (obvious cases)
+      // - Call moved to "connecting" or "active" (picked up on ANOTHER device/tab)
+      // WHY: Without "connecting"/"active", a second device keeps ringing even after
+      // the call was accepted on the first device.
+      const dismissStatuses = ["ended", "rejected", "missed", "connecting", "active"];
+      if (callData?.status && dismissStatuses.includes(callData.status)) {
+        // Only dismiss if WE didn't accept it (avoid dismissing on the device that accepted)
+        if (!isInCallRef.current) {
+          console.log("Incoming call dismissed — status:", callData.status);
+          setIncomingCall(null);
+        }
       }
     }, (error) => {
       if (error?.code !== "cancelled") {
@@ -342,6 +359,23 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // WHY: We reset state in a finally block so even if endCall() throws
+  // (network error, Firestore unavailable), the UI always returns to idle.
+  // Without this, a failed endCall could leave the user stuck on the call screen.
+  const resetCallState = useCallback(() => {
+    setIsInCall(false);
+    setCallStatus("idle");
+    setCallType(null);
+    setRemoteUserId(null);
+    setRemoteUserName(null);
+    setRemoteUserAvatar(null);
+    setIsCaller(false);
+    setLocalStream(null);
+    setRemoteStream(null);
+    setIsMuted(false);
+    setIsVideoOff(false);
+  }, []);
+
   const endCall = useCallback(async () => {
     if (!callManagerRef.current) return;
 
@@ -349,8 +383,11 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
       await callManagerRef.current.endCall();
     } catch (error: any) {
       console.error("Error ending call:", error);
+    } finally {
+      // Always reset UI state regardless of whether endCall succeeded
+      resetCallState();
     }
-  }, []);
+  }, [resetCallState]);
 
   const toggleMute = useCallback(() => {
     if (!callManagerRef.current) return;
@@ -364,6 +401,18 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
     const isNowEnabled = callManagerRef.current.toggleVideo();
     // If video is enabled, video is NOT off. If disabled, video IS off.
     setIsVideoOff(!isNowEnabled);
+    // Re-emit local stream so UI re-renders (video element picks up track enabled change)
+    const stream = callManagerRef.current.getLocalStream();
+    if (stream) setLocalStream(stream);
+  }, []);
+
+  const replaceVideoTrack = useCallback(async (newTrack: MediaStreamTrack): Promise<MediaStreamTrack | null> => {
+    if (!callManagerRef.current) return null;
+    const result = await callManagerRef.current.replaceVideoTrack(newTrack);
+    // Update local stream reference to trigger UI re-render
+    const stream = callManagerRef.current.getLocalStream();
+    if (stream) setLocalStream(stream);
+    return result;
   }, []);
 
   const value: CallContextValue = {
@@ -384,6 +433,7 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
     endCall,
     toggleMute,
     toggleVideo,
+    replaceVideoTrack,
     incomingCall,
   };
 

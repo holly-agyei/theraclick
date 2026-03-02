@@ -73,55 +73,51 @@ export default function ChatPage() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       
-      // Get supported mime type
-      let mimeType = "audio/webm";
-      if (!MediaRecorder.isTypeSupported("audio/webm")) {
-        if (MediaRecorder.isTypeSupported("audio/mp4")) {
-          mimeType = "audio/mp4";
-        } else if (MediaRecorder.isTypeSupported("audio/ogg")) {
-          mimeType = "audio/ogg";
-        } else {
-          mimeType = ""; // Use default
-        }
+      let mimeType = "";
+      for (const t of ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus", "audio/ogg"]) {
+        if (MediaRecorder.isTypeSupported(t)) { mimeType = t; break; }
       }
       
-      const options = mimeType ? { mimeType } : {};
-      const mediaRecorder = new MediaRecorder(stream, options);
+      const mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
       
       mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          audioChunksRef.current.push(e.data);
-        }
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
       };
-      
       mediaRecorder.onstop = () => {
-        const blob = new Blob(audioChunksRef.current, { type: mimeType || "audio/webm" });
-        setAudioBlob(blob);
+        const finalType = mimeType || mediaRecorder.mimeType || "audio/webm";
+        const blob = new Blob(audioChunksRef.current, { type: finalType });
+        setAudioBlob(blob.size > 0 ? blob : null);
         stream.getTracks().forEach((t) => t.stop());
       };
-      
-      mediaRecorder.onerror = (e) => {
-        console.error("MediaRecorder error:", e);
+      mediaRecorder.onerror = () => {
         setIsRecording(false);
         stream.getTracks().forEach((t) => t.stop());
       };
       
-      mediaRecorder.start(100); // Collect data every 100ms
+      mediaRecorder.start(1000); // 1s timeslice for cross-browser reliability
       setIsRecording(true);
       setRecordingTime(0);
       timerRef.current = setInterval(() => setRecordingTime((t) => t + 1), 1000);
     } catch (e) {
       console.error("Mic access denied:", e);
-      alert("Could not access microphone.\n\nPlease:\n1. Click the lock icon in your browser's address bar\n2. Allow microphone access\n3. Refresh the page and try again");
+      alert("Could not access microphone.\n\nPlease allow microphone access and try again.");
     }
   };
 
   const stopRecording = () => {
-    mediaRecorderRef.current?.stop();
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      if (mediaRecorderRef.current.state === "recording") {
+        try { mediaRecorderRef.current.requestData(); } catch { /* ok */ }
+      }
+      mediaRecorderRef.current.stop();
+    }
     setIsRecording(false);
-    if (timerRef.current) clearInterval(timerRef.current);
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
   };
 
   const cancelRecording = () => {
@@ -226,8 +222,11 @@ export default function ChatPage() {
       } finally {
         setIsTyping(false);
       }
+    } catch (error) {
+      console.error("handleSend error:", error);
+      setIsTyping(false);
+    }
   };
-
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();

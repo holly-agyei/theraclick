@@ -277,6 +277,20 @@ export default function ChatPage() {
         // After the first exchange, ask Gemini to generate a descriptive title
         if (needsTitle) {
           threadTitleSetRef.current.add(threadId);
+          const tid = threadId; // capture for closure safety
+
+          const applyTitle = (title: string) => {
+            const trimmed = title.length > 40 ? title.slice(0, 40) + "…" : title;
+            setThreads((prev) =>
+              prev.map((t) => (t.id === tid ? { ...t, title: trimmed } : t))
+            );
+            updateThreadTitle(profile, tid, trimmed).catch(() => {});
+          };
+
+          // Immediate placeholder: use first ~30 chars of user prompt
+          applyTitle(userText.slice(0, 30));
+
+          // Then ask Gemini for a better title in the background
           const titleHistory: ApiMsg[] = [
             { role: "user", content: userText },
             { role: "assistant", content: text },
@@ -287,15 +301,10 @@ export default function ChatPage() {
             body: JSON.stringify({ mode: "title", messages: titleHistory }),
           })
             .then((r) => r.json())
-            .then(async (d: { ok: boolean; title?: string }) => {
-              const title = d?.title || userText.slice(0, 40);
-              await updateThreadTitle(profile, threadId, title);
-              refreshThreads();
+            .then((d: { ok: boolean; title?: string }) => {
+              if (d?.title && d.title !== "New chat") applyTitle(d.title);
             })
-            .catch(() => {
-              // Fallback: use truncated user message if title generation fails
-              updateThreadTitle(profile, threadId, userText.slice(0, 40)).then(() => refreshThreads());
-            });
+            .catch(() => {});
         }
       } catch (fetchError: any) {
         clearTimeout(timeoutId);

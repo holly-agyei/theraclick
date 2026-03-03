@@ -168,7 +168,7 @@ async function generateTitle(messages: ChatMessage[]): Promise<string | null> {
   try {
     const model = ai.getGenerativeModel({
       model: modelName,
-      generationConfig: { temperature: 0.5, maxOutputTokens: 20 },
+      generationConfig: { temperature: 0.7, maxOutputTokens: 60 },
     });
 
     const convo = messages

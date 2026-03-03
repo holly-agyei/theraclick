@@ -43,7 +43,7 @@ export default function StudentSignupPage() {
     setIsLoading(true);
     try {
       await signupStudent({ fullName, email, schoolEmail, educationLevel, school, password });
-      router.push("/student/dashboard");
+      router.push("/verify-email");
     } catch (err: any) {
       setError(err?.message || "Could not create your account. Please try again.");
     } finally {

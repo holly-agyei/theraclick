@@ -18,6 +18,7 @@ export type StoredChatMessage = {
   sender: "user" | "ai";
   text: string;
   createdAt: number;
+  audioUrl?: string; // Firebase Storage URL for voice messages
 };
 
 export type AiThread = {
@@ -61,6 +62,7 @@ export async function loadAiThreadMessages(profile: UserProfile, threadId: strin
         sender: (data.sender ?? "ai") as "user" | "ai",
         text: (data.text ?? "") as string,
         createdAt: ts,
+        audioUrl: (data.audioUrl ?? undefined) as string | undefined,
       } satisfies StoredChatMessage;
     });
   }
@@ -82,11 +84,15 @@ export async function appendAiThreadMessage(
 ) {
   if (firebaseIsReady && db) {
     const msgCol = collection(db, "users", profile.uid, "aiThreads", threadId, "messages");
-    const res = await addDoc(msgCol, {
+    // Only include audioUrl if it exists (avoid storing undefined in Firestore)
+    const docData: Record<string, any> = {
       sender: message.sender,
       text: message.text,
       createdAt: serverTimestamp(),
-    });
+    };
+    if (message.audioUrl) docData.audioUrl = message.audioUrl;
+
+    const res = await addDoc(msgCol, docData);
     const threadRef = doc(db, "users", profile.uid, "aiThreads", threadId);
     await setDoc(threadRef, { updatedAt: serverTimestamp() }, { merge: true });
     return res.id;
@@ -97,7 +103,13 @@ export async function appendAiThreadMessage(
   const existing = await loadAiThreadMessages(profile, threadId);
   const next: StoredChatMessage[] = [
     ...existing,
-    { id: `${Date.now()}`, sender: message.sender, text: message.text, createdAt: Date.now() },
+    {
+      id: `${Date.now()}`,
+      sender: message.sender,
+      text: message.text,
+      createdAt: Date.now(),
+      audioUrl: message.audioUrl,
+    },
   ];
   localStorage.setItem(key, JSON.stringify(next));
   return next[next.length - 1]!.id;

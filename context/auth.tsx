@@ -6,6 +6,7 @@ import { auth, db, firebaseIsReady } from "@/lib/firebase";
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
+  sendEmailVerification,
   signInWithEmailAndPassword,
   signOut as fbSignOut,
   updateProfile as fbUpdateProfile,
@@ -293,7 +294,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginWithEmail = async (email: string, password: string) => {
     if (!isFirebaseBacked || !auth) throw new Error("Firebase is not configured");
-    await signInWithEmailAndPassword(auth, email.trim(), password);
+    const cred = await signInWithEmailAndPassword(auth, email.trim(), password);
+
+    // Block unverified emails — sign them out and throw a clear error
+    if (!cred.user.emailVerified) {
+      await fbSignOut(auth);
+      throw new Error("EMAIL_NOT_VERIFIED");
+    }
   };
 
   const signupStudent = async (input: {
@@ -328,6 +335,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       },
       { merge: true }
     );
+
+    // Send verification email, then sign out so they can't use the app until verified
+    await sendEmailVerification(cred.user);
+    await fbSignOut(auth);
   };
 
   const applyForRole = async (input: {
@@ -361,6 +372,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       },
       { merge: true }
     );
+
+    // Send verification email, then sign out
+    await sendEmailVerification(cred.user);
+    await fbSignOut(auth);
   };
 
   const setStudentAnonymousEnabled = async (enabled: boolean) => {

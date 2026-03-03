@@ -11,6 +11,7 @@ import { useAuth } from "@/context/auth";
 import { useCall } from "@/context/callContext";
 import { VoiceMessage } from "@/components/VoiceMessage";
 import { uploadVoiceMessage } from "@/lib/audioUpload";
+import { EmojiPicker } from "@/components/EmojiPicker";
 
 interface Message {
   id: string;
@@ -393,42 +394,54 @@ export default function PeerMentorChatPage() {
                 </button>
               </div>
             )}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={isRecording ? stopRecording : startRecording}
-                disabled={sending}
-                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all
-                  ${isRecording ? "bg-red-50 text-red-500" : "text-gray-400 hover:bg-gray-100 hover:text-gray-700"}
-                  ${sending ? "opacity-40" : ""}`}
-              >
-                {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
-              </button>
-              {isRecording && (
-                <span className="shrink-0 text-xs text-red-500 font-medium">{formatRecordingTime(recordingTime)}</span>
-              )}
-              <input
-                type="text"
-                placeholder="Message..."
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && !sending && sendMessage()}
-                disabled={sending}
-                className="flex-1 rounded-full border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-green-500 focus:outline-none disabled:opacity-40"
-              />
-              {(inputText.trim() || audioBlob) && (
-                <button
-                  onClick={sendMessage}
+            {isRecording ? (
+              <div className="flex items-center gap-3 rounded-full border border-red-200 bg-red-50 px-4 py-2">
+                <span className="relative flex h-3 w-3">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+                  <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500" />
+                </span>
+                <span className="text-sm font-medium text-red-600">Recording {formatRecordingTime(recordingTime)}</span>
+                <div className="flex-1" />
+                <button onClick={() => { stopRecording(); setAudioBlob(null); }}
+                  className="rounded-lg px-3 py-1 text-xs font-medium text-gray-500 hover:bg-red-100">Cancel</button>
+                <button onClick={stopRecording}
+                  className="rounded-lg bg-red-500 px-3 py-1 text-xs font-medium text-white hover:bg-red-600">Stop</button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <EmojiPicker onSelect={(emoji) => setInputText((t) => t + emoji)} />
+                <input
+                  type="text"
+                  placeholder="Message..."
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && !sending && sendMessage()}
                   disabled={sending}
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-600 text-white transition-all active:scale-95 disabled:opacity-40"
-                >
-                  {sending ? (
-                    <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    <Send className="h-4 w-4" />
-                  )}
-                </button>
-              )}
-            </div>
+                  className="flex-1 rounded-full border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-green-500 focus:outline-none disabled:opacity-40"
+                />
+                {inputText.trim() || audioBlob ? (
+                  <button
+                    onClick={sendMessage}
+                    disabled={sending}
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-600 text-white transition-all active:scale-95 disabled:opacity-40"
+                  >
+                    {sending ? (
+                      <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4" />
+                    )}
+                  </button>
+                ) : (
+                  <button
+                    onClick={startRecording}
+                    disabled={sending}
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-all disabled:opacity-40"
+                  >
+                    <Mic className="h-5 w-5" />
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

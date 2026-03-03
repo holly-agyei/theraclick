@@ -40,7 +40,7 @@ export default function CounselorApplyPage() {
     setIsLoading(true);
     try {
       await applyForRole({ role: "counselor", fullName, email, specialization, about, password });
-      router.push("/pending-approval");
+      router.push("/verify-email");
     } catch (err: any) {
       setError(err?.message || "Could not submit. Please try again.");
     } finally {

@@ -101,6 +101,7 @@ export default function ForumsPage() {
   const [selectedThread, setSelectedThread] = useState<ForumMessage | null>(null);
   const [threadReplies, setThreadReplies] = useState<ForumMessage[]>([]);
   const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
@@ -108,6 +109,7 @@ export default function ForumsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Demo messages
   const [demoMessages] = useState<Record<string, ForumMessage[]>>({
@@ -338,6 +340,8 @@ export default function ForumsPage() {
 
       mediaRecorder.start(1000);
       setIsRecording(true);
+      setRecordingTime(0);
+      timerRef.current = setInterval(() => setRecordingTime((t) => t + 1), 1000);
     } catch (e: any) {
       console.error("Mic access error:", e);
       alert("Could not access microphone.\n\nPlease allow microphone access and try again.");
@@ -352,6 +356,16 @@ export default function ForumsPage() {
       mediaRecorderRef.current.stop();
     }
     setIsRecording(false);
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  };
+
+  const formatRecordingTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   const formatTime = (date: Date) => {
@@ -392,7 +406,10 @@ export default function ForumsPage() {
             </div>
           )}
 
-          <p className="mt-1 text-sm text-gray-700 whitespace-pre-wrap">{msg.text}</p>
+          {/* Hide placeholder text when voice message is present */}
+          {msg.text && msg.text !== "🎤 Voice message" && (
+            <p className={`mt-1 text-sm text-gray-700 whitespace-pre-wrap ${msg.audioUrl ? "mt-2" : ""}`}>{msg.text}</p>
+          )}
 
           {msg.imageUrl && <img src={msg.imageUrl} alt="Shared" className="mt-2 max-h-64 rounded-lg" />}
           {msg.audioUrl && (
@@ -614,43 +631,64 @@ export default function ForumsPage() {
                     </div>
                   )}
 
-                  <div className="flex gap-2">
-                    <input type="file" ref={fileInputRef} accept="image/*" onChange={handleImageSelect} className="hidden" />
-                    
-                    <button onClick={() => fileInputRef.current?.click()}
-                      className="rounded-lg p-2.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900">
-                      <ImageIcon className="h-5 w-5" />
-                    </button>
+                  {isRecording ? (
+                    /* ── Recording indicator ── */
+                    <div className="flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5">
+                      <span className="relative flex h-3 w-3">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+                        <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500" />
+                      </span>
+                      <span className="text-sm font-medium text-red-600">Recording {formatRecordingTime(recordingTime)}</span>
+                      <div className="flex-1" />
+                      <button onClick={() => { stopRecording(); setAudioBlob(null); }}
+                        className="rounded-lg px-3 py-1 text-xs font-medium text-gray-600 hover:bg-red-100">
+                        Cancel
+                      </button>
+                      <button onClick={stopRecording}
+                        className="rounded-lg bg-red-500 px-3 py-1 text-xs font-medium text-white hover:bg-red-600">
+                        Stop
+                      </button>
+                    </div>
+                  ) : (
+                    /* ── Normal input ── */
+                    <div className="flex gap-2">
+                      <input type="file" ref={fileInputRef} accept="image/*" onChange={handleImageSelect} className="hidden" />
+                      
+                      <button onClick={() => fileInputRef.current?.click()}
+                        className="rounded-lg p-2.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900">
+                        <ImageIcon className="h-5 w-5" />
+                      </button>
 
-                    <button onClick={isRecording ? stopRecording : startRecording}
-                      className={`rounded-lg p-2.5 transition-colors ${isRecording ? "bg-red-500/20 text-red-400" : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"}`}>
-                      {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
-                    </button>
+                      <button onClick={startRecording}
+                        className="rounded-lg p-2.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900">
+                        <Mic className="h-5 w-5" />
+                      </button>
 
-                    <input
-                      type="text"
-                      placeholder={selectedThread ? "Reply in thread..." : `Message #${selectedForum.name.toLowerCase()}`}
-                      value={inputText}
-                      onChange={(e) => setInputText(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && !sending && sendMessage(!!selectedThread)}
-                      disabled={sending}
-                      className="flex-1 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5
-                        text-sm text-gray-900 placeholder-gray-500 transition-colors
-                        focus:border-green-500 focus:outline-none disabled:opacity-50"
-                    />
-                    
-                    <button onClick={() => sendMessage(!!selectedThread)}
-                      disabled={sending || (!inputText.trim() && !audioBlob && !selectedImage)}
-                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full
-                        bg-green-600 text-white transition-all hover:bg-green-700
-                        disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.92]">
-                      {sending ? (
-                        <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      ) : (
-                        <Send className="h-4 w-4" />
-                      )}
-                    </button>
-                  </div>
+                      <input
+                        type="text"
+                        placeholder={selectedThread ? "Reply in thread..." : `Message #${selectedForum.name.toLowerCase()}`}
+                        value={inputText}
+                        onChange={(e) => setInputText(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && !sending && sendMessage(!!selectedThread)}
+                        disabled={sending}
+                        className="flex-1 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5
+                          text-sm text-gray-900 placeholder-gray-500 transition-colors
+                          focus:border-green-500 focus:outline-none disabled:opacity-50"
+                      />
+                      
+                      <button onClick={() => sendMessage(!!selectedThread)}
+                        disabled={sending || (!inputText.trim() && !audioBlob && !selectedImage)}
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full
+                          bg-green-600 text-white transition-all hover:bg-green-700
+                          disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.92]">
+                        {sending ? (
+                          <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        ) : (
+                          <Send className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </>

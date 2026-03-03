@@ -14,11 +14,14 @@ import { useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/auth";
+import { auth } from "@/lib/firebase";
+import { signInWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import {
   GraduationCap,
   HeartHandshake,
   UserCheck,
   Loader2,
+  Mail,
 } from "lucide-react";
 import { AuthLeftPanel } from "@/components/AuthLeftPanel";
 
@@ -51,13 +54,15 @@ const roleConfig = {
 export function LoginClient({ initialRole }: { initialRole: Role }) {
   const router = useRouter();
   const [role] = useState<Role>(initialRole);
-  const { loginWithEmail, isFirebaseBacked, profile, loading: authLoading } = useAuth();
+  const { loginWithEmail, logout, isFirebaseBacked, profile, loading: authLoading } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasLoggedIn, setHasLoggedIn] = useState(false);
+  const [needsVerification, setNeedsVerification] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
   // Trigger enter animation after mount
   const [entered, setEntered] = useState(false);
   const [hydrated, setHydrated] = useState(false);
@@ -71,7 +76,9 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
     return () => clearTimeout(id);
   }, []);
 
-  // Redirect after successful auth
+  // Redirect after successful auth — or warn if wrong role
+  const [roleMismatch, setRoleMismatch] = useState<string | null>(null);
+
   useEffect(() => {
     if (hasLoggedIn && !authLoading && profile && profile.role) {
       if (profile.status === "pending") {
@@ -81,9 +88,24 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
         setHasLoggedIn(false);
         setIsLoading(false);
       } else if (profile.role === role) {
+        // Correct login page — go to dashboard
         router.push(role === "student" ? "/student/dashboard" : `/${role}/dashboard`);
       } else {
-        router.push(profile.role === "student" ? "/student/dashboard" : `/${profile.role}/dashboard`);
+        // Wrong login page — sign out and show a helpful message
+        const roleLabels: Record<string, string> = {
+          student: "Student",
+          "peer-mentor": "Peer Mentor",
+          counselor: "Counselor",
+        };
+        const actualRole = profile.role;
+        // Sign out so they don't stay authenticated on the wrong page
+        void logout();
+        setRoleMismatch(actualRole);
+        setError(
+          `This is a ${roleLabels[actualRole] || actualRole} account. Please sign in on the ${roleLabels[actualRole] || actualRole} login page.`
+        );
+        setIsLoading(false);
+        setHasLoggedIn(false);
       }
     }
   }, [hasLoggedIn, profile, authLoading, role, router]);
@@ -91,15 +113,46 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setNeedsVerification(false);
     setIsLoading(true);
     setHasLoggedIn(false);
     try {
       await loginWithEmail(email, password);
       setHasLoggedIn(true);
     } catch (err: any) {
-      setError(err?.message || "Could not sign in. Please try again.");
+      const msg = err?.message || "";
+      if (msg === "EMAIL_NOT_VERIFIED") {
+        // Show the verification notice with resend option
+        setNeedsVerification(true);
+        setError(null);
+      } else {
+        setError(msg || "Could not sign in. Please try again.");
+      }
       setIsLoading(false);
       setHasLoggedIn(false);
+    }
+  };
+
+  // Resend verification email
+  const handleResendVerification = async () => {
+    if (!auth || resendCooldown > 0) return;
+    try {
+      // Temporarily sign in to get user object, send email, then sign out
+      const cred = await signInWithEmailAndPassword(auth, email.trim(), password);
+      await sendEmailVerification(cred.user);
+      // Sign out again since they're not verified
+      const { signOut } = await import("firebase/auth");
+      await signOut(auth);
+      // Start cooldown (60 seconds)
+      setResendCooldown(60);
+      const interval = setInterval(() => {
+        setResendCooldown((c) => {
+          if (c <= 1) { clearInterval(interval); return 0; }
+          return c - 1;
+        });
+      }, 1000);
+    } catch {
+      setError("Could not resend verification email. Try again later.");
     }
   };
 
@@ -172,7 +225,15 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
 
             <div className={`transition-all duration-500 delay-[480ms]
               ${entered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}>
-              <label className="mb-2 block text-sm font-semibold text-[#2BB5A0]">Password</label>
+              <div className="mb-2 flex items-center justify-between">
+                <label className="block text-sm font-semibold text-[#2BB5A0]">Password</label>
+                <Link
+                  href="/forgot-password"
+                  className="text-xs font-medium text-[#6B8C89] hover:text-[#2BB5A0] hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
               <input
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -183,9 +244,43 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
               />
             </div>
 
+            {/* Email verification notice */}
+            {needsVerification && (
+              <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-4">
+                <div className="flex items-start gap-3">
+                  <Mail className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
+                  <div>
+                    <p className="text-sm font-semibold text-amber-800">Verify your email first</p>
+                    <p className="mt-1 text-sm text-amber-700">
+                      We sent a verification link to <span className="font-medium">{email}</span>. Check your inbox (and spam folder) and click the link, then come back and sign in.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleResendVerification}
+                      disabled={resendCooldown > 0}
+                      className="mt-3 text-sm font-semibold text-[#2BB5A0] hover:underline disabled:text-gray-400 disabled:no-underline"
+                    >
+                      {resendCooldown > 0
+                        ? `Resend in ${resendCooldown}s`
+                        : "Resend verification email"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {error && (
               <div className="tk-shake rounded-xl border border-red-200 bg-red-50 px-4 py-3">
                 <p className="text-sm font-medium text-red-600">{error}</p>
+                {/* If wrong role, show a link to the correct login page */}
+                {roleMismatch && (
+                  <Link
+                    href={`/login?role=${roleMismatch}`}
+                    className="mt-2 inline-block text-sm font-semibold text-[#2BB5A0] hover:underline"
+                  >
+                    Go to {roleMismatch === "student" ? "Student" : roleMismatch === "peer-mentor" ? "Peer Mentor" : "Counselor"} login &rarr;
+                  </Link>
+                )}
               </div>
             )}
 

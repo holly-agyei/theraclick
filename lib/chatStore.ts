@@ -3,12 +3,14 @@ import type { UserProfile } from "@/context/auth";
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDocs,
   orderBy,
   query,
   serverTimestamp,
   setDoc,
+  updateDoc,
 } from "firebase/firestore";
 
 export type StoredChatMessage = {
@@ -16,6 +18,12 @@ export type StoredChatMessage = {
   sender: "user" | "ai";
   text: string;
   createdAt: number;
+};
+
+export type AiThread = {
+  id: string;
+  title: string;
+  updatedAt: number;
 };
 
 const LS_PREFIX = "theraclick.aiThread.v1";
@@ -30,7 +38,7 @@ export async function ensureDefaultAiThread(profile: UserProfile) {
     const threadRef = doc(db, "users", profile.uid, "aiThreads", threadId);
     await setDoc(
       threadRef,
-      { id: threadId, updatedAt: serverTimestamp(), createdAt: serverTimestamp() },
+      { id: threadId, title: "New chat", updatedAt: serverTimestamp(), createdAt: serverTimestamp() },
       { merge: true }
     );
   } else if (typeof window !== "undefined") {
@@ -93,5 +101,92 @@ export async function appendAiThreadMessage(
   ];
   localStorage.setItem(key, JSON.stringify(next));
   return next[next.length - 1]!.id;
+}
+
+// ── Multi-thread support ─────────────────────────────────────────
+
+const LS_THREADS_KEY = (uid: string) => `${LS_PREFIX}.${uid}._threads`;
+
+export async function listAiThreads(profile: UserProfile): Promise<AiThread[]> {
+  if (firebaseIsReady && db) {
+    const threadsCol = collection(db, "users", profile.uid, "aiThreads");
+    const q = query(threadsCol, orderBy("updatedAt", "desc"));
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => {
+      const data = d.data() as any;
+      return {
+        id: d.id,
+        title: data.title || "New chat",
+        updatedAt: data.updatedAt?.toMillis?.() ?? Date.now(),
+      };
+    });
+  }
+
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(LS_THREADS_KEY(profile.uid));
+    if (!raw) return [];
+    return (JSON.parse(raw) as AiThread[]).sort((a, b) => b.updatedAt - a.updatedAt);
+  } catch {
+    return [];
+  }
+}
+
+export async function createAiThread(profile: UserProfile): Promise<string> {
+  const threadId = `t_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
+  if (firebaseIsReady && db) {
+    const threadRef = doc(db, "users", profile.uid, "aiThreads", threadId);
+    await setDoc(threadRef, {
+      id: threadId,
+      title: "New chat",
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+  } else if (typeof window !== "undefined") {
+    const raw = localStorage.getItem(LS_THREADS_KEY(profile.uid));
+    const threads: AiThread[] = raw ? JSON.parse(raw) : [];
+    threads.unshift({ id: threadId, title: "New chat", updatedAt: Date.now() });
+    localStorage.setItem(LS_THREADS_KEY(profile.uid), JSON.stringify(threads));
+    localStorage.setItem(lsKey(profile.uid, threadId), JSON.stringify([]));
+  }
+
+  return threadId;
+}
+
+export async function deleteAiThread(profile: UserProfile, threadId: string): Promise<void> {
+  if (firebaseIsReady && db) {
+    // Delete all messages in the subcollection first
+    const msgCol = collection(db, "users", profile.uid, "aiThreads", threadId, "messages");
+    const snap = await getDocs(msgCol);
+    const deletes = snap.docs.map((d) => deleteDoc(d.ref));
+    await Promise.all(deletes);
+    // Then delete the thread doc
+    await deleteDoc(doc(db, "users", profile.uid, "aiThreads", threadId));
+  } else if (typeof window !== "undefined") {
+    localStorage.removeItem(lsKey(profile.uid, threadId));
+    const raw = localStorage.getItem(LS_THREADS_KEY(profile.uid));
+    if (raw) {
+      const threads = (JSON.parse(raw) as AiThread[]).filter((t) => t.id !== threadId);
+      localStorage.setItem(LS_THREADS_KEY(profile.uid), JSON.stringify(threads));
+    }
+  }
+}
+
+export async function updateThreadTitle(profile: UserProfile, threadId: string, title: string): Promise<void> {
+  const trimmed = title.length > 40 ? title.slice(0, 40) + "…" : title;
+
+  if (firebaseIsReady && db) {
+    const threadRef = doc(db, "users", profile.uid, "aiThreads", threadId);
+    await updateDoc(threadRef, { title: trimmed });
+  } else if (typeof window !== "undefined") {
+    const raw = localStorage.getItem(LS_THREADS_KEY(profile.uid));
+    if (raw) {
+      const threads = JSON.parse(raw) as AiThread[];
+      const t = threads.find((t) => t.id === threadId);
+      if (t) t.title = trimmed;
+      localStorage.setItem(LS_THREADS_KEY(profile.uid), JSON.stringify(threads));
+    }
+  }
 }
 

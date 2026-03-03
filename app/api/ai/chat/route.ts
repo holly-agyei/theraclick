@@ -1,13 +1,16 @@
 import { NextResponse } from "next/server";
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 
 type ChatMessage = { role: "system" | "user" | "assistant"; content: string };
 type UserContext = {
   role?: "student" | "peer-mentor" | "counselor";
-  displayName?: string; // e.g., anonymousId (never real identity)
+  displayName?: string;
   school?: string;
   educationLevel?: string;
   country?: string;
 };
+
+// ── Crisis detection ──────────────────────────────────────────────
 
 const CRISIS_PATTERNS: RegExp[] = [
   /\bkill myself\b/i,
@@ -25,32 +28,17 @@ function looksLikeCrisis(text: string) {
 
 function crisisResponse() {
   return [
-    "I’m really sorry you’re feeling this way — you don’t have to carry it alone.",
+    "I'm really sorry you're feeling this way — you don't have to carry it alone.",
     "",
-    "If you’re in immediate danger or feel like you might hurt yourself, please call your local emergency number **right now** or go to the nearest emergency room.",
+    "If you're in immediate danger or feel like you might hurt yourself, please call your local emergency number **right now** or go to the nearest emergency room.",
     "",
     "If you can, tell me: **Are you safe right now?** (Yes / Not sure / No)",
     "",
-    "If you’d like, we can take one small step together: can you move to a safer place, and reach out to someone you trust (a friend, roommate, family member, or campus support) to stay with you?",
+    "If you'd like, we can take one small step together: can you move to a safer place, and reach out to someone you trust (a friend, roommate, family member, or campus support) to stay with you?",
   ].join("\n");
 }
 
-function demoResponse(userText: string) {
-  // A calm, non-clinical fallback aligned with context.md
-  const base = [
-    "I’m here with you.",
-    "Thanks for sharing that — it makes sense that this feels heavy.",
-    "",
-    "To make this easier, we can go step by step:",
-    "- What’s the hardest part right now?",
-    "- What would “a little bit better” look like in the next 30 minutes?",
-    "",
-    "If you want, you can also say whether this is mostly about **exams**, **anxiety/stress**, **relationships**, or just needing to **vent**.",
-  ].join("\n");
-
-  if (!userText.trim()) return base;
-  return base;
-}
+// ── System prompt ─────────────────────────────────────────────────
 
 function buildSystemPrompt(ctx?: UserContext) {
   const who =
@@ -63,167 +51,175 @@ function buildSystemPrompt(ctx?: UserContext) {
           : "a user";
 
   const personalization = [
-    ctx?.displayName ? `- The user prefers to be addressed as: ${ctx.displayName}` : null,
+    "- Do NOT address the user by name. Just say 'you' or 'hey'.",
     ctx?.school ? `- School: ${ctx.school}` : null,
     ctx?.educationLevel ? `- Education level: ${ctx.educationLevel}` : null,
-    ctx?.country ? `- Country context: ${ctx.country}` : " - Country context: Ghana (default)",
+    ctx?.country ? `- Country context: ${ctx.country}` : "- Country context: Ghana (default)",
   ]
     .filter(Boolean)
     .join("\n");
 
   return [
-    "You are Theraklick AI — a calm, empathetic, non-clinical support companion for students in Africa (starting Ghana).",
-    "",
+    "You are Theraklick AI — a warm, empathetic support companion for students in Africa (starting Ghana).",
     `You are talking to ${who}.`,
-    personalization ? `\nPersonalization context (do NOT request more identity):\n${personalization}\n` : "",
-    "Core principles:",
-    "- Anonymity-first: never ask for full names, phone numbers, addresses, or contact details. If the user shares any, do not repeat it back.",
-    "- Text-first, low cognitive load: short paragraphs, gentle tone, 1–2 questions at a time, offer simple options.",
-    "- Layered support: guide toward next steps (AI → peer support → counselor → emergency resources) when appropriate.",
-    "- Trust over features: clear, honest limitations. You are not a therapist or doctor.",
+    personalization ? `\nContext (do NOT ask for more identity info):\n${personalization}\n` : "",
+    "How to respond:",
+    "- Talk naturally, like a caring friend — not a form or template.",
+    "- Keep responses short (2-4 paragraphs max). Be conversational.",
+    "- You can discuss ANY topic the user brings up: academics, relationships, hobbies, life advice, fun questions, anything.",
+    "- Match the user's energy. If they're casual, be casual. If they're serious, be thoughtful.",
+    "- Ask follow-up questions to keep the conversation going.",
+    "- Use simple, warm language. Avoid clinical or overly formal tone.",
+    "- Do NOT use rigid headings or structured formats. Just talk.",
     "",
-    "Output format (must follow exactly):",
-    "Return a short, structured response in Markdown with these headings:",
-    "### What I’m hearing",
-    "### A small next step (5 minutes)",
-    "### Options (pick one)",
-    "### If this feels urgent",
-    "",
-    "Style rules:",
-    "- Validate feelings without diagnosing. Avoid clinical language.",
-    "- Offer 2–3 options max. Keep each bullet short.",
-    "- Ask at most ONE question at the end.",
+    "Boundaries:",
+    "- You are not a therapist or doctor. Be honest about your limitations when relevant.",
+    "- Anonymity-first: never ask for full names, phone numbers, or contact details.",
+    "- If the conversation naturally turns to something heavy, gently suggest they could also talk to a peer mentor or counselor on the app.",
     "",
     "Safety:",
-    "- If the user expresses self-harm/suicide intent or imminent danger: switch to safety mode.",
-    "- Ask if they are safe right now; encourage contacting local emergency services or going to the nearest emergency room.",
-    "- Encourage reaching a trusted person nearby. Do not provide instructions for self-harm.",
-  ]
-    .filter((s) => s !== "")
-    .join("\n");
+    "- If the user expresses self-harm/suicide intent: take it seriously, ask if they are safe, encourage contacting emergency services or a trusted person nearby.",
+  ].join("\n");
 }
 
-async function callGemini(messages: ChatMessage[], ctx?: UserContext) {
-  // Read from .env.local — never hardcode API keys in source code
+// ── Gemini SDK singleton ──────────────────────────────────────────
+// Initialized once at module load so the client is reused across requests
+
+let genAI: GoogleGenerativeAI | null = null;
+
+function getGenAI(): GoogleGenerativeAI | null {
+  if (genAI) return genAI;
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    console.log("Gemini: No API key configured");
+    console.warn("GEMINI_API_KEY not set in .env.local — AI will use demo responses");
     return null;
   }
+  genAI = new GoogleGenerativeAI(apiKey);
+  return genAI;
+}
 
-  // gemini-2.0-flash: free tier, fast, good quality — replaces deprecated gemini-pro
-  const model = "gemini-2.0-flash";
-  console.log(`Gemini: Using model ${model}`);
+// ── Gemini API call ───────────────────────────────────────────────
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(
-    model
-  )}:generateContent?key=${encodeURIComponent(apiKey)}`;
+async function callGemini(messages: ChatMessage[], ctx?: UserContext): Promise<string | null> {
+  const ai = getGenAI();
+  if (!ai) return null;
 
-  const contents = messages
-    .filter((m) => m.role !== "system")
-    .map((m) => ({
-      role: m.role === "assistant" ? "model" : "user",
-      parts: [{ text: m.content }],
-    }))
-    .slice(-30);
+  const modelName = process.env.GEMINI_MODEL || "gemini-2.0-flash";
 
-  const systemInstruction = { parts: [{ text: buildSystemPrompt(ctx) }] };
-
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      systemInstruction,
-      contents,
+  try {
+    const model = ai.getGenerativeModel({
+      model: modelName,
+      systemInstruction: buildSystemPrompt(ctx),
       generationConfig: {
         temperature: 0.7,
         topP: 0.9,
-        maxOutputTokens: 500,
+        maxOutputTokens: 2048,
       },
-    }),
-  });
+      safetySettings: [
+        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+      ],
+    });
 
-  if (!res.ok) {
-    const errorText = await res.text();
-    console.error("Gemini error:", res.status, errorText);
+    // Build chat history, filtering out system messages
+    const allMessages = messages
+      .filter((m) => m.role !== "system")
+      .slice(-30)
+      .map((m) => ({
+        role: m.role === "assistant" ? ("model" as const) : ("user" as const),
+        parts: [{ text: m.content }],
+      }));
+
+    // The last message is the one we send; everything before is history
+    const lastMessage = allMessages.pop();
+    if (!lastMessage) return null;
+
+    // Gemini requires history to start with a "user" message — drop leading "model" entries
+    const firstUserIdx = allMessages.findIndex((m) => m.role === "user");
+    const history = firstUserIdx >= 0 ? allMessages.slice(firstUserIdx) : [];
+
+    const chat = model.startChat({ history });
+    const result = await chat.sendMessage(lastMessage.parts);
+    const responseText = result.response.text();
+
+    return responseText?.trim() || null;
+  } catch (err: any) {
+    console.error(`Gemini [${modelName}] error:`, err?.message || err);
     return null;
   }
-
-  const data = (await res.json()) as any;
-  const responseText =
-    data?.candidates?.[0]?.content?.parts?.map((p: any) => p?.text).filter(Boolean).join("\n") ??
-    null;
-  
-  if (responseText) {
-    console.log("Gemini: Response received successfully");
-  }
-  return typeof responseText === "string" && responseText.trim() ? responseText : null;
 }
+
+// ── Demo fallback ─────────────────────────────────────────────────
+
+function demoResponse() {
+  return "Hey, I'm here for you. Tell me what's on your mind — I'm listening.\n\n*(AI is running in demo mode — add your `GEMINI_API_KEY` to `.env.local` for full responses.)*";
+}
+
+// ── Generate a short title from conversation ─────────────────────
+
+async function generateTitle(messages: ChatMessage[]): Promise<string | null> {
+  const ai = getGenAI();
+  if (!ai) return null;
+
+  const modelName = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+
+  try {
+    const model = ai.getGenerativeModel({
+      model: modelName,
+      generationConfig: { temperature: 0.5, maxOutputTokens: 20 },
+    });
+
+    const convo = messages
+      .filter((m) => m.role !== "system")
+      .slice(0, 4)
+      .map((m) => `${m.role}: ${m.content}`)
+      .join("\n");
+
+    const result = await model.generateContent(
+      `Given this conversation, generate a short title (3-6 words max, no quotes, no punctuation at the end):\n\n${convo}`
+    );
+
+    const title = result.response.text()?.trim();
+    return title || null;
+  } catch (err: any) {
+    console.error("Title generation error:", err?.message || err);
+    return null;
+  }
+}
+
+// ── POST handler ──────────────────────────────────────────────────
 
 export async function POST(req: Request) {
   try {
-    const body = (await req.json()) as { messages?: ChatMessage[]; userContext?: UserContext };
+    const body = (await req.json()) as { messages?: ChatMessage[]; userContext?: UserContext; mode?: "chat" | "title" };
     const messages = body.messages ?? [];
     const userContext = body.userContext;
-    const lastUser = [...messages].reverse().find((m) => m.role === "user")?.content ?? "";
 
-    if (looksLikeCrisis(lastUser)) {
-      return NextResponse.json({
-        ok: true,
-        mode: "crisis",
-        message: crisisResponse(),
-      });
+    // Title generation mode — lightweight call, no crisis check needed
+    if (body.mode === "title") {
+      const title = await generateTitle(messages);
+      return NextResponse.json({ ok: true, title: title || "New chat" });
     }
 
-    // PRIMARY: Gemini 2.0 Flash (free tier, fast)
+    const lastUser = [...messages].reverse().find((m) => m.role === "user")?.content ?? "";
+
+    // Crisis detection takes priority over everything
+    if (looksLikeCrisis(lastUser)) {
+      return NextResponse.json({ ok: true, mode: "crisis", message: crisisResponse() });
+    }
+
+    // Primary: Gemini via official SDK
     const geminiText = await callGemini(messages, userContext);
     if (geminiText) {
       return NextResponse.json({ ok: true, mode: "gemini", message: geminiText });
     }
 
-    // FALLBACK: OpenAI-compatible (Cogen AI) — only reached if Gemini fails
-    const apiKey = process.env.OPENAI_API_KEY || "sk-qZJyPuRxRCPzH0mwOBX6_A";
-    const baseUrl = process.env.OPENAI_BASE_URL || "https://api.cogenai.kalavai.net/v1";
-    const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
-    const system: ChatMessage = { role: "system", content: buildSystemPrompt(userContext) };
-
-    if (!apiKey) {
-      return NextResponse.json({ ok: true, mode: "demo", message: demoResponse(lastUser) });
-    }
-
-    const upstream = await fetch(`${baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model,
-        messages: [system, ...messages].slice(-30),
-        temperature: 0.7,
-      }),
-    });
-
-    if (!upstream.ok) {
-      const text = await upstream.text();
-      console.error("OpenAI upstream error:", upstream.status, text);
-      return NextResponse.json(
-        { ok: true, mode: "demo", message: demoResponse(lastUser) },
-        { status: 200 }
-      );
-    }
-
-    const data = (await upstream.json()) as any;
-    const content = data?.choices?.[0]?.message?.content;
-
-    return NextResponse.json({
-      ok: true,
-      mode: "openai",
-      message: typeof content === "string" ? content : demoResponse(lastUser),
-    });
+    // Fallback: structured demo response
+    return NextResponse.json({ ok: true, mode: "demo", message: demoResponse() });
   } catch (e) {
     console.error("AI route error:", e);
-    return NextResponse.json({ ok: false, error: "Bad request" }, { status: 400 });
+    return NextResponse.json({ ok: false, error: "Something went wrong" }, { status: 500 });
   }
 }
-

@@ -7,10 +7,10 @@ export default function SignupPage() {
   // - Student signup: /signup/student
   // - Applications: /apply/peer-mentor, /apply/counselor
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white dark:bg-gray-950 px-6">
-      <div className="w-full max-w-lg rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-6 text-center shadow-sm">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Sign up</h1>
-        <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+    <div className="flex min-h-screen items-center justify-center bg-white px-6">
+      <div className="w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-6 text-center shadow-sm">
+        <h1 className="text-2xl font-bold text-gray-900">Sign up</h1>
+        <p className="mt-2 text-sm text-gray-600">
           We’ve updated the signup flow to support real student accounts and approvals for mentors/counselors.
         </p>
         <div className="mt-6 flex flex-col gap-3">

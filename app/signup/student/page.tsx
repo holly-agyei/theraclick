@@ -69,12 +69,11 @@ export default function StudentSignupPage() {
       <AuthLeftPanel
         entered={entered}
         headline={"Join Theraklick\nfor students like you."}
-        poster="/images/student-hero.jpg"
       />
 
       {/* ── White card ── */}
       <div
-        className={`auth-right-panel relative z-10 flex flex-1 flex-col -mt-6 rounded-t-[28px] bg-white dark:bg-gray-950 px-6 py-6
+        className={`auth-right-panel relative z-10 flex flex-1 flex-col -mt-6 rounded-t-[28px] bg-white px-6 py-6
           shadow-2xl shadow-black/5
           transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]
           lg:mt-0 lg:rounded-none lg:px-10 lg:py-8 lg:shadow-none
@@ -84,43 +83,43 @@ export default function StudentSignupPage() {
       >
         <div className="mx-auto w-full max-w-md flex-1 overflow-y-auto">
           {/* Badge */}
-          <div className={`mb-4 inline-flex items-center gap-2 rounded-full border border-[#2BB5A0]/20 dark:border-teal-800
-            bg-[#2BB5A0]/5 dark:bg-teal-950/50 px-4 py-2 ${s(200)}`}>
-            <GraduationCap className="h-4 w-4 text-[#2BB5A0] dark:text-teal-400" />
-            <span className="text-sm font-medium text-[#1A7A6E] dark:text-teal-400">Student</span>
+          <div className={`mb-4 inline-flex items-center gap-2 rounded-full border border-[#2BB5A0]/20
+            bg-[#2BB5A0]/5 px-4 py-2 ${s(200)}`}>
+            <GraduationCap className="h-4 w-4 text-[#2BB5A0]" />
+            <span className="text-sm font-medium text-[#1A7A6E]">Student</span>
           </div>
 
-          <h1 className={`text-2xl font-bold tracking-tight text-[#0D1F1D] dark:text-gray-100 lg:text-3xl ${s(280)}`}>
+          <h1 className={`text-2xl font-bold tracking-tight text-[#0D1F1D] lg:text-3xl ${s(280)}`}>
             Create account
           </h1>
-          <p className={`mt-2 text-sm text-[#6B8C89] dark:text-gray-400 ${s(330)}`}>
+          <p className={`mt-2 text-sm text-[#6B8C89] ${s(330)}`}>
             Join Theraklick for calm, private support.
           </p>
 
           {/* Only render after hydration — isFirebaseBacked differs SSR vs client */}
           {hydrated && !isFirebaseBacked && (
-            <div className="mt-4 rounded-xl border border-[#F5C842]/30 dark:border-amber-800 bg-[#F5C842]/10 dark:bg-[#F5C842]/5 p-3">
-              <p className="text-sm font-semibold text-[#E8A800] dark:text-amber-400">Demo mode</p>
-              <p className="mt-1 text-xs text-[#E8A800]/70 dark:text-amber-400/80">Add Firebase keys to enable signup.</p>
+            <div className="mt-4 rounded-xl border border-[#F5C842]/30 bg-[#F5C842]/10#F5C842]/5 p-3">
+              <p className="text-sm font-semibold text-[#E8A800]">Demo mode</p>
+              <p className="mt-1 text-xs text-[#E8A800]/70">Add Firebase keys to enable signup.</p>
             </div>
           )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div className={s(380)}>
-              <label className="mb-1.5 block text-sm font-semibold text-[#2BB5A0] dark:text-teal-400">Full name</label>
+              <label className="mb-1.5 block text-sm font-semibold text-[#2BB5A0]">Full name</label>
               <input value={fullName} onChange={(e) => setFullName(e.target.value)}
                 placeholder="Ama Mensah" className="tk-input" />
             </div>
 
             <div className={`grid gap-4 sm:grid-cols-2 ${s(430)}`}>
               <div>
-                <label className="mb-1.5 block text-sm font-semibold text-[#2BB5A0] dark:text-teal-400">Email</label>
+                <label className="mb-1.5 block text-sm font-semibold text-[#2BB5A0]">Email</label>
                 <input value={email} onChange={(e) => setEmail(e.target.value)}
                   type="email" placeholder="ama@gmail.com" className="tk-input" />
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-semibold text-[#2BB5A0] dark:text-teal-400">School email</label>
+                <label className="mb-1.5 block text-sm font-semibold text-[#2BB5A0]">School email</label>
                 <input value={schoolEmail} onChange={(e) => setSchoolEmail(e.target.value)}
                   type="email" placeholder="ama@ug.edu.gh" className="tk-input" />
               </div>
@@ -128,12 +127,12 @@ export default function StudentSignupPage() {
 
             <div className={`grid gap-4 sm:grid-cols-2 ${s(480)}`}>
               <div>
-                <label className="mb-1.5 block text-sm font-semibold text-[#2BB5A0] dark:text-teal-400">Education level</label>
+                <label className="mb-1.5 block text-sm font-semibold text-[#2BB5A0]">Education level</label>
                 <input value={educationLevel} onChange={(e) => setEducationLevel(e.target.value)}
                   placeholder="Level 200" className="tk-input" />
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-semibold text-[#2BB5A0] dark:text-teal-400">School</label>
+                <label className="mb-1.5 block text-sm font-semibold text-[#2BB5A0]">School</label>
                 <input value={school} onChange={(e) => setSchool(e.target.value)}
                   placeholder="University of Ghana" className="tk-input" />
               </div>
@@ -141,20 +140,20 @@ export default function StudentSignupPage() {
 
             <div className={`grid gap-4 sm:grid-cols-2 ${s(530)}`}>
               <div>
-                <label className="mb-1.5 block text-sm font-semibold text-[#2BB5A0] dark:text-teal-400">Password</label>
+                <label className="mb-1.5 block text-sm font-semibold text-[#2BB5A0]">Password</label>
                 <input value={password} onChange={(e) => setPassword(e.target.value)}
                   type="password" placeholder="••••••••" className="tk-input" />
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-semibold text-[#2BB5A0] dark:text-teal-400">Confirm</label>
+                <label className="mb-1.5 block text-sm font-semibold text-[#2BB5A0]">Confirm</label>
                 <input value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
                   type="password" placeholder="••••••••" className="tk-input" />
               </div>
             </div>
 
             {error && (
-              <div className="tk-shake rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950 px-4 py-3">
-                <p className="text-sm font-medium text-red-600 dark:text-red-400">{error}</p>
+              <div className="tk-shake rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+                <p className="text-sm font-medium text-red-600">{error}</p>
               </div>
             )}
 
@@ -170,9 +169,9 @@ export default function StudentSignupPage() {
             </div>
           </form>
 
-          <p className={`mt-6 text-center text-sm text-[#6B8C89] dark:text-gray-400 ${s(640)}`}>
+          <p className={`mt-6 text-center text-sm text-[#6B8C89] ${s(640)}`}>
             Already have an account?{" "}
-            <Link href="/login?role=student" className="font-semibold text-[#2BB5A0] dark:text-teal-400 hover:underline">
+            <Link href="/login?role=student" className="font-semibold text-[#2BB5A0] hover:underline">
               Sign in
             </Link>
           </p>

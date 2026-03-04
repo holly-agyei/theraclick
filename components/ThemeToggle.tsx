@@ -1,12 +1,12 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { Sun, Moon, Monitor } from "lucide-react";
+import { Sun, Moon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Cycles through: light → dark → system.
+ * Simple light ↔ dark toggle.
  * Mounted guard prevents hydration mismatch since theme is unknown on the server.
  */
 export function ThemeToggle({ className }: { className?: string }) {
@@ -21,27 +21,20 @@ export function ThemeToggle({ className }: { className?: string }) {
     );
   }
 
-  const cycle = () => {
-    if (theme === "light") setTheme("dark");
-    else if (theme === "dark") setTheme("system");
-    else setTheme("light");
-  };
-
-  const Icon = theme === "dark" ? Moon : theme === "light" ? Sun : Monitor;
-  const label =
-    theme === "dark" ? "Dark" : theme === "light" ? "Light" : "System";
+  const isDark = theme === "dark";
+  const toggle = () => setTheme(isDark ? "light" : "dark");
 
   return (
     <button
-      onClick={cycle}
+      onClick={toggle}
       className={cn(
         "flex items-center gap-2.5 rounded-lg transition-colors",
         className
       )}
-      title={`Theme: ${label}`}
+      title={`Theme: ${isDark ? "Dark" : "Light"}`}
     >
-      <Icon className="h-4 w-4" />
-      <span>{label}</span>
+      {isDark ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+      <span>{isDark ? "Dark" : "Light"}</span>
     </button>
   );
 }

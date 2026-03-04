@@ -165,7 +165,6 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
       <AuthLeftPanel
         entered={entered}
         headline={"Your mind\ndeserves care."}
-        poster="/images/student-hero.jpg"
       />
 
       {/* ── White card (bottom on mobile, right on desktop) ── */}
@@ -181,30 +180,30 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
         <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center">
           {/* Role badge */}
           <div className={`mb-5 inline-flex items-center gap-2 self-start rounded-full
-            border border-[#2BB5A0]/20 dark:border-teal-800 bg-[#2BB5A0]/5 dark:bg-teal-950/50 px-4 py-2
+            border border-[#2BB5A0]/20 bg-[#2BB5A0]/5 px-4 py-2
             transition-all duration-500 delay-200
             ${entered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}>
-            <Icon className="h-4 w-4 text-[#2BB5A0] dark:text-teal-400" />
-            <span className="text-sm font-medium text-[#1A7A6E] dark:text-teal-400">
+            <Icon className="h-4 w-4 text-[#2BB5A0]" />
+            <span className="text-sm font-medium text-[#1A7A6E]">
               {role === "student" ? "Student" : role === "peer-mentor" ? "Peer Mentor" : "Counselor"}
             </span>
           </div>
 
           {/* Heading */}
-          <h1 className={`text-2xl font-bold tracking-tight text-[#0D1F1D] dark:text-gray-100 lg:text-3xl
+          <h1 className={`text-2xl font-bold tracking-tight text-[#0D1F1D] lg:text-3xl
             transition-all duration-500 delay-300
             ${entered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}>
             {config.title}
           </h1>
-          <p className={`mt-2 text-[#6B8C89] dark:text-gray-400 transition-all duration-500 delay-[350ms]
+          <p className={`mt-2 text-[#6B8C89] transition-all duration-500 delay-[350ms]
             ${entered ? "opacity-100" : "opacity-0"}`}>
             {config.subtitle}
           </p>
 
           {hydrated && !isFirebaseBacked && (
             <div className="mt-5 rounded-xl border border-[#F5C842]/30 bg-[#F5C842]/10 p-4">
-              <p className="text-sm font-semibold text-[#E8A800] dark:text-amber-400">Demo mode</p>
-              <p className="mt-1 text-sm text-[#E8A800]/70 dark:text-amber-400/80">Firebase isn&apos;t configured.</p>
+              <p className="text-sm font-semibold text-[#E8A800]">Demo mode</p>
+              <p className="mt-1 text-sm text-[#E8A800]/70">Firebase isn&apos;t configured.</p>
             </div>
           )}
 
@@ -212,7 +211,7 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
           <form onSubmit={handleLogin} className="mt-8 space-y-5">
             <div className={`transition-all duration-500 delay-[400ms]
               ${entered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}>
-              <label className="mb-2 block text-sm font-semibold text-[#2BB5A0] dark:text-teal-400">Email</label>
+              <label className="mb-2 block text-sm font-semibold text-[#2BB5A0]">Email</label>
               <input
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -226,10 +225,10 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
             <div className={`transition-all duration-500 delay-[480ms]
               ${entered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}>
               <div className="mb-2 flex items-center justify-between">
-                <label className="block text-sm font-semibold text-[#2BB5A0] dark:text-teal-400">Password</label>
+                <label className="block text-sm font-semibold text-[#2BB5A0]">Password</label>
                 <Link
                   href="/forgot-password"
-                  className="text-xs font-medium text-[#6B8C89] dark:text-gray-400 hover:text-[#2BB5A0] dark:hover:text-teal-400 hover:underline"
+                  className="text-xs font-medium text-[#6B8C89] hover:text-[#2BB5A0] hover:underline"
                 >
                   Forgot password?
                 </Link>
@@ -270,13 +269,13 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
             )}
 
             {error && (
-              <div className="tk-shake rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950 px-4 py-3">
-                <p className="text-sm font-medium text-red-600 dark:text-red-400">{error}</p>
+              <div className="tk-shake rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+                <p className="text-sm font-medium text-red-600">{error}</p>
                 {/* If wrong role, show a link to the correct login page */}
                 {roleMismatch && (
                   <Link
                     href={`/login?role=${roleMismatch}`}
-                    className="mt-2 inline-block text-sm font-semibold text-[#2BB5A0] dark:text-teal-400 hover:underline"
+                    className="mt-2 inline-block text-sm font-semibold text-[#2BB5A0] hover:underline"
                   >
                     Go to {roleMismatch === "student" ? "Student" : roleMismatch === "peer-mentor" ? "Peer Mentor" : "Counselor"} login &rarr;
                   </Link>
@@ -306,10 +305,10 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
           {/* Footer link */}
           <div className={`mt-8 text-center transition-all duration-500 delay-[640ms]
             ${entered ? "opacity-100" : "opacity-0"}`}>
-            <span className="text-sm text-[#6B8C89] dark:text-gray-400">Don&apos;t have an account? </span>
+            <span className="text-sm text-[#6B8C89]">Don&apos;t have an account? </span>
             <Link
               href={config.createLink}
-              className="text-sm font-semibold text-[#2BB5A0] dark:text-teal-400 hover:text-[#1A7A6E] dark:hover:text-teal-500 hover:underline"
+              className="text-sm font-semibold text-[#2BB5A0] hover:text-[#1A7A6E] hover:underline"
             >
               {config.createLabel}
             </Link>

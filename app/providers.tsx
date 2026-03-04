@@ -7,7 +7,7 @@ import { CallProvider } from "@/context/callContext";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <ThemeProvider attribute="class" defaultTheme="light">
       <AuthProvider>
         <CallProvider>{children}</CallProvider>
       </AuthProvider>

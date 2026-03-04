@@ -45,12 +45,12 @@ export default function RoleSelectionPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white dark:bg-gray-950 px-4 py-12 md:py-16">
+    <div className="flex min-h-screen items-center justify-center bg-white px-4 py-12 md:py-16">
       <div className="mx-auto w-full max-w-4xl">
-        <h1 className="mb-3 text-center text-3xl font-bold text-gray-900 dark:text-gray-100 md:text-4xl lg:text-5xl">
+        <h1 className="mb-3 text-center text-3xl font-bold text-gray-900 md:text-4xl lg:text-5xl">
           How would you like to join?
         </h1>
-        <p className="mb-12 text-center text-lg text-gray-600 dark:text-gray-300 md:text-xl lg:text-2xl">
+        <p className="mb-12 text-center text-lg text-gray-600 md:text-xl lg:text-2xl">
           Choose the role that best describes you
         </p>
 
@@ -62,7 +62,7 @@ export default function RoleSelectionPage() {
               <Card
                 key={role.id}
                 className={`cursor-pointer transition-all hover:shadow-lg ${
-                  isSelected ? "border-primary-400 border-2" : "border-gray-200 dark:border-gray-800"
+                  isSelected ? "border-primary-400 border-2" : "border-gray-200"
                 }`}
                 onClick={() => setSelectedRole(role.id)}
               >
@@ -70,19 +70,19 @@ export default function RoleSelectionPage() {
                   <div className="flex flex-col items-center text-center">
                     <div
                       className={`mb-4 flex h-16 w-16 items-center justify-center rounded-full md:h-20 md:w-20 ${
-                        isSelected ? "bg-primary-100" : "bg-gray-100 dark:bg-gray-800"
+                        isSelected ? "bg-primary-100" : "bg-gray-100"
                       }`}
                     >
                       <Icon
                         className={`h-8 w-8 md:h-10 md:w-10 ${
-                          isSelected ? "text-primary-600" : "text-gray-600 dark:text-gray-300"
+                          isSelected ? "text-primary-600" : "text-gray-600"
                         }`}
                       />
                     </div>
-                    <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-gray-100 md:text-2xl">
+                    <h3 className="mb-2 text-xl font-semibold text-gray-900 md:text-2xl">
                       {role.title}
                     </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-300 md:text-base">{role.description}</p>
+                    <p className="text-sm text-gray-600 md:text-base">{role.description}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -90,7 +90,7 @@ export default function RoleSelectionPage() {
           })}
         </div>
 
-        <div className="mb-8 rounded-lg bg-primary-50 dark:bg-gray-900 p-5 md:p-6">
+        <div className="mb-8 rounded-lg bg-primary-50 p-5 md:p-6">
           <div className="flex gap-4">
             <div className="mt-0.5 shrink-0">
               <svg
@@ -107,7 +107,7 @@ export default function RoleSelectionPage() {
                 />
               </svg>
             </div>
-            <p className="text-sm text-gray-700 dark:text-gray-300 md:text-base lg:text-lg">
+            <p className="text-sm text-gray-700 md:text-base lg:text-lg">
               You can change your role later in settings. All roles prioritize
               privacy and confidentiality.
             </p>

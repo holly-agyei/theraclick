@@ -76,12 +76,11 @@ export default function ForgotPasswordPage() {
       <AuthLeftPanel
         entered={entered}
         headline={"Reset your\npassword."}
-        poster="/images/student-hero.jpg"
       />
 
       {/* White card */}
       <div
-        className={`auth-right-panel relative z-10 flex flex-1 flex-col -mt-6 rounded-t-[28px] bg-white dark:bg-gray-950 px-6 py-8
+        className={`auth-right-panel relative z-10 flex flex-1 flex-col -mt-6 rounded-t-[28px] bg-white px-6 py-8
           shadow-2xl shadow-black/5
           transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]
           lg:mt-0 lg:rounded-none lg:px-12 lg:shadow-none
@@ -93,7 +92,7 @@ export default function ForgotPasswordPage() {
           {/* Back link */}
           <Link
             href="/login"
-            className={`mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-[#6B8C89] dark:text-gray-400 hover:text-[#2BB5A0] dark:hover:text-teal-400
+            className={`mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-[#6B8C89] hover:text-[#2BB5A0]
               transition-all duration-500 delay-200
               ${entered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}
           >
@@ -103,40 +102,40 @@ export default function ForgotPasswordPage() {
 
           {/* Icon badge */}
           <div className={`mb-5 inline-flex items-center gap-2 self-start rounded-full
-            border border-[#2BB5A0]/20 dark:border-teal-800 bg-[#2BB5A0]/5 dark:bg-teal-950/50 px-4 py-2
+            border border-[#2BB5A0]/20 bg-[#2BB5A0]/5 px-4 py-2
             transition-all duration-500 delay-200
             ${entered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}>
-            <Mail className="h-4 w-4 text-[#2BB5A0] dark:text-teal-400" />
-            <span className="text-sm font-medium text-[#1A7A6E] dark:text-teal-400">Password Reset</span>
+            <Mail className="h-4 w-4 text-[#2BB5A0]" />
+            <span className="text-sm font-medium text-[#1A7A6E]">Password Reset</span>
           </div>
 
           {/* Heading */}
-          <h1 className={`text-2xl font-bold tracking-tight text-[#0D1F1D] dark:text-gray-100 lg:text-3xl
+          <h1 className={`text-2xl font-bold tracking-tight text-[#0D1F1D] lg:text-3xl
             transition-all duration-500 delay-300
             ${entered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}>
             Forgot your password?
           </h1>
-          <p className={`mt-2 text-[#6B8C89] dark:text-gray-400 transition-all duration-500 delay-[350ms]
+          <p className={`mt-2 text-[#6B8C89] transition-all duration-500 delay-[350ms]
             ${entered ? "opacity-100" : "opacity-0"}`}>
             Enter your email and we&apos;ll send you a link to reset your password.
           </p>
 
           {isSent ? (
             /* ── Success state ── */
-            <div className={`mt-8 rounded-xl border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950 p-6 text-center
+            <div className={`mt-8 rounded-xl border border-green-200 bg-green-50 p-6 text-center
               transition-all duration-500 delay-[400ms]
               ${entered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}>
-              <CheckCircle2 className="mx-auto mb-3 h-10 w-10 text-green-600 dark:text-green-400" />
-              <p className="text-sm font-semibold text-green-800 dark:text-green-400">Check your inbox</p>
-              <p className="mt-2 text-sm text-green-700 dark:text-green-400">
+              <CheckCircle2 className="mx-auto mb-3 h-10 w-10 text-green-600" />
+              <p className="text-sm font-semibold text-green-800">Check your inbox</p>
+              <p className="mt-2 text-sm text-green-700">
                 We&apos;ve sent a password reset link to <strong>{email}</strong>. Click the link in the email to set a new password.
               </p>
-              <p className="mt-3 text-xs text-green-600 dark:text-green-400">
+              <p className="mt-3 text-xs text-green-600">
                 Didn&apos;t receive it? Check your spam folder or try again.
               </p>
               <button
                 onClick={() => { setIsSent(false); setEmail(""); }}
-                className="mt-4 text-sm font-semibold text-[#2BB5A0] dark:text-teal-400 hover:underline"
+                className="mt-4 text-sm font-semibold text-[#2BB5A0] hover:underline"
               >
                 Try a different email
               </button>
@@ -146,7 +145,7 @@ export default function ForgotPasswordPage() {
             <form onSubmit={handleSubmit} className="mt-8 space-y-5">
               <div className={`transition-all duration-500 delay-[400ms]
                 ${entered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}>
-                <label className="mb-2 block text-sm font-semibold text-[#2BB5A0] dark:text-teal-400">Email</label>
+                <label className="mb-2 block text-sm font-semibold text-[#2BB5A0]">Email</label>
                 <input
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -158,8 +157,8 @@ export default function ForgotPasswordPage() {
               </div>
 
               {error && (
-                <div className="tk-shake rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950 px-4 py-3">
-                  <p className="text-sm font-medium text-red-600 dark:text-red-400">{error}</p>
+                <div className="tk-shake rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+                  <p className="text-sm font-medium text-red-600">{error}</p>
                 </div>
               )}
 
@@ -186,10 +185,10 @@ export default function ForgotPasswordPage() {
           {/* Footer */}
           <div className={`mt-8 text-center transition-all duration-500 delay-[560ms]
             ${entered ? "opacity-100" : "opacity-0"}`}>
-            <span className="text-sm text-[#6B8C89] dark:text-gray-400">Remember your password? </span>
+            <span className="text-sm text-[#6B8C89]">Remember your password? </span>
             <Link
               href="/login"
-              className="text-sm font-semibold text-[#2BB5A0] dark:text-teal-400 hover:text-[#1A7A6E] dark:hover:text-teal-500 hover:underline"
+              className="text-sm font-semibold text-[#2BB5A0] hover:text-[#1A7A6E] hover:underline"
             >
               Sign in
             </Link>

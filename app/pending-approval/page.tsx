@@ -38,26 +38,26 @@ export default function PendingApprovalPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-primary-50/40 via-white to-white dark:from-gray-900 dark:via-gray-950 dark:to-gray-950 px-4 py-12">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-primary-50/40 via-white to-white px-4 py-12">
       <div className="w-full max-w-xl">
-        <Card className="border-gray-200 dark:border-gray-800 shadow-lg shadow-gray-100 dark:shadow-gray-900">
+        <Card className="border-gray-200 shadow-lg shadow-gray-100">
           <CardContent className="p-6 md:p-8">
             <div className="flex items-start gap-3">
-              <div className="rounded-xl bg-primary-100 dark:bg-gray-800 p-3">
+              <div className="rounded-xl bg-primary-100 p-3">
                 <Clock className="h-6 w-6 text-primary-700" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 md:text-3xl">Application received</h1>
-                <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">Application received</h1>
+                <p className="mt-2 text-sm text-gray-600">
                   Your account is waiting for admin approval. You’ll be able to access your dashboard once approved.
                 </p>
               </div>
             </div>
 
-            <div className="mt-6 rounded-2xl border border-primary-200 dark:border-gray-700 bg-primary-50 dark:bg-gray-900 p-5">
+            <div className="mt-6 rounded-2xl border border-primary-200 bg-primary-50 p-5">
               <div className="flex items-start gap-3">
                 <Shield className="mt-0.5 h-5 w-5 text-primary-700" />
-                <p className="text-sm text-gray-700 dark:text-gray-300">
+                <p className="text-sm text-gray-700">
                   This keeps students safe and prevents role mixing. If you think this is a mistake, contact the admin team.
                 </p>
               </div>

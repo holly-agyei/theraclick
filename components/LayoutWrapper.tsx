@@ -5,7 +5,8 @@ import { BottomNav } from "./BottomNav";
 import { useAuth } from "@/context/auth";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { Brain } from "lucide-react";
+import Image from "next/image";
+import { InteractiveGlobe } from "@/components/ui/interactive-globe";
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const { loading, profile } = useAuth();
@@ -57,7 +58,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
                   style={{ animationDuration: "1s" }}
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Brain className="h-6 w-6 text-green-600" strokeWidth={1.5} />
+                  <Image src="/images/theraklick-logo.png" alt="Theraklick" width={24} height={24} className="object-contain" />
                 </div>
               </div>
               <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Preparing your safe space...</p>
@@ -69,6 +70,17 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
         )}
       </main>
       <BottomNav />
+
+      {/* Globe watermark — bottom-right corner accent */}
+      <div className="pointer-events-none fixed bottom-6 right-6 z-40 hidden opacity-[0.20] dark:opacity-[0.30] md:block">
+        <InteractiveGlobe
+          size={240}
+          dotColor="rgba(22, 163, 74, ALPHA)"
+          arcColor="rgba(22, 163, 74, 0.4)"
+          markerColor="rgba(34, 197, 94, 0.8)"
+          autoRotateSpeed={0.003}
+        />
+      </div>
     </div>
   );
 }

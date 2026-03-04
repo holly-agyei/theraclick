@@ -173,13 +173,13 @@ export default function CounselorSettingsPage() {
 
   return (
     <LayoutWrapper>
-      <div className="min-h-screen bg-gray-50/80">
+      <div className="min-h-screen bg-gray-50/80 dark:bg-gray-900/80">
         <div className="px-4 py-6 pb-28 md:px-8 md:py-10">
           <div className="mx-auto max-w-lg">
-            <h1 className="mb-6 text-2xl font-bold text-gray-900">Settings</h1>
+            <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-gray-100">Settings</h1>
 
             {/* Profile Card */}
-            <div className="mb-2 rounded-2xl bg-white p-4 shadow-sm">
+            <div className="mb-2 rounded-2xl bg-white dark:bg-gray-950 p-4 shadow-sm">
               <div className="flex items-center gap-4">
                 <div className="relative shrink-0">
                   {profilePicture ? (
@@ -195,10 +195,10 @@ export default function CounselorSettingsPage() {
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-base font-semibold text-gray-900 truncate">
+                  <p className="text-base font-semibold text-gray-900 dark:text-gray-100 truncate">
                     {profile?.fullName || "—"}
                   </p>
-                  <p className="text-sm text-gray-500 truncate">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
                     {profile?.email || "—"}
                   </p>
                 </div>
@@ -206,44 +206,44 @@ export default function CounselorSettingsPage() {
             </div>
 
             {/* Profile Section */}
-            <p className="mb-2 mt-5 px-1 text-xs font-semibold uppercase tracking-wider text-gray-400">
+            <p className="mb-2 mt-5 px-1 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-400">
               Profile
             </p>
-            <div className="rounded-2xl bg-white shadow-sm overflow-hidden">
+            <div className="rounded-2xl bg-white dark:bg-gray-950 shadow-sm overflow-hidden">
               {/* Edit Profile Row */}
               <button
                 onClick={() => setEditingProfile(!editingProfile)}
-                className="flex w-full items-center gap-3 px-4 py-3.5 transition-colors hover:bg-gray-50"
+                className="flex w-full items-center gap-3 px-4 py-3.5 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-100">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900">
                   <Briefcase className="h-5 w-5 text-orange-500" />
                 </div>
-                <p className="flex-1 text-left text-sm font-medium text-gray-900">
+                <p className="flex-1 text-left text-sm font-medium text-gray-900 dark:text-gray-100">
                   Edit Profile
                 </p>
                 <ChevronRight
-                  className={`h-5 w-5 shrink-0 text-gray-400 transition-transform ${
+                  className={`h-5 w-5 shrink-0 text-gray-400 dark:text-gray-400 transition-transform ${
                     editingProfile ? "rotate-90" : ""
                   }`}
                 />
               </button>
 
               {editingProfile && (
-                <div className="border-t border-gray-100 px-4 py-4">
+                <div className="border-t border-gray-100 dark:border-gray-800 px-4 py-4">
                   <div className="space-y-3">
                     <div>
-                      <label className="mb-1.5 block text-xs font-medium text-gray-500">
+                      <label className="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">
                         Specialization
                       </label>
                       <Input
                         value={specialization}
                         onChange={(e) => setSpecialization(e.target.value)}
                         placeholder="e.g., Anxiety, Depression, Academic Stress"
-                        className="border-gray-200 bg-gray-50 text-gray-900 text-sm"
+                        className="border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm"
                       />
                     </div>
                     <div>
-                      <label className="mb-1.5 block text-xs font-medium text-gray-500">
+                      <label className="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">
                         About
                       </label>
                       <textarea
@@ -251,7 +251,7 @@ export default function CounselorSettingsPage() {
                         onChange={(e) => setAbout(e.target.value)}
                         placeholder="Tell students about your background and approach..."
                         rows={3}
-                        className="w-full resize-none rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-green-500 focus:outline-none"
+                        className="w-full resize-none rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-400 focus:border-green-500 focus:outline-none"
                       />
                     </div>
                     <div className="flex gap-2 pt-1">
@@ -274,7 +274,7 @@ export default function CounselorSettingsPage() {
                         }}
                         variant="outline"
                         size="sm"
-                        className="border-gray-200 text-gray-600"
+                        className="border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400"
                       >
                         Cancel
                       </Button>
@@ -283,28 +283,28 @@ export default function CounselorSettingsPage() {
                 </div>
               )}
 
-              <div className="border-t border-gray-100" />
+              <div className="border-t border-gray-100 dark:border-gray-800" />
 
               {/* Change Photo Row */}
               <button
                 onClick={() => setEditingPhoto(!editingPhoto)}
-                className="flex w-full items-center gap-3 px-4 py-3.5 transition-colors hover:bg-gray-50"
+                className="flex w-full items-center gap-3 px-4 py-3.5 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
                   <Camera className="h-5 w-5 text-blue-500" />
                 </div>
-                <p className="flex-1 text-left text-sm font-medium text-gray-900">
+                <p className="flex-1 text-left text-sm font-medium text-gray-900 dark:text-gray-100">
                   Change Photo
                 </p>
                 <ChevronRight
-                  className={`h-5 w-5 shrink-0 text-gray-400 transition-transform ${
+                  className={`h-5 w-5 shrink-0 text-gray-400 dark:text-gray-400 transition-transform ${
                     editingPhoto ? "rotate-90" : ""
                   }`}
                 />
               </button>
 
               {editingPhoto && (
-                <div className="border-t border-gray-100 px-4 py-4">
+                <div className="border-t border-gray-100 dark:border-gray-800 px-4 py-4">
                   <div className="flex items-center gap-4">
                     <div className="relative shrink-0">
                       {profilePicture ? (
@@ -312,7 +312,7 @@ export default function CounselorSettingsPage() {
                           <img
                             src={profilePicture}
                             alt="Profile"
-                            className="h-20 w-20 rounded-full object-cover border-2 border-gray-200"
+                            className="h-20 w-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-800"
                           />
                           <button
                             onClick={handleRemovePhoto}
@@ -322,7 +322,7 @@ export default function CounselorSettingsPage() {
                           </button>
                         </div>
                       ) : (
-                        <div className="h-20 w-20 rounded-full bg-green-600 flex items-center justify-center text-xl font-bold text-white border-2 border-gray-200">
+                        <div className="h-20 w-20 rounded-full bg-green-600 flex items-center justify-center text-xl font-bold text-white border-2 border-gray-200 dark:border-gray-800">
                           {initials}
                         </div>
                       )}
@@ -340,7 +340,7 @@ export default function CounselorSettingsPage() {
                         disabled={uploadingPhoto}
                         variant="outline"
                         size="sm"
-                        className="border-gray-200 text-gray-700 hover:bg-gray-100"
+                        className="border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                         onClick={() => fileInputRef.current?.click()}
                       >
                         <Upload
@@ -352,13 +352,13 @@ export default function CounselorSettingsPage() {
                       </Button>
                       {uploadingPhoto && (
                         <div className="mt-2">
-                          <div className="h-1 w-full overflow-hidden rounded-full bg-gray-200">
+                          <div className="h-1 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                             <div className="h-full w-1/2 animate-pulse bg-green-500 rounded-full" />
                           </div>
                         </div>
                       )}
                       {!uploadingPhoto && (
-                        <p className="mt-1.5 text-xs text-gray-400">
+                        <p className="mt-1.5 text-xs text-gray-400 dark:text-gray-400">
                           JPG, PNG or GIF. Max 5MB.
                         </p>
                       )}
@@ -369,25 +369,25 @@ export default function CounselorSettingsPage() {
             </div>
 
             {/* Account Section */}
-            <p className="mb-2 mt-5 px-1 text-xs font-semibold uppercase tracking-wider text-gray-400">
+            <p className="mb-2 mt-5 px-1 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-400">
               Account
             </p>
-            <div className="rounded-2xl bg-white shadow-sm overflow-hidden">
+            <div className="rounded-2xl bg-white dark:bg-gray-950 shadow-sm overflow-hidden">
               <button
                 onClick={() => void logout()}
-                className="flex w-full items-center gap-3 px-4 py-3.5 transition-colors hover:bg-gray-50"
+                className="flex w-full items-center gap-3 px-4 py-3.5 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900">
                   <LogOut className="h-5 w-5 text-red-500" />
                 </div>
-                <p className="flex-1 text-left text-sm font-medium text-gray-900">
+                <p className="flex-1 text-left text-sm font-medium text-gray-900 dark:text-gray-100">
                   Logout
                 </p>
-                <ChevronRight className="h-5 w-5 shrink-0 text-gray-400" />
+                <ChevronRight className="h-5 w-5 shrink-0 text-gray-400 dark:text-gray-400" />
               </button>
             </div>
 
-            <p className="mt-8 text-center text-xs text-gray-400">
+            <p className="mt-8 text-center text-xs text-gray-400 dark:text-gray-400">
               TheraClick v1.0
             </p>
           </div>

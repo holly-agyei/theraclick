@@ -69,7 +69,6 @@ export default function StudentSignupPage() {
       <AuthLeftPanel
         entered={entered}
         headline={"Join Theraklick\nfor students like you."}
-        poster="/images/student-hero.jpg"
       />
 
       {/* ── White card ── */}
@@ -99,7 +98,7 @@ export default function StudentSignupPage() {
 
           {/* Only render after hydration — isFirebaseBacked differs SSR vs client */}
           {hydrated && !isFirebaseBacked && (
-            <div className="mt-4 rounded-xl border border-[#F5C842]/30 bg-[#F5C842]/10 p-3">
+            <div className="mt-4 rounded-xl border border-[#F5C842]/30 bg-[#F5C842]/10#F5C842]/5 p-3">
               <p className="text-sm font-semibold text-[#E8A800]">Demo mode</p>
               <p className="mt-1 text-xs text-[#E8A800]/70">Add Firebase keys to enable signup.</p>
             </div>

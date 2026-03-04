@@ -13,10 +13,14 @@ import {
   Mail,
   Calendar,
   ChevronDown,
+  Sun,
+  Moon,
+  Monitor,
 } from "lucide-react";
 import { Logo } from "./Logo";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth";
+import { useTheme } from "next-themes";
 import { useState, useRef, useEffect } from "react";
 
 const studentNavItems = [
@@ -48,8 +52,12 @@ const counselorNavItems = [
 export function Sidebar() {
   const pathname = usePathname();
   const { logout, profile, loading } = useAuth();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -94,11 +102,11 @@ export function Sidebar() {
   })();
 
   return (
-    <header className="hidden md:block sticky top-0 z-50 w-full border-b border-gray-200 bg-white">
+    <header className="hidden md:block sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-6 px-6">
         {/* Logo */}
         <Link href={navItems[0]?.href || "/"} className="shrink-0">
-          <Logo className="text-gray-900" size="sm" />
+          <Logo className="text-gray-900 dark:text-gray-100" size="sm" />
         </Link>
 
         {/* Nav links */}
@@ -113,8 +121,8 @@ export function Sidebar() {
                 className={cn(
                   "relative flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px] font-medium transition-colors",
                   isActive
-                    ? "text-green-700 bg-green-50"
-                    : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
+                    ? "text-green-700 bg-green-50 dark:text-green-400 dark:bg-green-950"
+                    : "text-gray-500 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-gray-800"
                 )}
               >
                 <Icon className="h-4 w-4" />
@@ -131,32 +139,48 @@ export function Sidebar() {
         <div className="relative shrink-0" ref={menuRef}>
           <button
             onClick={() => setUserMenuOpen(!userMenuOpen)}
-            className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-gray-50"
+            className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-600 text-xs font-bold text-white">
               {initials || "?"}
             </div>
             <div className="hidden text-left lg:block">
-              <p className="max-w-[120px] truncate text-sm font-medium text-gray-900">
+              <p className="max-w-[120px] truncate text-sm font-medium text-gray-900 dark:text-gray-100">
                 {displayName}
               </p>
-              <p className="text-[11px] text-gray-500">{roleLabel}</p>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400">{roleLabel}</p>
             </div>
             <ChevronDown className="h-3.5 w-3.5 text-gray-400" />
           </button>
 
           {userMenuOpen && (
-            <div className="absolute right-0 top-full mt-1 w-48 rounded-xl border border-gray-200 bg-white py-1 shadow-lg">
-              <div className="border-b border-gray-100 px-4 py-2.5 lg:hidden">
-                <p className="truncate text-sm font-medium text-gray-900">{displayName}</p>
-                <p className="text-[11px] text-gray-500">{roleLabel}</p>
+            <div className="absolute right-0 top-full mt-1 w-48 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 py-1 shadow-lg">
+              <div className="border-b border-gray-100 dark:border-gray-800 px-4 py-2.5 lg:hidden">
+                <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">{displayName}</p>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400">{roleLabel}</p>
               </div>
+
+              {/* Theme toggle inside dropdown */}
+              {mounted && (
+                <button
+                  onClick={() => {
+                    if (theme === "light") setTheme("dark");
+                    else if (theme === "dark") setTheme("system");
+                    else setTheme("light");
+                  }}
+                  className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-gray-600 dark:text-gray-300 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100"
+                >
+                  {theme === "dark" ? <Moon className="h-4 w-4" /> : theme === "light" ? <Sun className="h-4 w-4" /> : <Monitor className="h-4 w-4" />}
+                  Theme: {theme === "dark" ? "Dark" : theme === "light" ? "Light" : "System"}
+                </button>
+              )}
+
               <button
                 onClick={() => {
                   setUserMenuOpen(false);
                   void logout();
                 }}
-                className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900"
+                className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-gray-600 dark:text-gray-300 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100"
               >
                 <LogOut className="h-4 w-4" />
                 Logout

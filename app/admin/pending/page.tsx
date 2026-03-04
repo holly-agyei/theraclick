@@ -93,24 +93,24 @@ export default function PendingApplicationsPage() {
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Pending Applications</h1>
-          <p className="mt-2 text-gray-500">Review and approve or reject applications</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Pending Applications</h1>
+          <p className="mt-2 text-gray-500 dark:text-gray-400">Review and approve or reject applications</p>
         </div>
 
         {/* Filters */}
         <div className="mb-6 flex flex-col gap-4 sm:flex-row">
           <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500" />
+            <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500 dark:text-gray-400" />
             <Input
               type="text"
               placeholder="Search by name, email, or specialization..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border-gray-200 bg-white pl-12 text-gray-900 placeholder-gray-500 focus:border-green-500/50"
+              className="w-full rounded-xl border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 pl-12 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:border-green-500/50"
             />
           </div>
           <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-gray-500" />
+            <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
             {(["all", "peer-mentor", "counselor"] as const).map((role) => (
               <button
                 key={role}
@@ -118,7 +118,7 @@ export default function PendingApplicationsPage() {
                 className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
                   roleFilter === role
                     ? "bg-green-600 text-white"
-                    : "bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+                    : "bg-white dark:bg-gray-950 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100"
                 }`}
               >
                 {role === "all" ? "All" : role === "peer-mentor" ? "Peer Mentors" : "Counselors"}
@@ -131,17 +131,17 @@ export default function PendingApplicationsPage() {
         {loading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-48 animate-pulse rounded-2xl border border-gray-200 bg-white" />
+              <div key={i} className="h-48 animate-pulse rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950" />
             ))}
           </div>
         ) : filteredUsers.length === 0 ? (
-          <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center">
-            <p className="text-gray-500">No pending applications found.</p>
+          <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-12 text-center">
+            <p className="text-gray-500 dark:text-gray-400">No pending applications found.</p>
           </div>
         ) : (
           <div className="space-y-4">
             {filteredUsers.map((user) => (
-              <div key={user.uid} className="rounded-2xl border border-gray-200 bg-white p-6">
+              <div key={user.uid} className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-6">
                 <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                   {/* User Info */}
                   <div className="flex-1 space-y-4">
@@ -151,21 +151,21 @@ export default function PendingApplicationsPage() {
                           {user.fullName?.split(" ").map((n) => n[0]).join("").slice(0, 2) || "U"}
                         </div>
                         <div>
-                          <h3 className="font-semibold text-gray-900">{user.fullName || "—"}</h3>
-                          <p className="text-sm text-gray-500 capitalize">{user.role?.replace("-", " ")}</p>
+                          <h3 className="font-semibold text-gray-900 dark:text-gray-100">{user.fullName || "—"}</h3>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">{user.role?.replace("-", " ")}</p>
                         </div>
                       </div>
                     </div>
 
                     <div className="grid gap-3 sm:grid-cols-2">
                       {user.email && (
-                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                           <Mail className="h-4 w-4" />
                           <span>{user.email}</span>
                         </div>
                       )}
                       {user.specialization && (
-                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                           <User className="h-4 w-4" />
                           <span>{user.specialization}</span>
                         </div>

@@ -51,22 +51,22 @@ export default function StudentSettingsPage() {
 
   return (
     <LayoutWrapper>
-      <div className="min-h-screen bg-gray-50/80">
+      <div className="min-h-screen bg-gray-50/80 dark:bg-gray-900/80">
         <div className="px-4 py-6 pb-28 md:px-8 md:py-10">
           <div className="mx-auto max-w-lg">
-            <h1 className="mb-6 text-2xl font-bold text-gray-900">Settings</h1>
+            <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-gray-100">Settings</h1>
 
             {/* Profile Card */}
-            <div className="mb-2 rounded-2xl bg-white p-4 shadow-sm">
+            <div className="mb-2 rounded-2xl bg-white dark:bg-gray-950 p-4 shadow-sm">
               <div className="flex items-center gap-4">
-                <div className="h-14 w-14 shrink-0 rounded-full bg-green-600 flex items-center justify-center text-lg font-bold text-white ring-2 ring-green-500 ring-offset-2">
+                <div className="h-14 w-14 shrink-0 rounded-full bg-green-600 flex items-center justify-center text-lg font-bold text-white ring-2 ring-green-500 ring-offset-2 dark:ring-offset-gray-950">
                   {initials}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-base font-semibold text-gray-900 truncate">
+                  <p className="text-base font-semibold text-gray-900 dark:text-gray-100 truncate">
                     {profile?.fullName || "—"}
                   </p>
-                  <p className="text-sm text-gray-500 truncate">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
                     {profile?.email || "—"}
                   </p>
                 </div>
@@ -76,29 +76,29 @@ export default function StudentSettingsPage() {
             {/* Profile Section */}
             {isStudent && (
               <>
-                <p className="mb-2 mt-5 px-1 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                <p className="mb-2 mt-5 px-1 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
                   Profile
                 </p>
-                <div className="rounded-2xl bg-white shadow-sm overflow-hidden">
+                <div className="rounded-2xl bg-white dark:bg-gray-950 shadow-sm overflow-hidden">
                   <button
                     onClick={() => setEditingProfile(!editingProfile)}
-                    className="flex w-full items-center gap-3 px-4 py-3.5 transition-colors hover:bg-gray-50"
+                    className="flex w-full items-center gap-3 px-4 py-3.5 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
                   >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-100">
-                      <User className="h-5 w-5 text-orange-500" />
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900">
+                      <User className="h-5 w-5 text-orange-500 dark:text-orange-400" />
                     </div>
-                    <p className="flex-1 text-left text-sm font-medium text-gray-900">
+                    <p className="flex-1 text-left text-sm font-medium text-gray-900 dark:text-gray-100">
                       Edit Profile
                     </p>
                     <ChevronRight
-                      className={`h-5 w-5 shrink-0 text-gray-400 transition-transform ${
+                      className={`h-5 w-5 shrink-0 text-gray-400 dark:text-gray-500 transition-transform ${
                         editingProfile ? "rotate-90" : ""
                       }`}
                     />
                   </button>
 
                   {editingProfile && (
-                    <div className="border-t border-gray-100 px-4 py-4">
+                    <div className="border-t border-gray-100 dark:border-gray-800 px-4 py-4">
                       <div className="space-y-3">
                         <div>
                           <label className="mb-1.5 block text-xs font-medium text-gray-500">
@@ -108,7 +108,7 @@ export default function StudentSettingsPage() {
                             value={school}
                             onChange={(e) => setSchool(e.target.value)}
                             placeholder="Your school name"
-                            className="border-gray-200 bg-gray-50 text-gray-900 text-sm"
+                            className="border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm"
                           />
                         </div>
                         <div>
@@ -119,7 +119,7 @@ export default function StudentSettingsPage() {
                             value={educationLevel}
                             onChange={(e) => setEducationLevel(e.target.value)}
                             placeholder="e.g., High School, University"
-                            className="border-gray-200 bg-gray-50 text-gray-900 text-sm"
+                            className="border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm"
                           />
                         </div>
                         <div className="flex gap-2 pt-1">
@@ -142,7 +142,7 @@ export default function StudentSettingsPage() {
                             }}
                             variant="outline"
                             size="sm"
-                            className="border-gray-200 text-gray-600"
+                            className="border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-300"
                           >
                             Cancel
                           </Button>
@@ -160,17 +160,17 @@ export default function StudentSettingsPage() {
                 <p className="mb-2 mt-5 px-1 text-xs font-semibold uppercase tracking-wider text-gray-400">
                   Privacy
                 </p>
-                <div className="rounded-2xl bg-white shadow-sm overflow-hidden">
+                <div className="rounded-2xl bg-white dark:bg-gray-950 shadow-sm overflow-hidden">
                   <div className="flex items-center gap-3 px-4 py-3.5">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-teal-100">
-                      <EyeOff className="h-5 w-5 text-teal-600" />
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-teal-100 dark:bg-teal-900">
+                      <EyeOff className="h-5 w-5 text-teal-600 dark:text-teal-400" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
                         Anonymous Mode
                       </p>
                       {anonEnabled && anonId && (
-                        <p className="text-xs text-gray-400 truncate">
+                        <p className="text-xs text-gray-400 dark:text-gray-500 truncate">
                           ID: <span className="font-mono">{anonId}</span>
                         </p>
                       )}
@@ -180,11 +180,11 @@ export default function StudentSettingsPage() {
                         void setStudentAnonymousEnabled(!anonEnabled)
                       }
                       className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors duration-200 ${
-                        anonEnabled ? "bg-green-500" : "bg-gray-300"
+                        anonEnabled ? "bg-green-500" : "bg-gray-300 dark:bg-gray-600"
                       }`}
                     >
                       <span
-                        className={`inline-block h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-200 ${
+                        className={`inline-block h-5 w-5 rounded-full bg-white dark:bg-gray-100 shadow-md transition-transform duration-200 ${
                           anonEnabled ? "translate-x-6" : "translate-x-1"
                         }`}
                       />
@@ -195,25 +195,25 @@ export default function StudentSettingsPage() {
             )}
 
             {/* Account Section */}
-            <p className="mb-2 mt-5 px-1 text-xs font-semibold uppercase tracking-wider text-gray-400">
+            <p className="mb-2 mt-5 px-1 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
               Account
             </p>
-            <div className="rounded-2xl bg-white shadow-sm overflow-hidden">
+            <div className="rounded-2xl bg-white dark:bg-gray-950 shadow-sm overflow-hidden">
               <button
                 onClick={() => void logout()}
-                className="flex w-full items-center gap-3 px-4 py-3.5 transition-colors hover:bg-gray-50"
+                className="flex w-full items-center gap-3 px-4 py-3.5 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100">
-                  <LogOut className="h-5 w-5 text-red-500" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900">
+                  <LogOut className="h-5 w-5 text-red-500 dark:text-red-400" />
                 </div>
-                <p className="flex-1 text-left text-sm font-medium text-gray-900">
+                <p className="flex-1 text-left text-sm font-medium text-gray-900 dark:text-gray-100">
                   Logout
                 </p>
-                <ChevronRight className="h-5 w-5 shrink-0 text-gray-400" />
+                <ChevronRight className="h-5 w-5 shrink-0 text-gray-400 dark:text-gray-500" />
               </button>
             </div>
 
-            <p className="mt-8 text-center text-xs text-gray-400">
+            <p className="mt-8 text-center text-xs text-gray-400 dark:text-gray-500">
               TheraClick v1.0
             </p>
           </div>

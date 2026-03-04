@@ -487,7 +487,7 @@ export function CallInterface() {
                   </div>
                 )}
                 <p className="mt-4 text-xl font-semibold text-white">{remoteUserName}</p>
-                <p className="mt-2 text-gray-500">{getStatusText()}</p>
+                <p className="mt-2 text-gray-500 dark:text-gray-400">{getStatusText()}</p>
                 
                 {isActive && !hasRemoteVideo && (
                   <p className="mt-2 text-xs text-yellow-400">Camera may be off</p>
@@ -553,7 +553,7 @@ export function CallInterface() {
           </div>
 
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">{remoteUserName}</h2>
-          <p className="text-lg text-gray-500">{getStatusText()}</p>
+          <p className="text-lg text-gray-500 dark:text-gray-400">{getStatusText()}</p>
         </div>
       )}
 

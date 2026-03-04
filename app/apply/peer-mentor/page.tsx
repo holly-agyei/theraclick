@@ -64,7 +64,6 @@ export default function PeerMentorApplyPage() {
       <AuthLeftPanel
         entered={entered}
         headline={"Help others\nthrive."}
-        poster="/images/peer-mentor-hero.jpg"
       />
 
       {/* ── White card ── */}
@@ -92,7 +91,7 @@ export default function PeerMentorApplyPage() {
           </p>
 
           {hydrated && !isFirebaseBacked && (
-            <div className="mt-4 rounded-xl border border-[#F5C842]/30 bg-[#F5C842]/10 p-3">
+            <div className="mt-4 rounded-xl border border-[#F5C842]/30 bg-[#F5C842]/10#F5C842]/5 p-3">
               <p className="text-sm font-semibold text-[#E8A800]">Demo mode</p>
               <p className="mt-1 text-xs text-[#E8A800]/70">Add Firebase keys to enable applications.</p>
             </div>

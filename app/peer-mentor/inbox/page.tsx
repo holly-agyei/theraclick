@@ -109,25 +109,25 @@ export default function PeerMentorInboxPage() {
 
   return (
     <LayoutWrapper>
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white dark:bg-gray-950">
         <div className="px-4 py-6 pb-24 md:px-8 md:py-10">
           <div className="mx-auto max-w-4xl">
             {/* Header */}
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900">My Inbox</h1>
-              <p className="mt-2 text-gray-500">All your conversations with students</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">My Inbox</h1>
+              <p className="mt-2 text-gray-500 dark:text-gray-400">All your conversations with students</p>
             </div>
 
             {/* Search */}
             <div className="mb-6">
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500" />
+                <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500 dark:text-gray-400" />
                 <input
                   type="text"
                   placeholder="Search conversations..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-12 pr-4 text-gray-900 placeholder-gray-500 transition-colors focus:border-green-500 focus:outline-none"
+                  className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 py-3 pl-12 pr-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors focus:border-green-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -136,16 +136,16 @@ export default function PeerMentorInboxPage() {
             {loading ? (
               <div className="space-y-3">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="h-20 animate-pulse rounded-xl border border-gray-200 bg-gray-100" />
+                  <div key={i} className="h-20 animate-pulse rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-800" />
                 ))}
               </div>
             ) : filteredConversations.length === 0 ? (
-              <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center">
-                <MessageCircle className="mx-auto mb-4 h-16 w-16 text-gray-400" />
-                <p className="text-gray-500">
+              <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-12 text-center">
+                <MessageCircle className="mx-auto mb-4 h-16 w-16 text-gray-400 dark:text-gray-400" />
+                <p className="text-gray-500 dark:text-gray-400">
                   {searchQuery ? "No conversations found" : "No conversations yet"}
                 </p>
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                   {searchQuery ? "Try a different search term" : "Students will reach out to you here"}
                 </p>
               </div>
@@ -155,7 +155,7 @@ export default function PeerMentorInboxPage() {
                   <button
                     key={conv.studentId}
                     onClick={() => router.push(`/peer-mentor/inbox/${conv.studentId}`)}
-                    className="group w-full rounded-xl border border-gray-200 bg-white p-5 text-left transition-all hover:border-green-300 hover:bg-gray-50"
+                    className="group w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-5 text-left transition-all hover:border-green-300 hover:bg-gray-50 dark:hover:bg-gray-800"
                   >
                     <div className="flex items-center gap-4">
                       <div className="flex h-14 w-14 items-center justify-center rounded-full bg-green-600 text-lg font-bold text-white">
@@ -163,16 +163,16 @@ export default function PeerMentorInboxPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
-                          <h3 className="font-semibold text-gray-900 truncate">{conv.studentName}</h3>
+                          <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate">{conv.studentName}</h3>
                           {conv.lastMessageTime && (
-                            <div className="flex items-center gap-1 text-xs text-gray-500">
+                            <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                               <Clock className="h-3 w-3" />
                               <span>{formatTime(conv.lastMessageTime)}</span>
                             </div>
                           )}
                         </div>
                         {conv.lastMessage && (
-                          <p className="line-clamp-2 text-sm text-gray-500">{conv.lastMessage}</p>
+                          <p className="line-clamp-2 text-sm text-gray-500 dark:text-gray-400">{conv.lastMessage}</p>
                         )}
                       </div>
                     </div>

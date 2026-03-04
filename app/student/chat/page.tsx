@@ -334,12 +334,12 @@ export default function ChatPage() {
 
   return (
     <LayoutWrapper>
-      <div className="flex h-full bg-white">
+      <div className="flex h-full bg-white dark:bg-gray-950">
         {/* ── Side panel ──────────────────────────────────────── */}
         <div
           className={`${
             sidebarOpen ? "w-64" : "w-0"
-          } shrink-0 overflow-hidden bg-gray-50/80 transition-all duration-200 md:relative fixed inset-y-0 left-0 z-30 md:z-auto`}
+          } shrink-0 overflow-hidden bg-gray-50/80 dark:bg-gray-900/80 transition-all duration-200 md:relative fixed inset-y-0 left-0 z-30 md:z-auto`}
         >
           <div className="flex h-full w-64 flex-col">
             {/* Brand + toggle */}
@@ -347,7 +347,7 @@ export default function ChatPage() {
               <Logo size="sm" iconOnly />
               <button
                 onClick={() => setSidebarOpen(false)}
-                className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-200 hover:text-gray-600"
+                className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-600 dark:hover:text-gray-300"
               >
                 <PanelLeftClose className="h-4 w-4" />
               </button>
@@ -357,22 +357,22 @@ export default function ChatPage() {
             <div className="px-3 pb-2 space-y-1">
               <button
                 onClick={handleNewChat}
-                className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+                className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
               >
                 <Plus className="h-4 w-4" />
                 New chat
               </button>
-              <div className="flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-2">
+              <div className="flex items-center gap-2 rounded-lg bg-gray-100 dark:bg-gray-800 px-3 py-2">
                 <Search className="h-4 w-4 text-gray-400 shrink-0" />
                 <input
                   type="text"
                   placeholder="Search chats..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="flex-1 bg-transparent text-sm text-gray-700 placeholder-gray-400 focus:outline-none"
+                  className="flex-1 bg-transparent text-sm text-gray-700 dark:text-gray-300 placeholder-gray-400 focus:outline-none"
                 />
                 {searchQuery && (
-                  <button onClick={() => setSearchQuery("")} className="text-gray-400 hover:text-gray-600">
+                  <button onClick={() => setSearchQuery("")} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                     <X className="h-3.5 w-3.5" />
                   </button>
                 )}
@@ -380,7 +380,7 @@ export default function ChatPage() {
             </div>
 
             {/* Divider */}
-            <div className="mx-4 border-t border-gray-200" />
+            <div className="mx-4 border-t border-gray-200 dark:border-gray-800" />
 
             {/* Section label */}
             <p className="px-4 pt-3 pb-1 text-[11px] font-medium uppercase tracking-wider text-gray-400">
@@ -400,8 +400,8 @@ export default function ChatPage() {
                   onClick={() => handleSwitchThread(t.id)}
                   className={`group flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 transition-colors ${
                     t.id === threadId
-                      ? "bg-green-50 text-green-700"
-                      : "text-gray-600 hover:bg-gray-100"
+                      ? "bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-400"
+                      : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                   }`}
                 >
                   <p className="min-w-0 flex-1 truncate text-[13px]">{t.title}</p>
@@ -438,7 +438,7 @@ export default function ChatPage() {
             {!sidebarOpen && (
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+                className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-600 dark:hover:text-gray-300"
               >
                 <PanelLeft className="h-5 w-5" />
               </button>
@@ -446,7 +446,7 @@ export default function ChatPage() {
             {!sidebarOpen && (
               <button
                 onClick={handleNewChat}
-                className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+                className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-600 dark:hover:text-gray-300"
                 title="New chat"
               >
                 <Plus className="h-5 w-5" />
@@ -465,19 +465,19 @@ export default function ChatPage() {
               /* Empty state — centered welcome */
               <div className="flex h-full flex-col items-center justify-center px-4">
                 <Bot className="mb-4 h-10 w-10 text-green-500 opacity-60" />
-                <h2 className="text-xl font-medium text-gray-800">Ready when you are.</h2>
+                <h2 className="text-xl font-medium text-gray-800 dark:text-gray-200">Ready when you are.</h2>
                 <p className="mt-2 text-sm text-gray-400">Ask anything, vent, or just chat.</p>
               </div>
             ) : (
               <div className="px-4 py-6 md:px-8">
                 <div className="mx-auto max-w-2xl space-y-5">
                   {safetyMode === "crisis" && (
-                    <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+                    <div className="rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950 p-4">
                       <div className="flex items-start gap-3">
-                        <ShieldAlert className="mt-0.5 h-5 w-5 text-amber-600" />
+                        <ShieldAlert className="mt-0.5 h-5 w-5 text-amber-600 dark:text-amber-400" />
                         <div>
-                          <p className="text-sm font-semibold text-amber-800">Safety check</p>
-                          <p className="mt-1 text-sm text-amber-700">
+                          <p className="text-sm font-semibold text-amber-800 dark:text-amber-200">Safety check</p>
+                          <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">
                             If you're in immediate danger, call your local emergency number or go to the nearest emergency room.
                           </p>
                         </div>
@@ -487,14 +487,14 @@ export default function ChatPage() {
                   {messages.filter((m) => m.id !== "welcome").map((message) => (
                     <div key={message.id} className={`flex gap-3 ${message.sender === "user" ? "justify-end" : ""}`}>
                       {message.sender === "ai" && (
-                        <div className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green-100">
-                          <Bot className="h-4 w-4 text-green-600" />
+                        <div className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
+                          <Bot className="h-4 w-4 text-green-600 dark:text-green-400" />
                         </div>
                       )}
                       <div className={`max-w-[80%] ${
                         message.sender === "user"
                           ? "rounded-[20px_20px_4px_20px] bg-green-600 px-4 py-3 text-white"
-                          : "pt-1 text-gray-800"
+                          : "pt-1 text-gray-800 dark:text-gray-200"
                       }`}>
                         {message.audioUrl && (
                           <audio controls className="mb-2 w-full" src={message.audioUrl}>
@@ -502,7 +502,7 @@ export default function ChatPage() {
                           </audio>
                         )}
                         {message.sender === "ai" ? (
-                          <div className="prose prose-sm max-w-none prose-p:my-1.5 prose-ul:my-1.5 prose-li:my-0 prose-headings:text-gray-900 prose-headings:text-sm prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-1">
+                          <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1.5 prose-ul:my-1.5 prose-li:my-0 prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-headings:text-sm prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-1">
                             <ReactMarkdown>{message.text}</ReactMarkdown>
                           </div>
                         ) : (
@@ -513,8 +513,8 @@ export default function ChatPage() {
                   ))}
                   {isTyping && (
                     <div className="flex gap-3">
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green-100">
-                        <Bot className="h-4 w-4 text-green-600" />
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
+                        <Bot className="h-4 w-4 text-green-600 dark:text-green-400" />
                       </div>
                       <div className="flex items-center gap-1.5 pt-2">
                         <div className="h-2 w-2 animate-bounce rounded-full bg-green-400" />
@@ -533,19 +533,19 @@ export default function ChatPage() {
           <div className="px-4 pb-4 pt-2 md:px-8">
             <div className="mx-auto max-w-2xl">
               {audioBlob && (
-                <div className="mb-2 flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-2.5">
-                  <Mic className="h-4 w-4 text-green-600 shrink-0" />
+                <div className="mb-2 flex items-center gap-3 rounded-xl border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950 px-4 py-2.5">
+                  <Mic className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0" />
                   <audio controls src={URL.createObjectURL(audioBlob)} className="flex-1 h-8" />
-                  <button onClick={() => setAudioBlob(null)} className="shrink-0 p-1 rounded-full text-gray-400 hover:text-gray-700">
+                  <button onClick={() => setAudioBlob(null)} className="shrink-0 p-1 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
                     <X className="h-4 w-4" />
                   </button>
                 </div>
               )}
-              <div className="flex items-center gap-2 rounded-2xl border border-gray-200 bg-gray-50 px-3 py-2 shadow-sm focus-within:border-green-400 focus-within:shadow-green-100">
+              <div className="flex items-center gap-2 rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 px-3 py-2 shadow-sm focus-within:border-green-400 focus-within:shadow-green-100 dark:focus-within:shadow-green-900/20">
                 <button
                   onClick={isRecording ? stopRecording : startRecording}
                   className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-all
-                    ${isRecording ? "bg-red-50 text-red-500" : "text-gray-400 hover:text-gray-600"}`}
+                    ${isRecording ? "bg-red-50 dark:bg-red-950 text-red-500" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"}`}
                 >
                   {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                 </button>
@@ -559,7 +559,7 @@ export default function ChatPage() {
                   onChange={(e) => setInputText(e.target.value)}
                   onKeyDown={handleKeyPress}
                   rows={1}
-                  className="flex-1 resize-none bg-transparent py-1 text-sm text-gray-900 placeholder-gray-400 focus:outline-none"
+                  className="flex-1 resize-none bg-transparent py-1 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none"
                 />
                 <button
                   onClick={handleSend}
@@ -567,13 +567,13 @@ export default function ChatPage() {
                   className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-all ${
                     inputText.trim() || audioBlob
                       ? "bg-green-600 text-white active:scale-95"
-                      : "text-gray-300"
+                      : "text-gray-300 dark:text-gray-600"
                   }`}
                 >
                   <Send className="h-4 w-4" />
                 </button>
               </div>
-              <p className="mt-2 text-center text-[11px] text-gray-300">
+              <p className="mt-2 text-center text-[11px] text-gray-300 dark:text-gray-600">
                 Theraklick AI can make mistakes. For urgent help, talk to a counselor.
               </p>
             </div>

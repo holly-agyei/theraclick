@@ -76,7 +76,6 @@ export default function ForgotPasswordPage() {
       <AuthLeftPanel
         entered={entered}
         headline={"Reset your\npassword."}
-        poster="/images/student-hero.jpg"
       />
 
       {/* White card */}

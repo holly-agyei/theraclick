@@ -149,45 +149,45 @@ export default function CounselorAvailabilityPage() {
 
   return (
     <LayoutWrapper>
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white dark:bg-gray-950">
         <div className="px-4 py-6 pb-24 md:px-8 md:py-10">
           <div className="mx-auto max-w-4xl">
             {/* Header */}
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900">Manage Availability</h1>
-              <p className="mt-2 text-gray-500">Set your available time slots for students to book</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Manage Availability</h1>
+              <p className="mt-2 text-gray-500 dark:text-gray-400">Set your available time slots for students to book</p>
             </div>
 
             {/* Add New Slot */}
-            <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-6">
-              <h2 className="mb-4 text-lg font-semibold text-gray-900">Add Availability Slot</h2>
+            <div className="mb-8 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-6">
+              <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Add Availability Slot</h2>
               <div className="grid gap-4 sm:grid-cols-4">
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-gray-700">Date</label>
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Date</label>
                   <Input
                     type="date"
                     value={newDate}
                     onChange={(e) => setNewDate(e.target.value)}
                     min={new Date().toISOString().split("T")[0]}
-                    className="border-gray-200 bg-white text-gray-900"
+                    className="border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100"
                   />
                 </div>
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-gray-700">Start Time</label>
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Start Time</label>
                   <Input
                     type="time"
                     value={newStartTime}
                     onChange={(e) => setNewStartTime(e.target.value)}
-                    className="border-gray-200 bg-white text-gray-900"
+                    className="border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100"
                   />
                 </div>
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-gray-700">End Time</label>
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">End Time</label>
                   <Input
                     type="time"
                     value={newEndTime}
                     onChange={(e) => setNewEndTime(e.target.value)}
-                    className="border-gray-200 bg-white text-gray-900"
+                    className="border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100"
                   />
                 </div>
                 <div className="flex items-end">
@@ -207,27 +207,27 @@ export default function CounselorAvailabilityPage() {
             {loading ? (
               <div className="space-y-3">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-20 animate-pulse rounded-xl border border-gray-200 bg-white" />
+                  <div key={i} className="h-20 animate-pulse rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950" />
                 ))}
               </div>
             ) : (
               <>
                 {upcomingSlots.length > 0 && (
                   <div className="mb-8">
-                    <h2 className="mb-4 text-lg font-semibold text-gray-900">Available Slots</h2>
+                    <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Available Slots</h2>
                     <div className="space-y-3">
                       {upcomingSlots.map((slot) => (
                         <div
                           key={slot.id}
-                          className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4"
+                          className="flex items-center justify-between rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-4"
                         >
                           <div className="flex items-center gap-4">
-                            <div className="rounded-lg bg-blue-100 p-3">
+                            <div className="rounded-lg bg-blue-100 dark:bg-blue-900 p-3">
                               <Calendar className="h-5 w-5 text-blue-600" />
                             </div>
                             <div>
-                              <p className="font-semibold text-gray-900">{formatDate(slot.date)}</p>
-                              <p className="text-sm text-gray-500">
+                              <p className="font-semibold text-gray-900 dark:text-gray-100">{formatDate(slot.date)}</p>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
                                 {slot.startTime} - {slot.endTime}
                               </p>
                             </div>
@@ -236,7 +236,7 @@ export default function CounselorAvailabilityPage() {
                             onClick={() => removeSlot(slot.id)}
                             variant="outline"
                             size="sm"
-                            className="border-red-300 text-red-600 hover:bg-red-100"
+                            className="border-red-300 dark:border-red-800 text-red-600 hover:bg-red-100 dark:hover:bg-red-900"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -249,25 +249,25 @@ export default function CounselorAvailabilityPage() {
                 {/* Booked Slots */}
                 {bookedSlots.length > 0 && (
                   <div className="mb-8">
-                    <h2 className="mb-4 text-lg font-semibold text-gray-900">Booked Slots</h2>
+                    <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Booked Slots</h2>
                     <div className="space-y-3">
                       {bookedSlots.map((slot) => (
                         <div
                           key={slot.id}
-                          className="flex items-center justify-between rounded-xl border border-green-200 bg-green-50 p-4"
+                          className="flex items-center justify-between rounded-xl border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950 p-4"
                         >
                           <div className="flex items-center gap-4">
-                            <div className="rounded-lg bg-green-100 p-3">
+                            <div className="rounded-lg bg-green-100 dark:bg-green-900 p-3">
                               <Clock className="h-5 w-5 text-green-600" />
                             </div>
                             <div>
-                              <p className="font-semibold text-gray-900">{formatDate(slot.date)}</p>
-                              <p className="text-sm text-gray-500">
+                              <p className="font-semibold text-gray-900 dark:text-gray-100">{formatDate(slot.date)}</p>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
                                 {slot.startTime} - {slot.endTime}
                               </p>
                             </div>
                           </div>
-                          <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-600">
+                          <span className="rounded-full bg-green-100 dark:bg-green-900 px-3 py-1 text-xs font-medium text-green-600">
                             Booked
                           </span>
                         </div>
@@ -277,10 +277,10 @@ export default function CounselorAvailabilityPage() {
                 )}
 
                 {upcomingSlots.length === 0 && bookedSlots.length === 0 && (
-                  <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center">
-                    <Calendar className="mx-auto mb-4 h-16 w-16 text-gray-400" />
-                    <p className="text-gray-500">No availability slots yet</p>
-                    <p className="mt-1 text-sm text-gray-500">Add slots above for students to book</p>
+                  <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-12 text-center">
+                    <Calendar className="mx-auto mb-4 h-16 w-16 text-gray-400 dark:text-gray-400" />
+                    <p className="text-gray-500 dark:text-gray-400">No availability slots yet</p>
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Add slots above for students to book</p>
                   </div>
                 )}
               </>

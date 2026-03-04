@@ -112,19 +112,19 @@ export default function ApprovedUsersPage() {
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredUsers.map((user) => (
-              <div key={user.uid} className="rounded-2xl border border-gray-200 bg-white p-5">
+              <div key={user.uid} className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-5">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-600 text-lg font-bold text-white">
                     {user.fullName?.split(" ").map((n) => n[0]).join("").slice(0, 2) || "U"}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 truncate">{user.fullName || "—"}</h3>
-                    <p className="text-sm text-green-600 capitalize">{user.role?.replace("-", " ")}</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate">{user.fullName || "—"}</h3>
+                    <p className="text-sm text-green-600 dark:text-green-400 capitalize">{user.role?.replace("-", " ")}</p>
                   </div>
-                  <CheckCircle className="h-5 w-5 text-green-600 shrink-0" />
+                  <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 shrink-0" />
                 </div>
 
-                <div className="space-y-2 text-sm text-gray-500">
+                <div className="space-y-2 text-sm text-gray-500 dark:text-gray-400">
                   {user.email && (
                     <div className="flex items-center gap-2">
                       <Mail className="h-4 w-4" />
@@ -146,7 +146,7 @@ export default function ApprovedUsersPage() {
                 </div>
 
                 {user.updatedAt && (
-                  <p className="mt-3 text-xs text-gray-500">
+                  <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
                     Approved: {user.updatedAt.toLocaleDateString()}
                   </p>
                 )}

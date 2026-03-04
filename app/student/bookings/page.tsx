@@ -100,57 +100,57 @@ export default function StudentBookingsPage() {
 
   return (
     <LayoutWrapper>
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white dark:bg-gray-950">
         <div className="px-4 py-6 pb-24 md:px-8 md:py-10">
           <div className="mx-auto max-w-4xl">
             {/* Header */}
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900">My Bookings</h1>
-              <p className="mt-2 text-gray-500">View and manage your scheduled sessions</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">My Bookings</h1>
+              <p className="mt-2 text-gray-500 dark:text-gray-400">View and manage your scheduled sessions</p>
             </div>
 
             {/* Upcoming Bookings */}
             {loading ? (
               <div className="space-y-3">
                 {[1, 2].map((i) => (
-                  <div key={i} className="h-24 animate-pulse rounded-xl border border-gray-200 bg-gray-100" />
+                  <div key={i} className="h-24 animate-pulse rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-800" />
                 ))}
               </div>
             ) : (
               <>
                 {upcomingBookings.length > 0 && (
                   <div className="mb-8">
-                    <h2 className="mb-4 text-lg font-semibold text-gray-900">Upcoming Sessions</h2>
+                    <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Upcoming Sessions</h2>
                     <div className="space-y-3">
                       {upcomingBookings.map((booking) => (
                         <div
                           key={booking.id}
-                          className="rounded-xl border border-green-200 bg-green-50 p-5"
+                          className="rounded-xl border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950 p-5"
                         >
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
                               <div className="mb-3 flex items-center gap-3">
-                                <div className="rounded-lg bg-green-100 p-2">
-                                  <Calendar className="h-5 w-5 text-green-600" />
+                                <div className="rounded-lg bg-green-100 dark:bg-green-900 p-2">
+                                  <Calendar className="h-5 w-5 text-green-600 dark:text-green-400" />
                                 </div>
                                 <div>
-                                  <h3 className="font-semibold text-gray-900">{booking.counselorName}</h3>
-                                  <p className="text-sm text-gray-500">Counselor</p>
+                                  <h3 className="font-semibold text-gray-900 dark:text-gray-100">{booking.counselorName}</h3>
+                                  <p className="text-sm text-gray-500 dark:text-gray-400">Counselor</p>
                                 </div>
                               </div>
                               <div className="ml-11 space-y-1">
-                                <p className="text-sm text-gray-700">{formatDate(booking.date, booking.startTime)}</p>
-                                <p className="text-sm text-gray-500">
+                                <p className="text-sm text-gray-700 dark:text-gray-300">{formatDate(booking.date, booking.startTime)}</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">
                                   {booking.startTime} - {booking.endTime}
                                 </p>
                                 {booking.message && (
-                                  <p className="mt-2 text-sm text-gray-500 italic">"{booking.message}"</p>
+                                  <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 italic">"{booking.message}"</p>
                                 )}
                               </div>
                             </div>
                             <Button
                               onClick={() => markAsDone(booking.id)}
-                              className="bg-green-100 text-green-700 hover:bg-green-200"
+                              className="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-800"
                             >
                               <CheckCircle className="mr-2 h-4 w-4" />
                               Mark Done
@@ -165,22 +165,22 @@ export default function StudentBookingsPage() {
                 {/* Past Bookings */}
                 {pastBookings.length > 0 && (
                   <div>
-                    <h2 className="mb-4 text-lg font-semibold text-gray-900">Past Sessions</h2>
+                    <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Past Sessions</h2>
                     <div className="space-y-3">
                       {pastBookings.map((booking) => (
                         <div
                           key={booking.id}
-                          className="rounded-xl border border-gray-200 bg-white p-5"
+                          className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-5"
                         >
                           <div className="flex items-start gap-3">
-                            <div className="rounded-lg bg-gray-100 p-2">
-                              <Clock className="h-5 w-5 text-gray-500" />
+                            <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-2">
+                              <Clock className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                             </div>
                             <div className="flex-1">
-                              <h3 className="font-semibold text-gray-900">{booking.counselorName}</h3>
-                              <p className="text-sm text-gray-500">{formatDate(booking.date, booking.startTime)}</p>
+                              <h3 className="font-semibold text-gray-900 dark:text-gray-100">{booking.counselorName}</h3>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">{formatDate(booking.date, booking.startTime)}</p>
                               {booking.status === "completed" && (
-                                <span className="mt-2 inline-block rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
+                                <span className="mt-2 inline-block rounded-full bg-green-100 dark:bg-green-900 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-400">
                                   Completed
                                 </span>
                               )}
@@ -193,10 +193,10 @@ export default function StudentBookingsPage() {
                 )}
 
                 {upcomingBookings.length === 0 && pastBookings.length === 0 && (
-                  <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center">
-                    <Calendar className="mx-auto mb-4 h-16 w-16 text-gray-300" />
-                    <p className="text-gray-500">No bookings yet</p>
-                    <p className="mt-1 text-sm text-gray-500">Book a session with a counselor to get started</p>
+                  <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-12 text-center">
+                    <Calendar className="mx-auto mb-4 h-16 w-16 text-gray-300 dark:text-gray-600" />
+                    <p className="text-gray-500 dark:text-gray-400">No bookings yet</p>
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Book a session with a counselor to get started</p>
                     <Button
                       onClick={() => router.push("/student/counselors")}
                       className="mt-4 bg-green-600 text-white hover:bg-green-700"

@@ -62,8 +62,8 @@ export function ReportIssueModal({ onClose }: Props) {
         {submitted ? (
           <div className="py-8 text-center">
             <CheckCircle className="mx-auto mb-4 h-12 w-12 text-green-600" />
-            <h3 className="text-lg font-semibold text-gray-900">Report submitted</h3>
-            <p className="mt-2 text-sm text-gray-500">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Report submitted</h3>
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
               Thank you for letting us know. Our team will look into this.
             </p>
             <button
@@ -78,10 +78,10 @@ export function ReportIssueModal({ onClose }: Props) {
           <>
             {/* Header */}
             <div className="mb-6 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Report an issue</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Report an issue</h3>
               <button
                 onClick={onClose}
-                className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+                className="rounded-lg p-1.5 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100"
               >
                 <X className="h-5 w-5" />
               </button>

@@ -41,8 +41,8 @@ export function BottomNav() {
   const navItems = getNavItems();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200
-      bg-white/95 backdrop-blur-xl md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 dark:border-gray-800
+      bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl md:hidden">
       <div className="mx-auto flex max-w-md justify-around">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -53,7 +53,7 @@ export function BottomNav() {
               href={item.href}
               className={cn(
                 "flex flex-1 flex-col items-center gap-1 py-3 transition-colors duration-200",
-                isActive ? "text-green-600" : "text-gray-400"
+                isActive ? "text-green-600 dark:text-green-400" : "text-gray-400 dark:text-gray-500"
               )}
             >
               <Icon className="h-5 w-5" />

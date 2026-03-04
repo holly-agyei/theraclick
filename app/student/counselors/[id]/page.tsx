@@ -445,7 +445,7 @@ export default function CounselorProfilePage() {
   if (loading) {
     return (
       <LayoutWrapper>
-        <div className="flex min-h-screen items-center justify-center bg-white">
+        <div className="flex min-h-screen items-center justify-center bg-white dark:bg-gray-950">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-green-500 border-t-transparent" />
         </div>
       </LayoutWrapper>
@@ -455,7 +455,7 @@ export default function CounselorProfilePage() {
   if (!counselor) {
     return (
       <LayoutWrapper>
-        <div className="flex min-h-screen flex-col items-center justify-center bg-white text-gray-900">
+        <div className="flex min-h-screen flex-col items-center justify-center bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
           <p>Counselor not found</p>
           <Button onClick={() => router.back()} className="mt-4">
             Go back
@@ -467,13 +467,13 @@ export default function CounselorProfilePage() {
 
   return (
     <LayoutWrapper>
-      <div className="flex h-full flex-col bg-white">
+      <div className="flex h-full flex-col bg-white dark:bg-gray-950">
         {/* Header */}
-        <div className="relative z-10 border-b border-gray-200 bg-white px-4 py-3 shadow-sm md:px-8">
+        <div className="relative z-10 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 px-4 py-3 shadow-sm md:px-8">
           <div className="flex items-center gap-4">
             <button
               onClick={() => router.back()}
-              className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-900"
+              className="rounded-lg p-2 text-gray-400 dark:text-gray-500 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100"
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
@@ -482,22 +482,22 @@ export default function CounselorProfilePage() {
               <img
                 src={counselor.avatar}
                 alt={counselor.fullName}
-                className="h-10 w-10 rounded-full object-cover border-2 border-gray-200"
+                className="h-10 w-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-800"
               />
             ) : (
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-sm font-bold text-green-600">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900 text-sm font-bold text-green-600">
                 {counselor.fullName.split(" ").map((n) => n[0]).join("")}
               </div>
             )}
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <h1 className="text-sm font-semibold text-gray-900 truncate">{counselor.fullName}</h1>
+                <h1 className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{counselor.fullName}</h1>
                 {counselor.isOnline && (
                   <span className="h-2 w-2 rounded-full bg-emerald-400 shrink-0" />
                 )}
               </div>
-              <p className="text-xs text-green-600">{counselor.specialization}</p>
+                <p className="text-xs text-green-600 dark:text-green-400">{counselor.specialization}</p>
             </div>
 
             {/* Call buttons */}
@@ -512,7 +512,7 @@ export default function CounselorProfilePage() {
                   }
                 }}
                 disabled={isInCall}
-                className="flex items-center gap-2 rounded-lg bg-green-50 px-3 py-2 text-sm font-medium text-green-600 transition-all hover:bg-green-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 rounded-lg bg-green-50 dark:bg-green-950 px-3 py-2 text-sm font-medium text-green-600 dark:text-green-400 transition-all hover:bg-green-100 dark:hover:bg-green-900 disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Voice call"
               >
                 <Phone className="h-4 w-4" />
@@ -528,7 +528,7 @@ export default function CounselorProfilePage() {
                   }
                 }}
                 disabled={isInCall}
-                className="flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-2 text-sm font-medium text-blue-600 transition-all hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 rounded-lg bg-blue-50 dark:bg-blue-950 px-3 py-2 text-sm font-medium text-blue-600 transition-all hover:bg-blue-100 dark:hover:bg-blue-900 disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Video call"
               >
                 <Video className="h-4 w-4" />
@@ -545,7 +545,7 @@ export default function CounselorProfilePage() {
               className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
                 activeTab === "chat"
                   ? "bg-green-600 text-white"
-                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                  : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"
               }`}
             >
               <MessageCircle className="h-4 w-4" />
@@ -556,7 +556,7 @@ export default function CounselorProfilePage() {
               className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
                 activeTab === "book"
                   ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                  : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"
               }`}
             >
               <Calendar className="h-4 w-4" />
@@ -572,10 +572,10 @@ export default function CounselorProfilePage() {
             <div className="flex-1 overflow-y-auto px-4 py-6 md:px-8">
               <div className="mx-auto max-w-3xl space-y-3">
                 {messages.length === 0 && (
-                  <div className="rounded-2xl border border-gray-200 bg-white p-6 text-center">
-                    <MessageCircle className="mx-auto mb-3 h-8 w-8 text-gray-400" />
-                    <p className="text-gray-500">No messages yet. Start the conversation!</p>
-                    <p className="mt-1 text-xs text-gray-400">Your messages are private and confidential.</p>
+                  <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-6 text-center">
+                    <MessageCircle className="mx-auto mb-3 h-8 w-8 text-gray-400 dark:text-gray-500" />
+                    <p className="text-gray-500 dark:text-gray-400">No messages yet. Start the conversation!</p>
+                    <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">Your messages are private and confidential.</p>
                   </div>
                 )}
                 {messages.map((msg) => {
@@ -591,7 +591,7 @@ export default function CounselorProfilePage() {
                       : isVideo ? Video
                       : PhoneIncoming;
                     const label = isMissed ? "Missed" : isRejected ? "Declined" : msg.callStatus === "outgoing" ? "Outgoing" : msg.callStatus === "ended" ? "Ended" : "Incoming";
-                    const tint = isMissed ? "bg-red-50 text-red-600" : isRejected ? "bg-gray-100 text-gray-500" : isVideo ? "bg-blue-50 text-blue-600" : "bg-green-50 text-green-600";
+                    const tint = isMissed ? "bg-red-50 dark:bg-red-950 text-red-600" : isRejected ? "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400" : isVideo ? "bg-blue-50 dark:bg-blue-950 text-blue-600" : "bg-green-50 dark:bg-green-950 text-green-600 dark:text-green-400";
 
                     return (
                       <div key={msg.id} className="flex justify-center my-3">
@@ -613,7 +613,7 @@ export default function CounselorProfilePage() {
                   return (
                     <div key={msg.id} className={`flex flex-col ${isOwn ? "items-end" : "items-start"}`}>
                       {!isOwn && (
-                        <span className="mb-1 ml-1 text-[11px] font-medium text-gray-400">
+                        <span className="mb-1 ml-1 text-[11px] font-medium text-gray-400 dark:text-gray-500">
                           {counselor?.fullName?.split(" ")[0] || msg.senderName}
                         </span>
                       )}
@@ -621,7 +621,7 @@ export default function CounselorProfilePage() {
                         className={`max-w-[75%] px-4 py-2.5 text-sm leading-relaxed
                           ${isOwn
                             ? "rounded-[18px_18px_4px_18px] bg-green-600 text-white"
-                            : "rounded-[18px_18px_18px_4px] bg-gray-100 text-gray-800"
+                            : "rounded-[18px_18px_18px_4px] bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200"
                           }`}
                         style={{ wordBreak: "break-word" }}
                       >
@@ -634,7 +634,7 @@ export default function CounselorProfilePage() {
                           <p className={msg.audioUrl ? "mt-1" : ""}>{msg.text}</p>
                         )}
                       </div>
-                      <span className={`mt-1 text-[11px] text-gray-400 ${isOwn ? "mr-1" : "ml-1"}`}>
+                      <span className={`mt-1 text-[11px] text-gray-400 dark:text-gray-500 ${isOwn ? "mr-1" : "ml-1"}`}>
                         {formatMessageTime(msg.createdAt)}
                       </span>
                     </div>
@@ -645,14 +645,14 @@ export default function CounselorProfilePage() {
             </div>
 
             {/* Input bar */}
-            <div className="border-t border-gray-200 bg-white"
+            <div className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950"
               style={{ padding: "12px 16px", paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
               <div className="mx-auto max-w-3xl">
                 {audioBlob && (
-                  <div className="mb-2 flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-2.5">
+                  <div className="mb-2 flex items-center gap-3 rounded-xl border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950 px-4 py-2.5">
                     <Mic className="h-4 w-4 text-green-600 shrink-0" />
                     <audio controls src={URL.createObjectURL(audioBlob)} className="flex-1 h-8" />
-                    <button onClick={() => setAudioBlob(null)} className="shrink-0 p-1 rounded-full text-gray-400 hover:text-gray-700">
+                    <button onClick={() => setAudioBlob(null)} className="shrink-0 p-1 rounded-full text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
                       <X className="h-4 w-4" />
                     </button>
                   </div>
@@ -666,7 +666,7 @@ export default function CounselorProfilePage() {
                     <span className="text-sm font-medium text-red-600">Recording {formatRecordingTime(recordingTime)}</span>
                     <div className="flex-1" />
                     <button onClick={() => { stopRecording(); setAudioBlob(null); }}
-                      className="rounded-lg px-3 py-1 text-xs font-medium text-gray-500 hover:bg-red-100">Cancel</button>
+                      className="rounded-lg px-3 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:bg-red-100">Cancel</button>
                     <button onClick={stopRecording}
                       className="rounded-lg bg-red-500 px-3 py-1 text-xs font-medium text-white hover:bg-red-600">Stop</button>
                   </div>
@@ -680,7 +680,7 @@ export default function CounselorProfilePage() {
                       onChange={(e) => setInputText(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && !sending && sendMessage()}
                       disabled={sending}
-                      className="flex-1 rounded-full border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-green-500 focus:outline-none disabled:opacity-40"
+                      className="flex-1 rounded-full border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-green-500 focus:outline-none disabled:opacity-40"
                     />
                     {inputText.trim() || audioBlob ? (
                       <button
@@ -698,7 +698,7 @@ export default function CounselorProfilePage() {
                       <button
                         onClick={startRecording}
                         disabled={sending}
-                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-all disabled:opacity-40"
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-600 dark:hover:text-gray-300 transition-all disabled:opacity-40"
                       >
                         <Mic className="h-5 w-5" />
                       </button>
@@ -713,14 +713,14 @@ export default function CounselorProfilePage() {
           <div className="flex-1 overflow-y-auto px-4 py-6 md:px-8">
             <div className="mx-auto max-w-2xl">
               {/* About */}
-              <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-5">
-                <h3 className="mb-2 font-medium text-gray-900">About</h3>
-                <p className="text-sm leading-relaxed text-gray-600">{counselor.about}</p>
+              <div className="mb-6 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-5">
+                <h3 className="mb-2 font-medium text-gray-900 dark:text-gray-100">About</h3>
+                <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300">{counselor.about}</p>
               </div>
 
               {/* Existing Request */}
               {existingRequest && (
-                <div className="mb-6 rounded-2xl border border-amber-300 bg-amber-50 p-5">
+                <div className="mb-6 rounded-2xl border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950 p-5">
                   <div className="flex items-start gap-3">
                     <AlertCircle className="mt-0.5 h-5 w-5 text-amber-600" />
                     <div>
@@ -734,20 +734,20 @@ export default function CounselorProfilePage() {
               )}
 
               {bookingStatus === "sent" ? (
-                <div className="rounded-2xl border border-green-300 bg-green-50 p-8 text-center">
+                <div className="rounded-2xl border border-green-300 dark:border-green-800 bg-green-50 dark:bg-green-950 p-8 text-center">
                   <CheckCircle className="mx-auto mb-3 h-12 w-12 text-green-600" />
-                  <h3 className="text-xl font-semibold text-gray-900">Request Sent!</h3>
-                  <p className="mt-2 text-gray-500">
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Request Sent!</h3>
+                  <p className="mt-2 text-gray-500 dark:text-gray-400">
                     {counselor.fullName} will review your request and get back to you via chat.
                   </p>
                 </div>
               ) : (
                 <>
                   {/* Availability */}
-                  <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-5">
+                  <div className="mb-6 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-5">
                     <div className="mb-4 flex items-center gap-2">
                       <Clock className="h-5 w-5 text-green-600" />
-                      <h3 className="font-medium text-gray-900">Available Time Slots</h3>
+                      <h3 className="font-medium text-gray-900 dark:text-gray-100">Available Time Slots</h3>
                     </div>
 
                     {availabilitySlots.length > 0 ? (
@@ -758,8 +758,8 @@ export default function CounselorProfilePage() {
                             onClick={() => setSelectedSlot(slot.id)}
                             className={`rounded-xl border px-4 py-3 text-left transition-all ${
                               selectedSlot === slot.id
-                                ? "border-green-500 bg-green-50 text-green-700"
-                                : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+                                ? "border-green-500 bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-400"
+                                : "border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-600 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-700"
                             }`}
                           >
                             <p className="font-medium">{formatSlotDate(slot.date, slot.startTime)}</p>
@@ -770,8 +770,8 @@ export default function CounselorProfilePage() {
                         ))}
                       </div>
                     ) : (
-                      <div className="rounded-xl bg-amber-50 p-4">
-                        <p className="text-sm text-amber-700">
+                      <div className="rounded-xl bg-amber-50 dark:bg-amber-950 p-4">
+                        <p className="text-sm text-amber-700 dark:text-amber-400">
                           {counselor.fullName} hasn't added available times yet. 
                           You can still request a session — they'll reach out to coordinate.
                         </p>
@@ -781,7 +781,7 @@ export default function CounselorProfilePage() {
 
                   {/* Message */}
                   <div className="mb-6">
-                    <label className="mb-2 block text-sm font-medium text-gray-700">
+                    <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                       Add a message (optional)
                     </label>
                     <textarea
@@ -789,7 +789,7 @@ export default function CounselorProfilePage() {
                       value={bookingMessage}
                       onChange={(e) => setBookingMessage(e.target.value)}
                       rows={3}
-                      className="w-full resize-none rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-green-500 focus:outline-none"
+                      className="w-full resize-none rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 px-4 py-3 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-green-500 focus:outline-none"
                     />
                   </div>
 

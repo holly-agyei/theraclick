@@ -65,11 +65,11 @@ export default function BookingPage() {
 
   return (
     <LayoutWrapper>
-      <div className="bg-white">
+      <div className="bg-white dark:bg-gray-950">
         {/* Header */}
-        <div className="border-b border-gray-200 bg-white px-4 py-4 md:px-8 md:py-6">
-          <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">Book a Session</h1>
-          <p className="mt-2 text-base text-gray-600 md:text-lg">
+        <div className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 px-4 py-4 md:px-8 md:py-6">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 md:text-3xl">Book a Session</h1>
+          <p className="mt-2 text-base text-gray-600 dark:text-gray-300 md:text-lg">
             Schedule time with a counselor or peer mentor
           </p>
         </div>
@@ -79,33 +79,33 @@ export default function BookingPage() {
             <div className="grid gap-8 lg:grid-cols-3">
               {/* Counselor List */}
               <div className="lg:col-span-2">
-                <h2 className="mb-6 text-xl font-semibold text-gray-900 md:text-2xl">
+                <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-gray-100 md:text-2xl">
                   Available Counselors
                 </h2>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1">
                   {mockCounselors.map((counselor) => (
                     <Card
                       key={counselor.id}
-                      className="cursor-pointer border-gray-200 transition-shadow hover:shadow-lg"
+                      className="cursor-pointer border-gray-200 dark:border-gray-800 transition-shadow hover:shadow-lg"
                       onClick={() => setSelectedCounselor(counselor)}
                     >
                       <CardContent className="p-5 md:p-6">
                         <div className="flex items-start gap-4">
-                          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary-100 md:h-16 md:w-16">
+                          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary-100 dark:bg-gray-800 md:h-16 md:w-16">
                             <User className="h-7 w-7 text-primary-600 md:h-8 md:w-8" />
                           </div>
                           <div className="flex-1">
-                            <h3 className="mb-1 text-lg font-semibold text-gray-900 md:text-xl">
+                            <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-gray-100 md:text-xl">
                               {counselor.name}
                             </h3>
                             <p className="mb-2 text-base font-medium text-primary-600 md:text-lg">
                               {counselor.specialty}
                             </p>
-                            <p className="text-sm text-gray-600 md:text-base">
+                            <p className="text-sm text-gray-600 dark:text-gray-300 md:text-base">
                               {counselor.bio}
                             </p>
                           </div>
-                          <ArrowRight className="mt-1 h-6 w-6 shrink-0 text-gray-400" />
+                          <ArrowRight className="mt-1 h-6 w-6 shrink-0 text-gray-400 dark:text-gray-500" />
                         </div>
                       </CardContent>
                     </Card>
@@ -115,12 +115,12 @@ export default function BookingPage() {
 
               {/* Peer Mentors Section */}
               <div className="lg:sticky lg:top-8 lg:h-fit">
-                <h2 className="mb-4 text-xl font-semibold text-gray-900 md:text-2xl">
+                <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-gray-100 md:text-2xl">
                   Peer Mentors
                 </h2>
-                <Card className="border-gray-200">
+                <Card className="border-gray-200 dark:border-gray-800">
                   <CardContent className="p-5 md:p-6">
-                    <p className="mb-4 text-sm text-gray-600 md:text-base">
+                    <p className="mb-4 text-sm text-gray-600 dark:text-gray-300 md:text-base">
                       Connect with trained peer mentors who understand what
                       you&apos;re going through. Peer mentors are available for
                       informal support and can help you decide if you need to
@@ -145,16 +145,16 @@ export default function BookingPage() {
               <div className="mb-8">
                 <button
                   onClick={() => setSelectedCounselor(null)}
-                  className="mb-6 text-base text-primary-600 hover:text-primary-700 md:text-lg"
+                  className="mb-6 text-base text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 md:text-lg"
                 >
                   ← Back to counselors
                 </button>
-                <Card className="mb-8 border-primary-200 bg-primary-50">
+                <Card className="mb-8 border-primary-200 dark:border-gray-800 bg-primary-50 dark:bg-gray-900">
                   <CardContent className="p-5 md:p-6">
                     <div className="flex items-start gap-4">
                       <User className="mt-0.5 h-6 w-6 text-primary-600 md:h-7 md:w-7" />
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900 md:text-xl">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 md:text-xl">
                           {selectedCounselor.name}
                         </h3>
                         <p className="text-base text-primary-600 md:text-lg">
@@ -165,7 +165,7 @@ export default function BookingPage() {
                   </CardContent>
                 </Card>
 
-                <h2 className="mb-6 text-xl font-semibold text-gray-900 md:text-2xl">
+                <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-gray-100 md:text-2xl">
                   Available Times
                 </h2>
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
@@ -176,17 +176,17 @@ export default function BookingPage() {
                       disabled={!slot.available}
                       className={`rounded-lg border p-4 text-left transition-colors ${
                         selectedSlot?.id === slot.id
-                          ? "border-primary-400 bg-primary-50"
+                          ? "border-primary-400 dark:border-primary-600 bg-primary-50 dark:bg-gray-900"
                           : slot.available
-                          ? "border-gray-200 bg-white hover:border-primary-200 hover:bg-primary-50"
-                          : "border-gray-100 bg-gray-50 opacity-50"
+                          ? "border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 hover:border-primary-200 dark:hover:border-gray-700 hover:bg-primary-50 dark:hover:bg-gray-800"
+                          : "border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 opacity-50"
                       }`}
                     >
-                      <div className="mb-2 flex items-center gap-2 text-xs text-gray-500 md:text-sm">
+                      <div className="mb-2 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 md:text-sm">
                         <Calendar className="h-4 w-4" />
                         <span>{slot.date}</span>
                       </div>
-                      <div className="flex items-center gap-2 font-medium text-gray-900 md:text-lg">
+                      <div className="flex items-center gap-2 font-medium text-gray-900 dark:text-gray-100 md:text-lg">
                         <Clock className="h-5 w-5" />
                         <span>{slot.time}</span>
                       </div>
@@ -198,12 +198,12 @@ export default function BookingPage() {
               {/* Booking Info */}
               {selectedSlot && (
                 <div className="mb-8 grid gap-6 md:grid-cols-2">
-                  <Card className="border-gray-200">
+                  <Card className="border-gray-200 dark:border-gray-800">
                     <CardContent className="p-5 md:p-6">
-                      <h3 className="mb-4 text-lg font-semibold text-gray-900 md:text-xl">
+                      <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100 md:text-xl">
                         Session Details
                       </h3>
-                      <div className="space-y-3 text-sm text-gray-600 md:text-base">
+                        <div className="space-y-3 text-sm text-gray-600 dark:text-gray-300 md:text-base">
                         <div className="flex items-center gap-3">
                           <User className="h-5 w-5" />
                           <span>{selectedCounselor.name}</span>

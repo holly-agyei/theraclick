@@ -155,25 +155,25 @@ export default function CounselorBookingsPage() {
 
   return (
     <LayoutWrapper>
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white dark:bg-gray-950">
         <div className="px-4 py-6 pb-24 md:px-8 md:py-10">
           <div className="mx-auto max-w-5xl">
             {/* Header */}
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900">My Bookings</h1>
-              <p className="mt-2 text-gray-500">View and manage your scheduled sessions</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">My Bookings</h1>
+              <p className="mt-2 text-gray-500 dark:text-gray-400">View and manage your scheduled sessions</p>
             </div>
 
             {/* Search */}
             <div className="mb-6">
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500" />
+                <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500 dark:text-gray-400" />
                 <input
                   type="text"
                   placeholder="Search by student name..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-12 pr-4 text-gray-900 placeholder-gray-500 transition-colors focus:border-green-500 focus:outline-none"
+                  className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 py-3 pl-12 pr-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors focus:border-green-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -182,38 +182,38 @@ export default function CounselorBookingsPage() {
             {loading ? (
               <div className="space-y-3">
                 {[1, 2].map((i) => (
-                  <div key={i} className="h-24 animate-pulse rounded-xl border border-gray-200 bg-white" />
+                  <div key={i} className="h-24 animate-pulse rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950" />
                 ))}
               </div>
             ) : (
               <>
                 {filteredUpcoming.length > 0 && (
                   <div className="mb-8">
-                    <h2 className="mb-4 text-lg font-semibold text-gray-900">Upcoming Sessions</h2>
+                    <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Upcoming Sessions</h2>
                     <div className="space-y-3">
                       {filteredUpcoming.map((booking) => (
                         <div
                           key={booking.id}
-                          className="rounded-xl border border-green-200 bg-green-50 p-5"
+                          className="rounded-xl border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950 p-5"
                         >
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
                               <div className="mb-3 flex items-center gap-3">
-                                <div className="rounded-lg bg-green-100 p-2">
+                                <div className="rounded-lg bg-green-100 dark:bg-green-900 p-2">
                                   <Calendar className="h-5 w-5 text-green-600" />
                                 </div>
                                 <div>
-                                  <h3 className="font-semibold text-gray-900">{booking.studentName}</h3>
-                                  <p className="text-sm text-gray-500">Student</p>
+                                  <h3 className="font-semibold text-gray-900 dark:text-gray-100">{booking.studentName}</h3>
+                                  <p className="text-sm text-gray-500 dark:text-gray-400">Student</p>
                                 </div>
                               </div>
                               <div className="ml-11 space-y-1">
-                                <p className="text-sm text-gray-700">{formatDate(booking.date, booking.startTime)}</p>
-                                <p className="text-sm text-gray-500">
+                                <p className="text-sm text-gray-700 dark:text-gray-300">{formatDate(booking.date, booking.startTime)}</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">
                                   {booking.startTime} - {booking.endTime}
                                 </p>
                                 {booking.message && (
-                                  <p className="mt-2 text-sm text-gray-500 italic">"{booking.message}"</p>
+                                  <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 italic">"{booking.message}"</p>
                                 )}
                                 {/* Meeting Notes */}
                                 <div className="mt-4">
@@ -224,13 +224,13 @@ export default function CounselorBookingsPage() {
                                         onChange={(e) => setNotesText(e.target.value)}
                                         placeholder="Add meeting notes..."
                                         rows={3}
-                                        className="w-full resize-none rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:border-green-500 focus:outline-none"
+                                        className="w-full resize-none rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:border-green-500 focus:outline-none"
                                       />
                                       <div className="flex gap-2">
                                         <Button
                                           onClick={() => saveNotes(booking.id)}
                                           size="sm"
-                                          className="bg-blue-100 text-blue-600 hover:bg-blue-200"
+                                          className="bg-blue-100 dark:bg-blue-900 text-blue-600 hover:bg-blue-200 dark:hover:bg-blue-800"
                                         >
                                           Save Notes
                                         </Button>
@@ -241,7 +241,7 @@ export default function CounselorBookingsPage() {
                                           }}
                                           size="sm"
                                           variant="outline"
-                                          className="border-gray-200 text-gray-700"
+                                          className="border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300"
                                         >
                                           Cancel
                                         </Button>
@@ -250,13 +250,13 @@ export default function CounselorBookingsPage() {
                                   ) : (
                                     <div>
                                       {booking.notes ? (
-                                        <div className="rounded-lg bg-gray-50 p-3">
-                                          <p className="text-sm text-gray-700 whitespace-pre-wrap">{booking.notes}</p>
+                                        <div className="rounded-lg bg-gray-50 dark:bg-gray-900 p-3">
+                                          <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{booking.notes}</p>
                                           <Button
                                             onClick={() => startEditingNotes(booking)}
                                             size="sm"
                                             variant="outline"
-                                            className="mt-2 border-gray-200 text-gray-500 hover:bg-gray-100"
+                                            className="mt-2 border-gray-200 dark:border-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
                                           >
                                             <FileText className="mr-1 h-3 w-3" />
                                             Edit Notes
@@ -267,7 +267,7 @@ export default function CounselorBookingsPage() {
                                           onClick={() => startEditingNotes(booking)}
                                           size="sm"
                                           variant="outline"
-                                          className="border-gray-200 text-gray-500 hover:bg-gray-100"
+                                          className="border-gray-200 dark:border-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
                                         >
                                           <Plus className="mr-1 h-3 w-3" />
                                           Add Notes
@@ -281,7 +281,7 @@ export default function CounselorBookingsPage() {
                             <div className="flex flex-col gap-2">
                               <Button
                                 onClick={() => markAsDone(booking.id)}
-                                className="bg-green-100 text-green-600 hover:bg-green-200"
+                                className="bg-green-100 dark:bg-green-900 text-green-600 hover:bg-green-200 dark:hover:bg-green-800"
                               >
                                 <CheckCircle className="mr-2 h-4 w-4" />
                                 Mark Done
@@ -289,7 +289,7 @@ export default function CounselorBookingsPage() {
                               <Button
                                 onClick={() => router.push(`/counselor/inbox/${booking.studentId}`)}
                                 variant="outline"
-                                className="border-gray-200 text-gray-700 hover:bg-gray-100"
+                                className="border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                               >
                                 Chat
                               </Button>
@@ -304,22 +304,22 @@ export default function CounselorBookingsPage() {
                 {/* Past Bookings */}
                 {filteredPast.length > 0 && (
                   <div>
-                    <h2 className="mb-4 text-lg font-semibold text-gray-900">Past Sessions</h2>
+                    <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Past Sessions</h2>
                     <div className="space-y-3">
                       {filteredPast.map((booking) => (
                         <div
                           key={booking.id}
-                          className="rounded-xl border border-gray-200 bg-white p-5"
+                          className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-5"
                         >
                           <div className="flex items-start gap-3">
-                            <div className="rounded-lg bg-gray-100 p-2">
-                              <Clock className="h-5 w-5 text-gray-500" />
+                            <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-2">
+                              <Clock className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                             </div>
                             <div className="flex-1">
-                              <h3 className="font-semibold text-gray-900">{booking.studentName}</h3>
-                              <p className="text-sm text-gray-500">{formatDate(booking.date, booking.startTime)}</p>
+                              <h3 className="font-semibold text-gray-900 dark:text-gray-100">{booking.studentName}</h3>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">{formatDate(booking.date, booking.startTime)}</p>
                               {booking.status === "completed" && (
-                                <span className="mt-2 inline-block rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-600">
+                                <span className="mt-2 inline-block rounded-full bg-green-100 dark:bg-green-900 px-2 py-1 text-xs font-medium text-green-600">
                                   Completed
                                 </span>
                               )}
@@ -332,12 +332,12 @@ export default function CounselorBookingsPage() {
                 )}
 
                 {filteredUpcoming.length === 0 && filteredPast.length === 0 && (
-                  <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center">
-                    <Calendar className="mx-auto mb-4 h-16 w-16 text-gray-400" />
-                    <p className="text-gray-500">
+                  <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-12 text-center">
+                    <Calendar className="mx-auto mb-4 h-16 w-16 text-gray-400 dark:text-gray-400" />
+                    <p className="text-gray-500 dark:text-gray-400">
                       {searchQuery ? "No bookings found" : "No bookings yet"}
                     </p>
-                    <p className="mt-1 text-sm text-gray-500">
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                       {searchQuery ? "Try a different search term" : "Students will book your available time slots"}
                     </p>
                   </div>

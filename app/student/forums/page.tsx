@@ -386,29 +386,29 @@ export default function ForumsPage() {
     <div className="group">
       <div className="flex gap-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full
-          bg-green-100 text-xs font-bold text-green-600">
+          bg-green-100 dark:bg-green-900 text-xs font-bold text-green-600">
           {msg.senderName.split(" ").map((n) => n[0]).join("").slice(0, 2)}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-2 flex-wrap">
-            <span className="text-sm font-medium text-gray-900">{msg.senderName}</span>
+            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{msg.senderName}</span>
             {msg.isAnonymous && (
-              <span className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-500">Anonymous</span>
+              <span className="rounded bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 text-[10px] text-gray-500 dark:text-gray-400">Anonymous</span>
             )}
-            <span className="text-[11px] text-gray-500">{formatTime(msg.createdAt)}</span>
+            <span className="text-[11px] text-gray-500 dark:text-gray-400">{formatTime(msg.createdAt)}</span>
           </div>
 
           {msg.replyTo && (
-            <div className="mt-1.5 flex items-center gap-2 rounded-lg border border-gray-200
-              bg-white px-3 py-1.5 text-sm">
-              <Reply className="h-3 w-3 text-gray-500" />
-              <span className="text-gray-500 truncate">{msg.replyTo.senderName}: {msg.replyTo.text}</span>
+            <div className="mt-1.5 flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-800
+              bg-white dark:bg-gray-950 px-3 py-1.5 text-sm">
+              <Reply className="h-3 w-3 text-gray-500 dark:text-gray-400" />
+              <span className="text-gray-500 dark:text-gray-400 truncate">{msg.replyTo.senderName}: {msg.replyTo.text}</span>
             </div>
           )}
 
           {/* Hide placeholder text when voice message is present */}
           {msg.text && msg.text !== "🎤 Voice message" && (
-            <p className={`mt-1 text-sm text-gray-700 whitespace-pre-wrap ${msg.audioUrl ? "mt-2" : ""}`}>{msg.text}</p>
+            <p className={`mt-1 text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap ${msg.audioUrl ? "mt-2" : ""}`}>{msg.text}</p>
           )}
 
           {msg.imageUrl && <img src={msg.imageUrl} alt="Shared" className="mt-2 max-h-64 rounded-lg" />}
@@ -426,8 +426,8 @@ export default function ForumsPage() {
                 <button key={emoji} onClick={() => toggleReaction(msg.id, emoji, isThread)}
                   className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-sm transition-all
                     ${hasReacted
-                      ? "border-green-400 bg-green-50 text-green-600"
-                      : "border-gray-200 bg-white text-gray-500 hover:border-gray-300"
+                      ? "border-green-400 dark:border-green-600 bg-green-50 dark:bg-green-950 text-green-600"
+                      : "border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-700"
                     }`}>
                   <span>{emoji}</span><span className="text-xs">{users.length}</span>
                 </button>
@@ -437,16 +437,16 @@ export default function ForumsPage() {
             {/* Quick react */}
             <div className="relative">
               <button onClick={() => setShowEmojiPicker(showEmojiPicker === msg.id ? null : msg.id)}
-                className="rounded-full p-1 text-gray-500 opacity-0 transition-all hover:bg-gray-100
-                  hover:text-gray-900 group-hover:opacity-100">
+                className="rounded-full p-1 text-gray-500 dark:text-gray-400 opacity-0 transition-all hover:bg-gray-100 dark:hover:bg-gray-800
+                  hover:text-gray-900 dark:hover:text-gray-100 group-hover:opacity-100">
                 <Smile className="h-4 w-4" />
               </button>
               {showEmojiPicker === msg.id && (
                 <div className="absolute bottom-full left-0 z-20 mb-2 flex gap-1 rounded-xl
-                  border border-gray-200 bg-white p-2 shadow-xl">
+                  border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-2 shadow-xl">
                   {reactionEmojis.map((emoji) => (
                     <button key={emoji} onClick={() => toggleReaction(msg.id, emoji, isThread)}
-                      className="rounded p-1.5 text-lg hover:bg-gray-100">{emoji}</button>
+                      className="rounded p-1.5 text-lg hover:bg-gray-100 dark:hover:bg-gray-800">{emoji}</button>
                   ))}
                 </div>
               )}
@@ -454,22 +454,22 @@ export default function ForumsPage() {
 
             {!isThread && (
               <button onClick={() => setSelectedThread(msg)}
-                className="flex items-center gap-1 rounded-full p-1 text-gray-500 opacity-0
-                  transition-all hover:bg-gray-100 hover:text-gray-900 group-hover:opacity-100">
+                className="flex items-center gap-1 rounded-full p-1 text-gray-500 dark:text-gray-400 opacity-0
+                  transition-all hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 group-hover:opacity-100">
                 <MessageSquare className="h-4 w-4" />
                 {msg.threadCount && msg.threadCount > 0 && <span className="text-xs">{msg.threadCount}</span>}
               </button>
             )}
 
             <button onClick={() => setReplyingTo(msg)}
-              className="rounded-full p-1 text-gray-500 opacity-0 transition-all hover:bg-gray-100
-                hover:text-gray-900 group-hover:opacity-100">
+              className="rounded-full p-1 text-gray-500 dark:text-gray-400 opacity-0 transition-all hover:bg-gray-100 dark:hover:bg-gray-800
+                hover:text-gray-900 dark:hover:text-gray-100 group-hover:opacity-100">
               <Reply className="h-4 w-4" />
             </button>
 
             {msg.senderId === profile?.uid && (
               <button onClick={() => deleteMessage(msg.id, isThread)}
-                className="rounded-full p-1 text-gray-500 opacity-0 transition-all hover:bg-red-50
+                className="rounded-full p-1 text-gray-500 dark:text-gray-400 opacity-0 transition-all hover:bg-red-50 dark:hover:bg-red-950
                   hover:text-red-500 group-hover:opacity-100">
                 <Trash2 className="h-4 w-4" />
               </button>
@@ -482,20 +482,20 @@ export default function ForumsPage() {
 
   return (
     <LayoutWrapper>
-      <div className="flex h-full bg-white">
+      <div className="flex h-full bg-white dark:bg-gray-950">
         {/* Forum list sidebar */}
-        <div className={`${showMobileForums ? "flex" : "hidden"} w-full flex-col border-r border-gray-200 bg-white md:flex md:w-72`}>
-          <div className="border-b border-gray-200 p-4">
-            <h1 className="text-lg font-semibold text-gray-900">Forums</h1>
-            <p className="text-sm text-gray-500">Connect with your community</p>
+        <div className={`${showMobileForums ? "flex" : "hidden"} w-full flex-col border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 md:flex md:w-72`}>
+          <div className="border-b border-gray-200 dark:border-gray-800 p-4">
+            <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Forums</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Connect with your community</p>
           </div>
           <div className="p-3">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500 dark:text-gray-400" />
               <input type="text" placeholder="Search forums..." value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-10 pr-4
-                  text-sm text-gray-900 placeholder-gray-500 focus:border-green-500 focus:outline-none" />
+                className="w-full rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 py-2 pl-10 pr-4
+                  text-sm text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:border-green-500 focus:outline-none" />
             </div>
           </div>
           <div className="flex-1 overflow-y-auto px-2 pb-20">
@@ -506,23 +506,23 @@ export default function ForumsPage() {
                   onClick={() => { setSelectedForum(forum); setShowMobileForums(false); setSelectedThread(null); }}
                   className={`mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-all
                     ${selectedForum?.id === forum.id
-                      ? "bg-green-50 border border-green-200"
-                      : "border border-transparent hover:bg-gray-50"
+                      ? "bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800"
+                      : "border border-transparent hover:bg-gray-50 dark:hover:bg-gray-800"
                     }`}>
                   <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg
-                    ${selectedForum?.id === forum.id ? "bg-green-100" : "bg-gray-100"}`}>
-                    <Icon className={`h-4 w-4 ${selectedForum?.id === forum.id ? "text-green-600" : "text-gray-500"}`} />
+                    ${selectedForum?.id === forum.id ? "bg-green-100 dark:bg-green-900" : "bg-gray-100 dark:bg-gray-800"}`}>
+                    <Icon className={`h-4 w-4 ${selectedForum?.id === forum.id ? "text-green-600" : "text-gray-500 dark:text-gray-400"}`} />
                   </div>
                 <div className="flex-1 min-w-0">
                     <p className={`text-sm font-medium truncate
-                      ${selectedForum?.id === forum.id ? "text-gray-900" : "text-gray-700"}`}>
+                      ${selectedForum?.id === forum.id ? "text-gray-900 dark:text-gray-100" : "text-gray-700 dark:text-gray-300"}`}>
                       {forum.name}
                     </p>
                     {forum.lastPost && (
-                      <p className="text-xs text-gray-500 truncate mt-0.5">{forum.lastPost}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">{forum.lastPost}</p>
                     )}
                 </div>
-                  <ChevronRight className="h-4 w-4 text-gray-500 md:hidden shrink-0" />
+                  <ChevronRight className="h-4 w-4 text-gray-500 dark:text-gray-400 md:hidden shrink-0" />
               </button>
               );
             })}
@@ -534,32 +534,32 @@ export default function ForumsPage() {
           {selectedForum ? (
             <>
               {/* Header */}
-              <div className="flex items-center gap-3 border-b border-gray-200 bg-white/95 px-4 py-3 backdrop-blur-xl">
+              <div className="flex items-center gap-3 border-b border-gray-200 dark:border-gray-800 bg-white/95 dark:bg-gray-950/95 px-4 py-3 backdrop-blur-xl">
                 <button onClick={() => { setShowMobileForums(true); setSelectedThread(null); }}
-                  className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 md:hidden">
+                  className="rounded-lg p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 md:hidden">
                   <ChevronRight className="h-5 w-5 rotate-180" />
                 </button>
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-100">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900">
                   <selectedForum.icon className="h-4 w-4 text-green-600" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <Hash className="h-3.5 w-3.5 text-gray-500" />
-                    <h2 className="text-sm font-semibold text-gray-900">
+                    <Hash className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
+                    <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                       {selectedThread ? `Thread in ${selectedForum.name}` : selectedForum.name}
                     </h2>
                   </div>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
                     {selectedThread ? `Replying to ${selectedThread.senderName}` : selectedForum.description}
                   </p>
                 </div>
                 {selectedThread && (
                   <button onClick={() => setSelectedThread(null)}
-                    className="rounded-lg p-2 text-gray-500 hover:bg-gray-100">
+                    className="rounded-lg p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800">
                     <X className="h-5 w-5" />
                   </button>
                 )}
-                <div className="flex items-center gap-1.5 text-gray-500">
+                <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
                   <Users className="h-4 w-4" /><span className="text-xs">{selectedForum.memberCount}</span>
                 </div>
               </div>
@@ -569,10 +569,10 @@ export default function ForumsPage() {
                 <div className="mx-auto max-w-3xl space-y-5">
                   {selectedThread ? (
                     <>
-                      <div className="rounded-xl border border-gray-200 bg-white p-4">
+                      <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-4">
                         <MessageComponent msg={selectedThread} />
                       </div>
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                         <ChevronDown className="h-4 w-4" />
                         <span>{threadReplies.length} {threadReplies.length === 1 ? "reply" : "replies"}</span>
                       </div>
@@ -582,8 +582,8 @@ export default function ForumsPage() {
                     <>
                       {messages.length === 0 && (
                         <div className="py-12 text-center">
-                          <MessageSquare className="mx-auto mb-3 h-10 w-10 text-gray-300" />
-                          <p className="text-sm text-gray-500">No messages yet. Be the first to share.</p>
+                          <MessageSquare className="mx-auto mb-3 h-10 w-10 text-gray-300 dark:text-gray-600" />
+                          <p className="text-sm text-gray-500 dark:text-gray-400">No messages yet. Be the first to share.</p>
                         </div>
                       )}
                       {messages.map((msg) => <MessageComponent key={msg.id} msg={msg} />)}
@@ -594,18 +594,18 @@ export default function ForumsPage() {
               </div>
 
               {/* Input */}
-              <div className="border-t border-gray-200 bg-white/95 p-4 backdrop-blur-xl"
+              <div className="border-t border-gray-200 dark:border-gray-800 bg-white/95 dark:bg-gray-950/95 p-4 backdrop-blur-xl"
                 style={{ paddingBottom: "max(16px, env(safe-area-inset-bottom))" }}>
                 <div className="mx-auto max-w-3xl">
                   {replyingTo && (
-                    <div className="mb-2 flex items-center justify-between rounded-lg border border-gray-200
-                      bg-white px-3 py-2">
+                    <div className="mb-2 flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-800
+                      bg-white dark:bg-gray-950 px-3 py-2">
                       <div className="flex items-center gap-2 text-sm">
                         <Reply className="h-4 w-4 text-green-600" />
-                        <span className="text-gray-500">Replying to</span>
-                        <span className="font-medium text-gray-900">{replyingTo.senderName}</span>
+                        <span className="text-gray-500 dark:text-gray-400">Replying to</span>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">{replyingTo.senderName}</span>
                       </div>
-                      <button onClick={() => setReplyingTo(null)} className="text-gray-500 hover:text-gray-900">
+                      <button onClick={() => setReplyingTo(null)} className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
                         <X className="h-4 w-4" />
                       </button>
                     </div>
@@ -615,17 +615,17 @@ export default function ForumsPage() {
                     <div className="relative mb-2 inline-block">
                       <img src={selectedImage} alt="Preview" className="h-20 rounded-lg" />
                       <button onClick={() => setSelectedImage(null)}
-                        className="absolute -right-2 -top-2 rounded-full bg-gray-100 p-1 text-gray-700 hover:bg-gray-200">
+                        className="absolute -right-2 -top-2 rounded-full bg-gray-100 dark:bg-gray-800 p-1 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">
                         <X className="h-3 w-3" />
                       </button>
                     </div>
                   )}
 
                   {audioBlob && (
-                    <div className="mb-2 flex items-center gap-2 rounded-lg border border-gray-200
-                      bg-white px-3 py-2">
+                    <div className="mb-2 flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-800
+                      bg-white dark:bg-gray-950 px-3 py-2">
                       <audio controls src={URL.createObjectURL(audioBlob)} className="h-8 flex-1" />
-                      <button onClick={() => setAudioBlob(null)} className="text-gray-500 hover:text-gray-900">
+                      <button onClick={() => setAudioBlob(null)} className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
                         <X className="h-4 w-4" />
                       </button>
                     </div>
@@ -633,7 +633,7 @@ export default function ForumsPage() {
 
                   {isRecording ? (
                     /* ── Recording indicator ── */
-                    <div className="flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5">
+                    <div className="flex items-center gap-3 rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950 px-4 py-2.5">
                       <span className="relative flex h-3 w-3">
                         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
                         <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500" />
@@ -641,7 +641,7 @@ export default function ForumsPage() {
                       <span className="text-sm font-medium text-red-600">Recording {formatRecordingTime(recordingTime)}</span>
                       <div className="flex-1" />
                       <button onClick={() => { stopRecording(); setAudioBlob(null); }}
-                        className="rounded-lg px-3 py-1 text-xs font-medium text-gray-600 hover:bg-red-100">
+                        className="rounded-lg px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-red-100 dark:hover:bg-red-900">
                         Cancel
                       </button>
                       <button onClick={stopRecording}
@@ -655,12 +655,12 @@ export default function ForumsPage() {
                       <input type="file" ref={fileInputRef} accept="image/*" onChange={handleImageSelect} className="hidden" />
                       
                       <button onClick={() => fileInputRef.current?.click()}
-                        className="rounded-lg p-2.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900">
+                        className="rounded-lg p-2.5 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100">
                         <ImageIcon className="h-5 w-5" />
                       </button>
 
                       <button onClick={startRecording}
-                        className="rounded-lg p-2.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900">
+                        className="rounded-lg p-2.5 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100">
                         <Mic className="h-5 w-5" />
                       </button>
 
@@ -671,8 +671,8 @@ export default function ForumsPage() {
                         onChange={(e) => setInputText(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && !sending && sendMessage(!!selectedThread)}
                         disabled={sending}
-                        className="flex-1 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5
-                          text-sm text-gray-900 placeholder-gray-500 transition-colors
+                        className="flex-1 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 px-4 py-2.5
+                          text-sm text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors
                           focus:border-green-500 focus:outline-none disabled:opacity-50"
                       />
                       
@@ -696,8 +696,8 @@ export default function ForumsPage() {
             /* This should never show now since we auto-select, but as fallback: */
             <div className="hidden flex-1 items-center justify-center md:flex">
               <div className="text-center">
-                <MessageSquare className="mx-auto mb-3 h-10 w-10 text-gray-300" />
-                <p className="text-sm text-gray-500">Select a forum to get started</p>
+                <MessageSquare className="mx-auto mb-3 h-10 w-10 text-gray-300 dark:text-gray-600" />
+                <p className="text-sm text-gray-500 dark:text-gray-400">Select a forum to get started</p>
               </div>
             </div>
           )}

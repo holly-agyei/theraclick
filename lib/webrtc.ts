@@ -255,7 +255,7 @@ export class WebRTCCallManager {
       this.peerConnection = new RTCPeerConnection(config);
       
       // Log ICE servers for debugging
-      console.log("Using ICE servers:", config.iceServers.map(s => s.urls).flat());
+      console.log("Using ICE servers:", config.iceServers?.map(s => s.urls).flat());
       console.log("ICE Transport Policy:", config.iceTransportPolicy);
 
       // Add local tracks to peer connection
@@ -341,7 +341,7 @@ export class WebRTCCallManager {
 
       // Create call document in Firestore
       if (db) {
-        await setDoc(doc(db, "calls", this.callId), {
+        await setDoc(doc(db!, "calls", this.callId), {
           callerId: this.userId,
           receiverId: receiverId,
           callType: type,
@@ -427,7 +427,7 @@ export class WebRTCCallManager {
       this.pendingIceCandidates = [];
       
       // Log ICE servers for debugging
-      console.log("Using ICE servers:", config.iceServers.map(s => s.urls).flat());
+      console.log("Using ICE servers:", config.iceServers?.map(s => s.urls).flat());
       console.log("ICE Transport Policy:", config.iceTransportPolicy);
 
       // Add local tracks
@@ -489,7 +489,7 @@ export class WebRTCCallManager {
 
       // Update call document FIRST
       if (db) {
-        await setDoc(doc(db, "calls", callId), {
+        await setDoc(doc(db!, "calls", callId), {
           callerId: callerId,
           receiverId: this.userId,
           callType: type,
@@ -799,7 +799,7 @@ export class WebRTCCallManager {
     console.log("Call ID:", this.callId);
 
     // Listen for signals from remote user
-    const signalsRef = collection(db, "calls", this.callId, "signals");
+    const signalsRef = collection(db!, "calls", this.callId, "signals");
     
     const unsub = onSnapshot(signalsRef, (snapshot) => {
       const changes = snapshot.docChanges();
@@ -852,7 +852,7 @@ export class WebRTCCallManager {
     console.log("Listening for signals from caller:", callerId);
     console.log("Call ID:", this.callId);
 
-    const signalsRef = collection(db, "calls", this.callId, "signals");
+    const signalsRef = collection(db!, "calls", this.callId, "signals");
     
     // Use onSnapshot to get all existing signals AND listen for new ones
     const unsub = onSnapshot(signalsRef, async (snapshot) => {
@@ -940,7 +940,7 @@ export class WebRTCCallManager {
         await this.handleAnswer(signal.data);
         // Update call status to active
         if (db && this.callId) {
-          await updateDoc(doc(db, "calls", this.callId), {
+          await updateDoc(doc(db!, "calls", this.callId), {
             status: "active",
             connectedAt: serverTimestamp(),
           });
@@ -1002,7 +1002,7 @@ export class WebRTCCallManager {
       timestamp: serverTimestamp() as Timestamp,
     };
 
-    const signalRef = doc(db, "calls", this.callId, "signals", `${signal.type}_${Date.now()}`);
+    const signalRef = doc(db!, "calls", this.callId, "signals", `${signal.type}_${Date.now()}`);
     await setDoc(signalRef, signalData);
   }
 
@@ -1012,7 +1012,7 @@ export class WebRTCCallManager {
   async rejectCall(callId: string, callerId: string): Promise<void> {
     // Update call document
     if (db) {
-      await setDoc(doc(db, "calls", callId), {
+      await setDoc(doc(db!, "calls", callId), {
         status: "rejected",
         rejectedAt: serverTimestamp(),
       }, { merge: true });
@@ -1035,7 +1035,7 @@ export class WebRTCCallManager {
   async endCall(): Promise<void> {
     if (this.callId && this.remoteUserId && db) {
       // Update call document
-      await setDoc(doc(db, "calls", this.callId), {
+      await setDoc(doc(db!, "calls", this.callId), {
         status: "ended",
         endedAt: serverTimestamp(),
       }, { merge: true });
@@ -1269,7 +1269,7 @@ export class WebRTCCallManager {
       if (callIdToCleanup && db) {
         setTimeout(async () => {
           try {
-            const callRef = doc(db, "calls", callIdToCleanup);
+            const callRef = doc(db!, "calls", callIdToCleanup);
             await deleteDoc(callRef);
           } catch (error) {
             // Ignore errors - document might already be deleted

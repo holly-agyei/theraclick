@@ -23,8 +23,8 @@ export function Toggle({
       className={cn(
         "flex items-center gap-2 rounded-lg border px-4 py-3 transition-colors",
         selected
-          ? "border-gray-800 bg-white text-gray-900"
-          : "border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100",
+          ? "border-gray-800 dark:border-gray-700 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100"
+          : "border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800",
         className
       )}
     >

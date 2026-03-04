@@ -4,7 +4,7 @@
  * AUTH LEFT PANEL — The living, breathing window.
  *
  * Layers (bottom → top):
- *   1. Video / poster image — slow cinematic zoom (disabled on mobile)
+ *   1. Interactive Globe — rotating Ghana-themed globe
  *   2. Gradient overlay — brand teal wash
  *   3. Ambient orbs — drifting, blurred light sources (static on mobile)
  *   4. Content — back link, logo, rotating feature slides, tagline, stats
@@ -15,7 +15,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowLeft, Brain } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import Image from "next/image";
+import { InteractiveGlobe } from "@/components/ui/interactive-globe";
 
 /* ── Feature Slides (not testimonials — app isn't launched yet) ── */
 const slides = [
@@ -46,14 +48,11 @@ interface AuthLeftPanelProps {
   entered: boolean;
   /** Two-line headline — use \n to split. Second line renders in gold. */
   headline?: string;
-  /** Poster fallback image (shown while video loads or if it fails). */
-  poster?: string;
 }
 
 export function AuthLeftPanel({
   entered,
   headline = "Your mind\ndeserves care.",
-  poster = "/images/student-hero.jpg",
 }: AuthLeftPanelProps) {
   /* ── Slide rotator ── */
   const [slideIdx, setSlideIdx] = useState(0);
@@ -90,38 +89,19 @@ export function AuthLeftPanel({
             : "-translate-y-[60px] lg:-translate-x-[60px] lg:translate-y-0"
         }`}
     >
-      {/* ─── Layer 1: Video / poster ─── */}
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        poster={poster}
-        src="/videos/campus.mp4?v=3"
-        className="absolute inset-0 z-[1] h-full w-full object-cover object-[center_top]
-          will-change-transform
-          lg:animate-[videoBreath_18s_ease-in-out_infinite_alternate]
-          scale-[1.05] lg:scale-100"
+      {/* ─── Layer 1: Deep teal base ─── */}
+      <div className="absolute inset-0 z-[1] bg-[#0A3C34]" />
+
+      {/* ─── Layer 2: Interactive Globe (above the base, below content) ─── */}
+      <div className="absolute inset-0 z-[2] flex items-center justify-center overflow-hidden">
+        <InteractiveGlobe
+          size={520}
+          dotColor="rgba(255, 255, 255, ALPHA)"
+          arcColor="rgba(255, 255, 255, 0.3)"
+          markerColor="rgba(245, 200, 66, 1)"
+          autoRotateSpeed={0.0012}
         />
-
-      {/* Animated poster fallback — if video fails, poster still has gentle motion (desktop) */}
-      <div
-        className="absolute inset-0 z-[0] bg-cover bg-[center_top]
-          will-change-transform
-          lg:animate-[videoBreath_18s_ease-in-out_infinite_alternate]
-          scale-[1.05] lg:scale-100"
-        style={{ backgroundImage: `url(${poster})` }}
-      />
-
-      {/* ─── Layer 2: Gradient overlay ─── */}
-      <div
-        className="absolute inset-0 z-[2]"
-        style={{
-          background:
-            "linear-gradient(160deg, rgba(10,60,52,0.85) 0%, rgba(43,181,160,0.6) 50%, rgba(10,60,52,0.9) 100%)",
-        }}
-      />
+      </div>
 
       {/* ─── Layer 3: Ambient orbs ─── */}
       <div className="pointer-events-none absolute inset-0 z-[3] overflow-hidden">
@@ -192,7 +172,7 @@ export function AuthLeftPanel({
                   : "opacity-0 -translate-y-5"
               }`}
           >
-            <Brain className="h-10 w-10 text-white" strokeWidth={1.5} />
+            <Image src="/images/theraklick-logo.png" alt="Theraklick" width={40} height={40} className="shrink-0 object-contain" />
             <span className="text-xl font-bold tracking-tight text-white">
               Theraklick
             </span>
@@ -249,29 +229,10 @@ export function AuthLeftPanel({
           </h2>
         </div>
 
-        {/* ─── Bottom: Stats row — desktop only ─── */}
-        <div
-          className={`hidden items-center gap-6 rounded-[20px]
-            border border-white/[0.12] bg-white/[0.08] p-5
-            backdrop-blur-2xl lg:flex
-            transition-all duration-700 delay-700 ease-[cubic-bezier(0.16,1,0.3,1)]
-            ${
-              entered
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-6"
-            }`}
-        >
-          <StatCell value="100%" label="Anonymous" />
-          <div className="h-9 w-px bg-white/15" />
-          <StatCell value="24/7" label="Always available" />
-          <div className="h-9 w-px bg-white/15" />
-          <StatCell value="Free" label="No hidden costs" />
-        </div>
-
         {/* ─── Mobile: compact brand + tagline (row layout) ─── */}
         <div className="flex flex-1 items-end justify-between lg:hidden">
             <div className="flex items-center gap-2">
-              <Brain className="h-7 w-7 text-white" strokeWidth={1.5} />
+              <Image src="/images/theraklick-logo.png" alt="Theraklick" width={28} height={28} className="shrink-0 object-contain" />
               <span className="text-base font-bold text-white">Theraklick</span>
             </div>
           <p className="text-right text-[1.1rem] font-bold leading-tight text-white">
@@ -287,16 +248,3 @@ export function AuthLeftPanel({
   );
 }
 
-/* ── Stat cell sub-component ── */
-function StatCell({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="flex flex-1 flex-col items-center gap-1">
-      <span className="text-[clamp(1.4rem,2.5vw,1.8rem)] font-extrabold tabular-nums text-[#F5C842]">
-        {value}
-      </span>
-      <span className="whitespace-nowrap text-[0.72rem] uppercase tracking-[0.05em] text-white/65">
-        {label}
-      </span>
-    </div>
-  );
-}

@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 export function AnimatedBackdrop({
   imageSrc,
-  overlay = "bg-white/85",
+  overlay = "bg-white/85 dark:bg-gray-950/85",
   className,
 }: {
   imageSrc?: string;
@@ -27,7 +27,7 @@ export function AnimatedBackdrop({
           <div className={cn("absolute inset-0", overlay)} />
         </>
       ) : (
-        <div className="absolute inset-0 bg-gradient-to-b from-primary-50/40 via-white to-white" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary-50/40 via-white to-white dark:from-gray-900/40 dark:via-gray-950 dark:to-gray-950" />
       )}
 
       {/* Animated orbs */}

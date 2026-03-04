@@ -135,17 +135,17 @@ export default function CounselorsPage() {
 
   return (
     <LayoutWrapper>
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white dark:bg-gray-950">
         <div className="px-4 py-6 pb-24 md:px-8 md:py-10">
           <div className="mx-auto max-w-5xl">
             {/* Header */}
             <div className="mb-8">
               <div className="mb-2 flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-green-600" />
-                <span className="text-sm font-medium text-green-600">Professional Support</span>
+                <Sparkles className="h-4 w-4 text-green-600 dark:text-green-400" />
+                <span className="text-sm font-medium text-green-600 dark:text-green-400">Professional Support</span>
               </div>
-              <h1 className="text-3xl font-bold text-gray-900">Talk to a Counselor</h1>
-              <p className="mt-2 text-gray-500">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Talk to a Counselor</h1>
+              <p className="mt-2 text-gray-500 dark:text-gray-400">
                 Connect with licensed professionals who understand what you're going through.
               </p>
             </div>
@@ -153,17 +153,17 @@ export default function CounselorsPage() {
             {/* Search & Filter */}
             <div className="mb-6 flex flex-col gap-4 sm:flex-row">
               <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500" />
+                <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500 dark:text-gray-400" />
                 <input
                   type="text"
                   placeholder="Search counselors..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-12 pr-4 text-gray-900 placeholder-gray-400 transition-colors focus:border-green-500 focus:outline-none"
+                  className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 py-3 pl-12 pr-4 text-gray-900 dark:text-gray-100 placeholder-gray-400 transition-colors focus:border-green-500 focus:outline-none"
                 />
               </div>
               <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0">
-                <Filter className="h-4 w-4 shrink-0 text-gray-500" />
+                <Filter className="h-4 w-4 shrink-0 text-gray-500 dark:text-gray-400" />
                 {specializations.map((spec) => (
                   <button
                     key={spec}
@@ -171,7 +171,7 @@ export default function CounselorsPage() {
                     className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all ${
                       selectedSpec === spec
                         ? "bg-green-600 text-white"
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900"
+                        : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100"
                     }`}
                   >
                     {spec}
@@ -184,12 +184,12 @@ export default function CounselorsPage() {
             {loading ? (
               <div className="grid gap-4 md:grid-cols-2">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="animate-pulse rounded-2xl border border-gray-200 bg-white p-6">
+                  <div key={i} className="animate-pulse rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
                     <div className="flex gap-4">
-                      <div className="h-16 w-16 rounded-full bg-gray-100" />
+                      <div className="h-16 w-16 rounded-full bg-gray-100 dark:bg-gray-800" />
                       <div className="flex-1 space-y-3">
-                        <div className="h-5 w-32 rounded bg-gray-100" />
-                        <div className="h-4 w-48 rounded bg-gray-100" />
+                        <div className="h-5 w-32 rounded bg-gray-100 dark:bg-gray-800" />
+                        <div className="h-4 w-48 rounded bg-gray-100 dark:bg-gray-800" />
                       </div>
                     </div>
                   </div>
@@ -201,13 +201,13 @@ export default function CounselorsPage() {
                   <button
                     key={counselor.uid}
                     onClick={() => router.push(`/student/counselors/${counselor.uid}`)}
-                    className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm p-5 text-left transition-all hover:border-green-300 hover:shadow-md"
+                    className="group relative overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-5 text-left transition-all hover:border-green-300 dark:hover:border-green-700 hover:shadow-md"
                   >
                     {/* Online indicator */}
                     {counselor.isOnline && (
                       <div className="absolute right-4 top-4 flex items-center gap-1.5">
                         <span className="h-2 w-2 rounded-full bg-green-400" />
-                        <span className="text-xs text-green-500">Online</span>
+                        <span className="text-xs text-green-500 dark:text-green-400">Online</span>
                       </div>
                     )}
 
@@ -218,7 +218,7 @@ export default function CounselorsPage() {
                           <img
                             src={counselor.avatar}
                             alt={counselor.fullName}
-                            className="h-16 w-16 rounded-full object-cover border-2 border-gray-200"
+                            className="h-16 w-16 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700"
                           />
                         ) : (
                           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-500 text-xl font-bold text-white">
@@ -229,12 +229,12 @@ export default function CounselorsPage() {
 
                       {/* Info */}
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 truncate">{counselor.fullName}</h3>
-                        <p className="text-sm text-green-600">{counselor.specialization}</p>
+                        <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate">{counselor.fullName}</h3>
+                        <p className="text-sm text-green-600 dark:text-green-400">{counselor.specialization}</p>
                         
                         {/* Stats */}
                         {counselor.sessionsCompleted && (
-                          <div className="mt-2 text-sm text-gray-500">
+                          <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                             <span>{counselor.sessionsCompleted} sessions</span>
                           </div>
                         )}
@@ -242,7 +242,7 @@ export default function CounselorsPage() {
                         {/* Availability */}
                         <div className="mt-3 flex items-center gap-2">
                           {counselor.availability && counselor.availability.length > 0 ? (
-                            <span className="flex items-center gap-1 text-xs text-gray-500">
+                            <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                               <Clock className="h-3 w-3" />
                               {counselor.availability[0]}
                             </span>
@@ -252,16 +252,16 @@ export default function CounselorsPage() {
                         </div>
                       </div>
 
-                      <ChevronRight className="mt-6 h-5 w-5 text-gray-400 transition-transform group-hover:translate-x-1 group-hover:text-gray-900" />
+                      <ChevronRight className="mt-6 h-5 w-5 text-gray-400 dark:text-gray-500 transition-transform group-hover:translate-x-1 group-hover:text-gray-900 dark:group-hover:text-gray-100" />
                     </div>
 
                     {/* Quick actions */}
                     <div className="mt-4 flex gap-2">
-                      <span className="flex items-center gap-1.5 rounded-lg bg-green-50 px-3 py-1.5 text-xs font-medium text-green-600">
+                      <span className="flex items-center gap-1.5 rounded-lg bg-green-50 dark:bg-green-950 px-3 py-1.5 text-xs font-medium text-green-600 dark:text-green-400">
                         <MessageCircle className="h-3.5 w-3.5" />
                         Chat
                       </span>
-                      <span className="flex items-center gap-1.5 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-600">
+                      <span className="flex items-center gap-1.5 rounded-lg bg-blue-50 dark:bg-blue-950 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400">
                         <Calendar className="h-3.5 w-3.5" />
                         Book Session
                       </span>
@@ -272,8 +272,8 @@ export default function CounselorsPage() {
             )}
 
             {!loading && filteredCounselors.length === 0 && (
-              <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center">
-                <p className="text-gray-500">No counselors found matching your search.</p>
+              <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-12 text-center">
+                <p className="text-gray-500 dark:text-gray-400">No counselors found matching your search.</p>
               </div>
             )}
           </div>

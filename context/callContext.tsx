@@ -174,7 +174,7 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
           
           // Get caller info
           try {
-            const callerDoc = await getDoc(doc(db, "users", callData.callerId));
+            const callerDoc = await getDoc(doc(db!, "users", callData.callerId));
             if (!isMounted) return; // Check again after async operation
             
             const callerData = callerDoc.data();

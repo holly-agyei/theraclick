@@ -101,48 +101,48 @@ export default function PeerMentorDashboardPage() {
 
   return (
     <LayoutWrapper>
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white dark:bg-gray-950">
         <div className="px-4 py-8 pb-28 md:px-8 md:py-10">
           <div className="mx-auto max-w-5xl">
 
             {/* Header */}
             <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-                <p className="mt-1 text-sm text-gray-500">
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Dashboard</h1>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                   Welcome back, {profile?.fullName?.split(" ")[0] || "there"}
                 </p>
               </div>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950 px-3 py-1.5 text-xs font-medium text-green-700 dark:text-green-400">
                 <Calendar className="h-3.5 w-3.5" />
                 {todayFormatted}
               </span>
             </div>
 
             {/* Stats Row */}
-            <div className="mb-8 rounded-xl border border-gray-200 bg-white">
-              <div className="grid grid-cols-3 divide-x divide-gray-200">
+            <div className="mb-8 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
+              <div className="grid grid-cols-3 divide-x divide-gray-200 dark:divide-gray-800">
                 <div className="p-5">
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-400">
                     Total Conversations
                   </p>
-                  <p className="mt-2 text-3xl font-bold text-gray-900">
+                  <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-gray-100">
                     {loading ? "--" : stats.totalConversations}
                   </p>
                 </div>
                 <div className="p-5">
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-400">
                     Active This Week
                   </p>
-                  <p className="mt-2 text-3xl font-bold text-gray-900">
+                  <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-gray-100">
                     {loading ? "--" : stats.activeChats}
                   </p>
                 </div>
                 <div className="p-5">
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-400">
                     Specialization
                   </p>
-                  <p className="mt-2 truncate text-lg font-bold text-gray-900">
+                  <p className="mt-2 truncate text-lg font-bold text-gray-900 dark:text-gray-100">
                     {profile?.application?.specialization || "General Support"}
                   </p>
                 </div>
@@ -151,29 +151,29 @@ export default function PeerMentorDashboardPage() {
 
             {/* Quick Actions */}
             <div className="mb-8">
-              <h2 className="mb-4 text-lg font-semibold text-gray-900">Quick actions</h2>
+              <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Quick actions</h2>
               <div className="grid gap-3 sm:grid-cols-2">
                 <button
                   onClick={() => router.push("/student/forums")}
-                  className="flex items-center gap-3 rounded-xl border border-gray-200 p-4 text-left transition-colors hover:bg-gray-50"
+                  className="flex items-center gap-3 rounded-xl border border-gray-200 dark:border-gray-800 p-4 text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
                 >
                   <MessageSquare className="h-5 w-5 shrink-0 text-green-600" />
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-gray-900">View Forums</p>
-                    <p className="text-xs text-gray-500">Participate in community discussions</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">View Forums</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Participate in community discussions</p>
                   </div>
-                  <ChevronRight className="ml-auto h-4 w-4 shrink-0 text-gray-300" />
+                  <ChevronRight className="ml-auto h-4 w-4 shrink-0 text-gray-300 dark:text-gray-600" />
                 </button>
                 <button
                   onClick={() => router.push("/peer-mentor/inbox")}
-                  className="flex items-center gap-3 rounded-xl border border-gray-200 p-4 text-left transition-colors hover:bg-gray-50"
+                  className="flex items-center gap-3 rounded-xl border border-gray-200 dark:border-gray-800 p-4 text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
                 >
                   <MessageCircle className="h-5 w-5 shrink-0 text-blue-600" />
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-gray-900">My Inbox</p>
-                    <p className="text-xs text-gray-500">View all student conversations</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">My Inbox</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">View all student conversations</p>
                   </div>
-                  <ChevronRight className="ml-auto h-4 w-4 shrink-0 text-gray-300" />
+                  <ChevronRight className="ml-auto h-4 w-4 shrink-0 text-gray-300 dark:text-gray-600" />
                 </button>
               </div>
             </div>
@@ -181,10 +181,10 @@ export default function PeerMentorDashboardPage() {
             {/* Recent Conversations Table */}
             <div>
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">Recent conversations</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Recent conversations</h2>
                 <button
                   onClick={() => router.push("/peer-mentor/inbox")}
-                  className="inline-flex items-center gap-1 rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs font-medium text-green-700 transition-colors hover:bg-green-100"
+                  className="inline-flex items-center gap-1 rounded-full border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950 px-3 py-1 text-xs font-medium text-green-700 dark:text-green-400 transition-colors hover:bg-green-100 dark:hover:bg-green-900"
                 >
                   View All
                 </button>
@@ -193,50 +193,50 @@ export default function PeerMentorDashboardPage() {
               {loading ? (
                 <div className="space-y-3">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="h-12 animate-pulse rounded-lg bg-gray-100" />
+                    <div key={i} className="h-12 animate-pulse rounded-lg bg-gray-100 dark:bg-gray-800" />
                   ))}
                 </div>
               ) : conversations.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-gray-300 py-10 text-center">
-                  <MessageCircle className="mx-auto mb-2 h-8 w-8 text-gray-300" />
-                  <p className="text-sm text-gray-500">No conversations yet</p>
-                  <p className="mt-1 text-xs text-gray-400">Students will reach out to you here</p>
+                <div className="rounded-xl border border-dashed border-gray-300 dark:border-gray-800 py-10 text-center">
+                  <MessageCircle className="mx-auto mb-2 h-8 w-8 text-gray-300 dark:text-gray-600" />
+                  <p className="text-sm text-gray-500 dark:text-gray-400">No conversations yet</p>
+                  <p className="mt-1 text-xs text-gray-400 dark:text-gray-400">Students will reach out to you here</p>
                 </div>
               ) : (
-                <div className="overflow-hidden rounded-xl border border-gray-200">
+                <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800">
                   <table className="w-full text-left text-sm">
                     <thead>
-                      <tr className="border-b border-gray-100 bg-gray-50/60">
-                        <th className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                      <tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-900/60">
+                        <th className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-400">
                           Name
                         </th>
-                        <th className="hidden px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-gray-400 sm:table-cell">
+                        <th className="hidden px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-400 sm:table-cell">
                           Last Message
                         </th>
-                        <th className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                        <th className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-400">
                           Time
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                       {conversations.slice(0, 5).map((conv) => (
                         <tr
                           key={conv.studentId}
                           onClick={() => router.push(`/peer-mentor/inbox/${conv.studentId}`)}
-                          className="cursor-pointer transition-colors hover:bg-gray-50"
+                          className="cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
                         >
                           <td className="px-5 py-3.5">
                             <div className="flex items-center gap-3">
-                              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-100 text-xs font-bold text-green-600">
+                              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900 text-xs font-bold text-green-600">
                                 {conv.studentName.split(" ").map((n) => n[0]).join("").slice(0, 2)}
                               </div>
-                              <span className="font-medium text-gray-900">{conv.studentName}</span>
+                              <span className="font-medium text-gray-900 dark:text-gray-100">{conv.studentName}</span>
                             </div>
                           </td>
-                          <td className="hidden max-w-[200px] truncate px-5 py-3.5 text-gray-500 sm:table-cell">
+                          <td className="hidden max-w-[200px] truncate px-5 py-3.5 text-gray-500 dark:text-gray-400 sm:table-cell">
                             {conv.lastMessage || "No messages"}
                           </td>
-                          <td className="whitespace-nowrap px-5 py-3.5 text-gray-400">
+                          <td className="whitespace-nowrap px-5 py-3.5 text-gray-400 dark:text-gray-400">
                             {conv.lastMessageTime ? formatTime(conv.lastMessageTime) : "--"}
                           </td>
                         </tr>

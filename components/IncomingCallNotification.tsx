@@ -266,7 +266,7 @@ export function IncomingCallNotification() {
             >
               <PhoneOff className="h-7 w-7 text-white" />
             </button>
-            <p className="mt-3 text-xs text-gray-400 font-medium">Decline</p>
+            <p className="mt-3 text-xs text-gray-400 dark:text-gray-500 font-medium">Decline</p>
           </div>
 
           {/* Accept button */}
@@ -278,7 +278,7 @@ export function IncomingCallNotification() {
             >
               <Phone className="h-7 w-7 text-white" />
             </button>
-            <p className="mt-3 text-xs text-gray-400 font-medium">Accept</p>
+            <p className="mt-3 text-xs text-gray-400 dark:text-gray-500 font-medium">Accept</p>
           </div>
         </div>
       </div>

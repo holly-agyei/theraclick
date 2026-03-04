@@ -165,7 +165,6 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
       <AuthLeftPanel
         entered={entered}
         headline={"Your mind\ndeserves care."}
-        poster="/images/student-hero.jpg"
       />
 
       {/* ── White card (bottom on mobile, right on desktop) ── */}

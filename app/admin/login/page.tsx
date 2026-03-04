@@ -43,7 +43,7 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 px-4">
       {/* Ambient effects */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute -left-20 top-20 h-72 w-72 rounded-full bg-blue-500/10 blur-[100px]" />
@@ -51,19 +51,19 @@ export default function AdminLoginPage() {
       </div>
 
       <div className="relative z-10 w-full max-w-md">
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
+        <div className="rounded-2xl border border-white/10 dark:border-white/20 bg-white/5 dark:bg-white/10 p-8 backdrop-blur-xl">
           {/* Header */}
           <div className="mb-8 text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600">
               <Shield className="h-8 w-8 text-white" />
             </div>
             <h1 className="text-2xl font-bold text-white">Admin Login</h1>
-            <p className="mt-2 text-sm text-gray-400">Access the admin dashboard</p>
+            <p className="mt-2 text-sm text-gray-400 dark:text-gray-400">Access the admin dashboard</p>
           </div>
 
           {/* Error */}
           {error && (
-            <div className="mb-4 flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3">
+            <div className="mb-4 flex items-center gap-2 rounded-lg border border-red-500/30 dark:border-red-500/50 bg-red-500/10 dark:bg-red-950 px-4 py-3">
               <AlertCircle className="h-5 w-5 text-red-400" />
               <p className="text-sm text-red-400">{error}</p>
             </div>
@@ -72,31 +72,31 @@ export default function AdminLoginPage() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-300">Username</label>
+              <label className="mb-2 block text-sm font-medium text-gray-300 dark:text-gray-600">Username</label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500" />
+                <User className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500 dark:text-gray-400" />
                 <Input
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Enter username"
                   required
-                  className="w-full rounded-xl border-white/10 bg-white/5 pl-10 text-white placeholder-gray-500 focus:border-blue-500/50"
+                  className="w-full rounded-xl border-white/10 dark:border-white/20 bg-white/5 dark:bg-white/10 pl-10 text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500/50"
                 />
               </div>
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-300">Password</label>
+              <label className="mb-2 block text-sm font-medium text-gray-300 dark:text-gray-600">Password</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500" />
+                <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500 dark:text-gray-400" />
                 <Input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter password"
                   required
-                  className="w-full rounded-xl border-white/10 bg-white/5 pl-10 text-white placeholder-gray-500 focus:border-blue-500/50"
+                  className="w-full rounded-xl border-white/10 dark:border-white/20 bg-white/5 dark:bg-white/10 pl-10 text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500/50"
                 />
               </div>
             </div>

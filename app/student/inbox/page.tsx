@@ -121,19 +121,19 @@ export default function StudentInboxPage() {
 
   return (
     <LayoutWrapper>
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white dark:bg-gray-950">
         <div className="px-4 py-6 pb-24 md:px-8 md:py-10">
           <div className="mx-auto max-w-4xl">
             {/* Header */}
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900">My Inbox</h1>
-              <p className="mt-2 text-gray-500">All your conversations with counselors and peer mentors</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">My Inbox</h1>
+              <p className="mt-2 text-gray-500 dark:text-gray-400">All your conversations with counselors and peer mentors</p>
             </div>
 
             {/* Search */}
             <div className="mb-6">
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500" />
+                <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500 dark:text-gray-400" />
                 <input
                   type="text"
                   placeholder="Search conversations..."
@@ -148,16 +148,16 @@ export default function StudentInboxPage() {
             {loading ? (
               <div className="space-y-3">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="h-20 animate-pulse rounded-xl border border-gray-200 bg-gray-100" />
+                  <div key={i} className="h-20 animate-pulse rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-800" />
                 ))}
               </div>
             ) : filteredConversations.length === 0 ? (
-              <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center">
-                <MessageCircle className="mx-auto mb-4 h-16 w-16 text-gray-300" />
-                <p className="text-gray-500">
+              <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-12 text-center">
+                <MessageCircle className="mx-auto mb-4 h-16 w-16 text-gray-300 dark:text-gray-600" />
+                <p className="text-gray-500 dark:text-gray-400">
                   {searchQuery ? "No conversations found" : "No conversations yet"}
                 </p>
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                   {searchQuery ? "Try a different search term" : "Start chatting with a counselor or peer mentor to see messages here"}
                 </p>
                 {!searchQuery && (
@@ -208,7 +208,7 @@ export default function StudentInboxPage() {
                           </div>
                         )}
                         {/* Online indicator */}
-                        <div className={`absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-white ${
+                        <div className={`absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-white dark:border-gray-800 ${
                           conv.type === "counselor" ? "bg-blue-400" : "bg-emerald-400"
                         }`} />
                       </div>
@@ -227,19 +227,19 @@ export default function StudentInboxPage() {
                         <div className="flex items-center gap-2 mb-1">
                           <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
                             conv.type === "counselor"
-                              ? "bg-blue-100 text-blue-600"
-                              : "bg-green-100 text-green-600"
+                              ? "bg-blue-100 dark:bg-blue-900 text-blue-600"
+                              : "bg-green-100 dark:bg-green-900 text-green-600"
                           }`}>
                             {conv.type === "counselor" ? "Counselor" : "Peer Mentor"}
                           </span>
                         </div>
                         {conv.lastMessage && (
-                          <p className="line-clamp-2 text-sm text-gray-500">{conv.lastMessage}</p>
+                          <p className="line-clamp-2 text-sm text-gray-500 dark:text-gray-400">{conv.lastMessage}</p>
                         )}
                       </div>
 
                       {/* Arrow */}
-                      <Mail className="h-5 w-5 text-gray-400 transition-all group-hover:translate-x-1 group-hover:text-green-600 shrink-0" />
+                      <Mail className="h-5 w-5 text-gray-400 dark:text-gray-500 transition-all group-hover:translate-x-1 group-hover:text-green-600 shrink-0" />
                     </div>
                   </button>
                 ))}

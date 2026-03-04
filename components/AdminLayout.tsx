@@ -21,7 +21,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#F0FDF4]">
+      <div className="flex min-h-screen items-center justify-center bg-[#F0FDF4] dark:bg-gray-950">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-green-600 border-t-transparent" />
       </div>
     );
@@ -40,25 +40,25 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   ];
 
   return (
-    <div className="flex h-screen bg-[#F0FDF4]">
+    <div className="flex h-screen bg-[#F0FDF4] dark:bg-gray-950">
       {/* Sidebar */}
-      <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-50 w-64 border-r border-gray-200 bg-white transition-transform md:relative md:translate-x-0`}>
-        <div className="flex h-16 items-center justify-between border-b border-gray-200 px-6">
+      <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-50 w-64 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 transition-transform md:relative md:translate-x-0`}>
+        <div className="flex h-16 items-center justify-between border-b border-gray-200 dark:border-gray-800 px-6">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-600">
               <Shield className="h-6 w-6 text-white" />
             </div>
-            <span className="font-semibold text-gray-900">Admin Panel</span>
+            <span className="font-semibold text-gray-900 dark:text-gray-100">Admin Panel</span>
           </div>
-          <button onClick={() => setSidebarOpen(false)} className="md:hidden text-gray-500 hover:text-gray-900">
+          <button onClick={() => setSidebarOpen(false)} className="md:hidden text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
             <X className="h-5 w-5" />
           </button>
         </div>
 
         <div className="p-4">
-          <div className="mb-4 rounded-lg bg-gray-50 px-3 py-2">
-            <p className="text-xs text-gray-500">Logged in as</p>
-            <p className="font-medium text-gray-900">{admin?.username}</p>
+          <div className="mb-4 rounded-lg bg-gray-50 dark:bg-gray-900 px-3 py-2">
+            <p className="text-xs text-gray-500 dark:text-gray-400">Logged in as</p>
+            <p className="font-medium text-gray-900 dark:text-gray-100">{admin?.username}</p>
           </div>
         </div>
 
@@ -73,8 +73,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
                   isActive
-                    ? "bg-green-100 text-green-600"
-                    : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+                    ? "bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400"
+                    : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100"
                 }`}
               >
                 <Icon className="h-5 w-5" />
@@ -84,10 +84,10 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
-        <div className="border-t border-gray-200 p-4">
+        <div className="border-t border-gray-200 dark:border-gray-800 p-4">
           <button
             onClick={() => logout()}
-            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100"
           >
             <LogOut className="h-5 w-5" />
             <span>Logout</span>
@@ -98,13 +98,13 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       {/* Main content */}
       <div className="flex-1 overflow-y-auto">
         {/* Mobile header */}
-        <div className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b border-gray-200 bg-white/80 px-4 backdrop-blur-xl md:hidden">
-          <button onClick={() => setSidebarOpen(true)} className="text-gray-500 hover:text-gray-900">
+        <div className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-950/80 px-4 backdrop-blur-xl md:hidden">
+          <button onClick={() => setSidebarOpen(true)} className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
             <Menu className="h-6 w-6" />
           </button>
           <div className="flex items-center gap-2">
             <Shield className="h-5 w-5 text-green-600" />
-            <span className="font-semibold text-gray-900">Admin</span>
+            <span className="font-semibold text-gray-900 dark:text-gray-100">Admin</span>
           </div>
         </div>
 

@@ -114,7 +114,7 @@ export default function ForumsPage() {
   // Demo messages
   const [demoMessages] = useState<Record<string, ForumMessage[]>>({
     general: [
-      { id: "1", text: "Hey everyone! Just joined Theraklick. Feeling a bit overwhelmed but hoping to find some support here.", senderId: "user1", senderName: "Anonymous Owl", createdAt: new Date(Date.now() - 3600000 * 2), reactions: { "❤️": ["user2", "user3"], "🤗": ["user4"] }, isAnonymous: true, threadCount: 2 },
+      { id: "1", text: "Hey everyone! Just joined TheraClick. Feeling a bit overwhelmed but hoping to find some support here.", senderId: "user1", senderName: "Anonymous Owl", createdAt: new Date(Date.now() - 3600000 * 2), reactions: { "❤️": ["user2", "user3"], "🤗": ["user4"] }, isAnonymous: true, threadCount: 2 },
       { id: "2", text: "Welcome! You're in the right place. We're all here to support each other. What's been on your mind?", senderId: "user2", senderName: "Peaceful Bear", createdAt: new Date(Date.now() - 3600000 * 1.5), reactions: { "👍": ["user1"] }, isAnonymous: true },
       { id: "3", text: "Same here! Just started my second year and the pressure is real. But talking about it helps.", senderId: "user3", senderName: "Brave Lion", createdAt: new Date(Date.now() - 3600000), reactions: { "💪": ["user1", "user2"] }, isAnonymous: true },
     ],

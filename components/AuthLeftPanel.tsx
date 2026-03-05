@@ -172,9 +172,9 @@ export function AuthLeftPanel({
                   : "opacity-0 -translate-y-5"
               }`}
           >
-            <Image src="/images/theraklick-logo.png" alt="Theraklick" width={40} height={40} className="shrink-0 object-contain" />
+            <Image src="/images/theraklick-logo.png" alt="TheraClick" width={40} height={40} className="shrink-0 object-contain" />
             <span className="text-xl font-bold tracking-tight text-white">
-              Theraklick
+              TheraClick
             </span>
           </div>
         </div>
@@ -232,8 +232,8 @@ export function AuthLeftPanel({
         {/* ─── Mobile: compact brand + tagline (row layout) ─── */}
         <div className="flex flex-1 items-end justify-between lg:hidden">
             <div className="flex items-center gap-2">
-              <Image src="/images/theraklick-logo.png" alt="Theraklick" width={28} height={28} className="shrink-0 object-contain" />
-              <span className="text-base font-bold text-white">Theraklick</span>
+              <Image src="/images/theraklick-logo.png" alt="TheraClick" width={28} height={28} className="shrink-0 object-contain" />
+              <span className="text-base font-bold text-white">TheraClick</span>
             </div>
           <p className="text-right text-[1.1rem] font-bold leading-tight text-white">
             {lines[0]}

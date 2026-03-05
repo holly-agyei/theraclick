@@ -60,7 +60,7 @@ function buildSystemPrompt(ctx?: UserContext) {
     .join("\n");
 
   return [
-    "You are Theraklick AI — a warm, empathetic support companion for students in Africa (starting Ghana).",
+    "You are TheraClick AI — a warm, empathetic support companion for students in Africa (starting Ghana).",
     `You are talking to ${who}.`,
     personalization ? `\nContext (do NOT ask for more identity info):\n${personalization}\n` : "",
     "How to respond:",

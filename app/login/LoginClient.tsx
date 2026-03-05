@@ -22,6 +22,9 @@ import {
   UserCheck,
   Loader2,
   Mail,
+  Eye,
+  EyeOff,
+  Shield,
 } from "lucide-react";
 import { AuthLeftPanel } from "@/components/AuthLeftPanel";
 
@@ -58,12 +61,12 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasLoggedIn, setHasLoggedIn] = useState(false);
   const [needsVerification, setNeedsVerification] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
-  // Trigger enter animation after mount
   const [entered, setEntered] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
@@ -76,7 +79,6 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
     return () => clearTimeout(id);
   }, []);
 
-  // Redirect after successful auth — or warn if wrong role
   const [roleMismatch, setRoleMismatch] = useState<string | null>(null);
 
   useEffect(() => {
@@ -88,17 +90,14 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
         setHasLoggedIn(false);
         setIsLoading(false);
       } else if (profile.role === role) {
-        // Correct login page — go to dashboard
         router.push(role === "student" ? "/student/dashboard" : `/${role}/dashboard`);
       } else {
-        // Wrong login page — sign out and show a helpful message
         const roleLabels: Record<string, string> = {
           student: "Student",
           "peer-mentor": "Peer Mentor",
           counselor: "Counselor",
         };
         const actualRole = profile.role;
-        // Sign out so they don't stay authenticated on the wrong page
         void logout();
         setRoleMismatch(actualRole);
         setError(
@@ -108,7 +107,7 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
         setHasLoggedIn(false);
       }
     }
-  }, [hasLoggedIn, profile, authLoading, role, router]);
+  }, [hasLoggedIn, profile, authLoading, role, router, logout]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,10 +118,9 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
     try {
       await loginWithEmail(email, password);
       setHasLoggedIn(true);
-    } catch (err: any) {
-      const msg = err?.message || "";
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "";
       if (msg === "EMAIL_NOT_VERIFIED") {
-        // Show the verification notice with resend option
         setNeedsVerification(true);
         setError(null);
       } else {
@@ -133,17 +131,13 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
     }
   };
 
-  // Resend verification email
   const handleResendVerification = async () => {
     if (!auth || resendCooldown > 0) return;
     try {
-      // Temporarily sign in to get user object, send email, then sign out
       const cred = await signInWithEmailAndPassword(auth, email.trim(), password);
       await sendEmailVerification(cred.user);
-      // Sign out again since they're not verified
       const { signOut } = await import("firebase/auth");
       await signOut(auth);
-      // Start cooldown (60 seconds)
       setResendCooldown(60);
       const interval = setInterval(() => {
         setResendCooldown((c) => {
@@ -156,7 +150,6 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
     }
   };
 
-  /* shared transition helper */
   const stagger = (delayMs: number) =>
     `transition-all duration-500 delay-[${delayMs}ms] ${entered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`;
 
@@ -164,10 +157,10 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
     <div className="auth-page-wrapper flex min-h-[100dvh] flex-col lg:flex-row">
       <AuthLeftPanel
         entered={entered}
-        headline={"Your mind\ndeserves care."}
+        headline={"Your feelings are valid.\nYour privacy is protected."}
       />
 
-      {/* ── White card (bottom on mobile, right on desktop) ── */}
+      {/* White card */}
       <div
         className={`auth-right-panel relative z-10 flex flex-1 flex-col -mt-6 rounded-t-[28px] bg-white px-6 py-8
           shadow-2xl shadow-black/5
@@ -177,6 +170,7 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
             ? "translate-y-0 opacity-100 lg:translate-x-0"
             : "translate-y-[60px] opacity-0 lg:translate-y-0 lg:translate-x-[60px]"}`}
       >
+        {/* justify-center ensures vertical centering */}
         <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center">
           {/* Role badge */}
           <div className={`mb-5 inline-flex items-center gap-2 self-start rounded-full
@@ -209,8 +203,7 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
 
           {/* Form */}
           <form onSubmit={handleLogin} className="mt-8 space-y-5">
-            <div className={`transition-all duration-500 delay-[400ms]
-              ${entered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}>
+            <div className={stagger(400)}>
               <label className="mb-2 block text-sm font-semibold text-[#2BB5A0]">Email</label>
               <input
                 value={email}
@@ -222,25 +215,30 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
               />
             </div>
 
-            <div className={`transition-all duration-500 delay-[480ms]
-              ${entered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}>
+            <div className={stagger(480)}>
               <div className="mb-2 flex items-center justify-between">
                 <label className="block text-sm font-semibold text-[#2BB5A0]">Password</label>
                 <Link
                   href="/forgot-password"
-                  className="text-xs font-medium text-[#6B8C89] hover:text-[#2BB5A0] hover:underline"
+                  className="text-[13px] font-semibold text-[#0F4F47] hover:text-[#2BB5A0] hover:underline"
                 >
                   Forgot password?
                 </Link>
               </div>
-              <input
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                type="password"
-                autoComplete="current-password"
-                placeholder="Your password"
-                className="tk-input"
-              />
+              <div className="relative">
+                <input
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  placeholder="Your password"
+                  className="tk-input pr-11"
+                />
+                <button type="button" onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+                  {showPassword ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
+                </button>
+              </div>
             </div>
 
             {/* Email verification notice */}
@@ -271,7 +269,6 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
             {error && (
               <div className="tk-shake rounded-xl border border-red-200 bg-red-50 px-4 py-3">
                 <p className="text-sm font-medium text-red-600">{error}</p>
-                {/* If wrong role, show a link to the correct login page */}
                 {roleMismatch && (
                   <Link
                     href={`/login?role=${roleMismatch}`}
@@ -283,12 +280,11 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
               </div>
             )}
 
-            <div className={`pt-2 transition-all duration-500 delay-[560ms]
-              ${entered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}>
+            <div className={`pt-2 ${stagger(560)}`}>
               <button
                 type="submit"
                 disabled={!isFirebaseBacked || isLoading || !email.trim() || !password.trim()}
-                className="tk-btn-gold"
+                className="tk-btn-primary"
               >
                 {isLoading ? (
                   <span className="flex items-center justify-center gap-2">
@@ -302,9 +298,20 @@ export function LoginClient({ initialRole }: { initialRole: Role }) {
             </div>
           </form>
 
+          {/* Anonymous mode link */}
+          <div className={`mt-5 flex items-center justify-center gap-2 ${stagger(620)}`}>
+            <Shield className="h-3.5 w-3.5 text-[#2BB5A0]" />
+            <span className="text-[13px] text-[#6B8C89]">
+              Prefer privacy?{" "}
+              <span className="font-semibold text-[#2BB5A0] underline underline-offset-2 cursor-help"
+                title="After signing in, enable anonymous mode from Settings to hide your real identity across the platform.">
+                Continue anonymously &rarr;
+              </span>
+            </span>
+          </div>
+
           {/* Footer link */}
-          <div className={`mt-8 text-center transition-all duration-500 delay-[640ms]
-            ${entered ? "opacity-100" : "opacity-0"}`}>
+          <div className={`mt-6 text-center ${stagger(660)}`}>
             <span className="text-sm text-[#6B8C89]">Don&apos;t have an account? </span>
             <Link
               href={config.createLink}

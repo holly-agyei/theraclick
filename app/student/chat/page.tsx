@@ -455,7 +455,7 @@ export default function ChatPage() {
             <div className="flex-1" />
             <div className="flex items-center gap-1.5 text-xs text-gray-400">
               <Sparkles className="h-3.5 w-3.5 text-green-500" />
-              <span>Theraklick AI</span>
+              <span>TheraClick AI</span>
             </div>
           </div>
 
@@ -574,7 +574,7 @@ export default function ChatPage() {
                 </button>
               </div>
               <p className="mt-2 text-center text-[11px] text-gray-300 dark:text-gray-600">
-                Theraklick AI can make mistakes. For urgent help, talk to a counselor.
+                TheraClick AI can make mistakes. For urgent help, talk to a counselor.
               </p>
             </div>
           </div>

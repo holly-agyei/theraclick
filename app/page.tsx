@@ -1,340 +1,573 @@
 "use client";
 
 /**
- * LANDING PAGE — The first breath.
+ * LANDING PAGE — Full conversion-optimized marketing page.
  *
- * WHAT: Splash intro → animated hero landing.
- * WHY:  First impression. A 20-year-old student in Accra opens this
- *       at 11 pm after a hard exam. It should feel like exhaling.
- * HOW:
- *   - Phase 0–4: Splash — logo springs in, wordmark fades, tagline breathes
- *     in from blur, then everything scales up and fades away.
- *   - Phase 5: Landing — teal gradient with floating orbs, particles, and
- *     staggered content entrance with spring easing.
- *   - Total splash: ~4 s. Feels cinematic, not slow.
+ * 12 sections: Splash → Hero → Stats → Problem → Features → How It Works
+ * → Counselors & Mentors → AI Highlight → Forums → Trust → Testimonials
+ * → Final CTA → Footer
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight } from "lucide-react";
+import {
+  ArrowRight,
+  Shield,
+  Clock,
+  Brain,
+  MessageCircle,
+  Sparkles,
+  Phone,
+  Users,
+  Lock,
+  AlertTriangle,
+  CheckCircle,
+  BadgeCheck,
+  Star,
+  ChevronRight,
+  ExternalLink,
+} from "lucide-react";
 import { BrainMark } from "@/components/Logo";
-import { Particles } from "@/components/Particles";
 
-export default function WelcomePage() {
+function useInView(threshold = 0.12) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) setVisible(true); },
+      { threshold, rootMargin: "0px 0px -40px 0px" }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold]);
+  return { ref, visible };
+}
+
+export default function LandingPage() {
   const router = useRouter();
 
-  // Splash phases:
-  //  0 = blank,  1 = logo in,  2 = wordmark,  3 = tagline,
-  //  4 = zoom-through exit,  5 = landing visible
   const [phase, setPhase] = useState(0);
+  const [skipSplash, setSkipSplash] = useState(false);
 
   useEffect(() => {
-    const timers = [
-      setTimeout(() => setPhase(1), 300),   // logo springs in
-      setTimeout(() => setPhase(2), 1100),  // wordmark fades letter-by-letter
-      setTimeout(() => setPhase(3), 2000),  // tagline breathes in
-      setTimeout(() => setPhase(4), 3200),  // zoom-through begins
-      setTimeout(() => setPhase(5), 4000),  // landing blooms in
+    if (sessionStorage.getItem("splash_seen") === "1") {
+      setPhase(5);
+      setSkipSplash(true);
+      return;
+    }
+    const t = [
+      setTimeout(() => setPhase(1), 300),
+      setTimeout(() => setPhase(2), 1100),
+      setTimeout(() => setPhase(3), 2000),
+      setTimeout(() => setPhase(4), 3200),
+      setTimeout(() => { setPhase(5); sessionStorage.setItem("splash_seen", "1"); }, 4000),
     ];
-    return () => timers.forEach(clearTimeout);
+    return () => t.forEach(clearTimeout);
   }, []);
 
   const splashVisible = phase < 5;
   const splashExiting = phase === 4;
+  const landed = phase >= 5;
+
+  const stats = useInView();
+  const problem = useInView();
+  const features = useInView();
+  const howItWorks = useInView();
+  const forPros = useInView();
+  const aiSection = useInView();
+  const forums = useInView();
+  const trust = useInView();
+  const testimonials = useInView();
+
+  const anim = (v: boolean, delay = "") =>
+    `transition-all duration-700 ease-out ${delay} ${v ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`;
+
+  const goldBtn =
+    "group inline-flex items-center justify-center gap-2 rounded-full bg-[#F5C842] px-8 py-4 text-[15px] font-bold text-[#0D1F1D] shadow-lg shadow-[#F5C842]/25 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:scale-[1.03] hover:bg-[#FFD95A] hover:shadow-xl active:scale-[0.97]";
+
+  const outlineBtn =
+    "group inline-flex items-center justify-center gap-2 rounded-full border-2 border-white/30 px-8 py-4 text-[15px] font-semibold text-white transition-all duration-300 hover:border-white/60 hover:bg-white/10 active:scale-[0.97]";
+
+  const scrollTo = (id: string) =>
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
   return (
-    <div className="relative min-h-[100dvh] overflow-hidden bg-[#0F4F47]">
-
-      {/* ════════════════════════════════════════
-          SPLASH OVERLAY
-          ════════════════════════════════════════ */}
+    <div className="bg-[#0F4F47]">
+      {/* ═══════════ SPLASH ═══════════ */}
       <div
         className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0F4F47]
           transition-all duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)]
-          ${splashExiting
-            ? "scale-[1.08] opacity-0"
-            : splashVisible
-              ? "scale-100 opacity-100"
-              : "pointer-events-none scale-[1.08] opacity-0"}`}
+          ${splashExiting ? "scale-[1.08] opacity-0" : splashVisible ? "scale-100 opacity-100" : "pointer-events-none scale-[1.08] opacity-0"}`}
       >
-        {/* Brain icon — springs in */}
-        <div className={`transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)]
-          ${phase >= 1 ? "opacity-100 scale-100" : "opacity-0 scale-75"}`}>
-          <BrainMark className="h-20 w-20 text-white md:h-24 md:w-24" />
+        <div className={`transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${phase >= 1 ? "opacity-100 scale-100" : "opacity-0 scale-75"}`}>
+          <BrainMark className="h-20 w-20 md:h-24 md:w-24" />
         </div>
-
-        {/* Wordmark — slides up */}
-        <h1 className={`mt-6 text-[28px] font-bold tracking-[0.25em] text-white
-          transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] md:text-[34px]
-          ${phase >= 2 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-          THERAKLICK
+        <h1 className={`mt-6 text-[28px] font-bold tracking-[0.25em] text-white md:text-[34px] transition-all duration-[600ms] ${phase >= 2 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+          THERACLICK
         </h1>
-
-        {/* Tagline — breathes in from blur */}
-        <p className={`mt-4 text-[15px] font-light tracking-wide text-[#7BD8CA]
-          transition-all duration-[600ms]
-          ${phase >= 3 ? "opacity-100 blur-0" : "opacity-0 blur-[8px]"}`}>
+        <p className={`mt-4 text-[15px] font-light tracking-wide text-[#7BD8CA] transition-all duration-[600ms] ${phase >= 3 ? "opacity-100 blur-0" : "opacity-0 blur-[8px]"}`}>
           You are in the right place.
         </p>
       </div>
 
-      {/* ════════════════════════════════════════
-          LANDING CONTENT — 50/50 split
-          ════════════════════════════════════════ */}
-      <div className={`flex min-h-[100dvh] flex-col lg:flex-row
-        transition-all duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)]
-        ${phase >= 5 ? "opacity-100 scale-100" : "opacity-0 scale-[0.95]"}`}>
+      {/* ═══════════ MAIN ═══════════ */}
+      <div className={`transition-all duration-[800ms] ${landed ? "opacity-100" : "opacity-0"}`}>
 
-        {/* ── LEFT HALF: Video + branding ── */}
-        <div className={`relative shrink-0 overflow-hidden select-none
-          h-[240px] lg:h-auto lg:w-1/2
-          transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]
-          ${phase >= 5
-            ? "translate-y-0 lg:translate-x-0"
-            : "-translate-y-[60px] lg:-translate-x-[60px] lg:translate-y-0"}`}>
+        {/* ────────── HERO ────────── */}
+        <section className="relative flex min-h-[100dvh] flex-col overflow-hidden">
+          <video autoPlay muted loop playsInline preload="auto" poster="/images/student-hero.jpg" src="/videos/campus.mp4?v=3"
+            className="absolute inset-0 z-0 h-full w-full object-cover scale-[1.1] blur-[3px]" />
+          <div className="absolute inset-0 z-[1]" style={{
+            background: "linear-gradient(180deg, rgba(10,60,52,0.90) 0%, rgba(15,79,71,0.84) 40%, rgba(10,60,52,0.94) 100%)",
+          }} />
 
-          {/* Poster fallback */}
-          <div
-            className="absolute inset-0 z-[0] bg-cover bg-[center_top]"
-            style={{ backgroundImage: "url(/images/student-hero.jpg)" }}
-          />
-
-          {/* Video */}
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            poster="/images/student-hero.jpg"
-            src="/videos/campus.mp4?v=3"
-            className="absolute inset-0 z-[1] h-full w-full object-cover object-[center_top]
-              will-change-transform lg:animate-[videoBreath_18s_ease-in-out_infinite_alternate]
-              scale-[1.05] lg:scale-100"
-          />
-
-          {/* Teal gradient overlay */}
-          <div
-            className="absolute inset-0 z-[2]"
-            style={{
-              background:
-                "linear-gradient(160deg, rgba(10,60,52,0.75) 0%, rgba(43,181,160,0.50) 50%, rgba(10,60,52,0.80) 100%)",
-            }}
-          />
-
-          {/* Ambient orbs */}
-          <div className="pointer-events-none absolute inset-0 z-[3] overflow-hidden">
-            <div
-              className="absolute -left-20 -top-20
-                h-[200px] w-[200px] lg:h-[380px] lg:w-[380px]
-                rounded-full blur-[50px] lg:blur-[70px] mix-blend-screen
-                lg:animate-[driftOrb1_14s_ease-in-out_infinite_alternate]"
-              style={{
-                background: "radial-gradient(circle, rgba(43,181,160,0.35) 0%, transparent 70%)",
-              }}
-            />
-            <div
-              className="absolute -right-[60px] bottom-[10%]
-                h-[160px] w-[160px] lg:h-[280px] lg:w-[280px]
-                rounded-full blur-[50px] lg:blur-[70px] mix-blend-screen
-                lg:animate-[driftOrb2_18s_ease-in-out_infinite_alternate]"
-              style={{
-                background: "radial-gradient(circle, rgba(245,200,66,0.20) 0%, transparent 70%)",
-              }}
-            />
-          </div>
-
-          {/* Particles overlay */}
-          <Particles count={20} className="z-[4]" />
-
-          {/* Content overlay — logo, tagline, stats */}
-          <div className="absolute inset-0 z-[5] flex flex-col justify-between p-5 lg:p-10">
-            {/* Top: Logo */}
-            <div className={`hidden items-center gap-3 lg:flex
-              transition-all duration-[600ms] delay-100
-              ${phase >= 5 ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-5"}`}>
-              <BrainMark className="h-10 w-10 text-white" />
-              <span className="text-xl font-bold tracking-tight text-white">Theraklick</span>
+          {/* Nav */}
+          <nav className={`relative z-10 flex items-center justify-between px-6 py-5 md:px-12 lg:px-20
+            transition-all duration-500 delay-100 ${landed ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"}`}>
+            <div className="flex items-center gap-2.5">
+              <BrainMark className="h-9 w-9" />
+              <span className="text-lg font-bold tracking-tight text-white">TheraClick</span>
             </div>
-
-            {/* Center: Tagline — desktop only */}
-            <div className="hidden flex-1 flex-col justify-center py-8 lg:flex">
-              <h2 className={`text-[clamp(2rem,3.5vw,3rem)] font-bold leading-[1.15] text-white
-                transition-all duration-700 delay-[400ms]
-                ${phase >= 5 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
-                Your mind
-                <span className="block text-[#F5C842]">deserves care.</span>
-              </h2>
-              <p className={`mt-4 max-w-[360px] text-[15px] font-light leading-relaxed text-white/75
-                transition-all duration-500 delay-500
-                ${phase >= 5 ? "opacity-100" : "opacity-0"}`}>
-                Professional counseling, peer support, and AI-powered wellness — built for African university students.
-              </p>
-            </div>
-
-            {/* Bottom: Stats — desktop only */}
-            <div className={`hidden items-center gap-6 rounded-[20px]
-              border border-white/[0.12] bg-white/[0.08] p-5 backdrop-blur-2xl lg:flex
-              transition-all duration-700 delay-700
-              ${phase >= 5 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
-              <StatCell value="100%" label="Anonymous" />
-              <div className="h-9 w-px bg-white/15" />
-              <StatCell value="24/7" label="Always available" />
-              <div className="h-9 w-px bg-white/15" />
-              <StatCell value="Free" label="No hidden costs" />
-            </div>
-
-            {/* Mobile: compact brand + tagline */}
-            <div className="flex flex-1 items-end justify-between lg:hidden">
-              <div className="flex items-center gap-2">
-                <BrainMark className="h-7 w-7 text-white" />
-                <span className="text-base font-bold text-white">Theraklick</span>
-              </div>
-              <p className="text-right text-[1.1rem] font-bold leading-tight text-white">
-                Your mind<br />
-                <span className="text-[#F5C842]">deserves care.</span>
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* ── RIGHT HALF: CTAs with frosted glass feel ── */}
-        <div className={`relative z-10 flex flex-1 flex-col -mt-6 rounded-t-[28px] px-6 py-8
-          bg-white
-          shadow-2xl shadow-black/5
-          transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]
-          lg:mt-0 lg:rounded-none lg:px-12 lg:shadow-none
-          ${phase >= 5
-            ? "translate-y-0 opacity-100 lg:translate-x-0"
-            : "translate-y-[60px] opacity-0 lg:translate-y-0 lg:translate-x-[60px]"}`}>
-
-          {/* Subtle decorative gradient accent — top edge glow */}
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] rounded-t-[28px] bg-gradient-to-r from-transparent via-[#2BB5A0]/40 to-transparent lg:rounded-none" />
-
-          {/* Faint radial glow behind the card content */}
-          <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
-            h-[500px] w-[500px] rounded-full bg-[#2BB5A0]/[0.04] blur-[100px]" />
-
-          <div className="relative mx-auto flex w-full max-w-sm flex-1 flex-col justify-center">
-            {/* Brain logo */}
-            <div className={`transition-all duration-700 delay-100
-              ease-[cubic-bezier(0.34,1.56,0.64,1)]
-              ${phase >= 5 ? "opacity-100 scale-100" : "opacity-0 scale-75"}`}>
-              <BrainMark className="h-14 w-14 text-[#0F4F47] md:h-16 md:w-16" />
-            </div>
-
-            {/* Welcome */}
-            <p className={`mt-6 text-[13px] font-medium uppercase tracking-[0.35em] text-gray-500
-              transition-all duration-500 delay-200
-              ${phase >= 5 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}>
-              Welcome to
-            </p>
-
-            <h1 className={`mt-1 text-[32px] font-extrabold tracking-[0.08em] text-gray-900
-              transition-all duration-[600ms] delay-300 md:text-[40px]
-              ${phase >= 5 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
-              THERAKLICK
-            </h1>
-
-            <p className={`mt-2 text-[15px] font-medium text-gray-600
-              transition-all duration-500 delay-[400ms]
-              ${phase >= 5 ? "opacity-100" : "opacity-0"}`}>
-              Your safe space for mental wellness.
-            </p>
-
-            {/* CTAs */}
-            <div className={`mt-10 space-y-4
-              transition-all duration-500 delay-500
-              ${phase >= 5 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-
-              {/* Primary CTA */}
-              <button
-                onClick={() => router.push("/signup/student")}
-                className="group flex w-full items-center justify-center gap-2 rounded-full
-                  bg-[#F5C842] py-4 text-[15px] font-bold text-[#0D1F1D]
-                  shadow-lg shadow-[#F5C842]/30
-                  transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
-                  hover:scale-[1.03] hover:bg-[#FFD95A] hover:shadow-xl
-                  active:scale-[0.97]"
-              >
-                Get started — It&apos;s free
-                <ArrowRight className="h-4 w-4 transition-transform duration-300
-                  group-hover:translate-x-1.5" />
+            <div className="hidden items-center gap-8 md:flex">
+              <button onClick={() => scrollTo("features")} className="text-[13px] font-medium text-white/70 transition-colors hover:text-white">Features</button>
+              <button onClick={() => scrollTo("how-it-works")} className="text-[13px] font-medium text-white/70 transition-colors hover:text-white">How It Works</button>
+              <button onClick={() => scrollTo("for-pros")} className="text-[13px] font-medium text-white/70 transition-colors hover:text-white">For Counselors</button>
+              <button onClick={() => scrollTo("forums")} className="text-[13px] font-medium text-white/70 transition-colors hover:text-white">Community</button>
+              <button onClick={() => router.push("/login?role=student")} className="text-[13px] font-medium text-white/70 transition-colors hover:text-white">Sign In</button>
+              <button onClick={() => router.push("/signup/student")}
+                className="rounded-full bg-[#F5C842] px-5 py-2 text-[13px] font-bold text-[#0D1F1D] transition-all hover:bg-[#FFD95A]">
+                Get Started Free
               </button>
-
-              <p className="text-center text-[13px] text-gray-500">
-                Already have an account?{" "}
-                <button
-                  onClick={() => router.push("/login?role=student")}
-                  className="font-bold text-[#0F4F47] underline-offset-4
-                    transition-all duration-200 hover:text-[#1A7A6E] hover:underline"
-                >
-                  Sign in
-                </button>
-              </p>
             </div>
-
-            {/* Divider */}
-            <div className={`mt-8 flex items-center gap-4
-              transition-all duration-500 delay-[600ms]
-              ${phase >= 5 ? "opacity-100" : "opacity-0"}`}>
-              <div className="h-px flex-1 bg-gray-200" />
-              <span className="text-[11px] uppercase tracking-widest text-gray-400">or</span>
-              <div className="h-px flex-1 bg-gray-200" />
+            <div className="flex items-center gap-3 md:hidden">
+              <button onClick={() => router.push("/login?role=student")} className="text-[13px] font-medium text-white/70">Sign In</button>
+              <button onClick={() => router.push("/signup/student")}
+                className="rounded-full bg-[#F5C842] px-4 py-1.5 text-[12px] font-bold text-[#0D1F1D]">Get Started</button>
             </div>
+          </nav>
 
-            {/* Helper roles */}
-            <div className={`mt-6
-              transition-all duration-500 delay-[650ms]
-              ${phase >= 5 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-              <p className="mb-4 text-center text-[12px] font-medium text-gray-500">Want to help others?</p>
-              <div className="flex justify-center gap-3">
-                <button
-                  onClick={() => router.push("/login?role=peer-mentor")}
-                  className="rounded-full border-2 border-[#0F4F47] bg-transparent px-6 py-2.5
-                    text-[13px] font-bold text-[#0F4F47]
-                    transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
-                    hover:scale-[1.04] hover:bg-[#0F4F47] hover:text-white
-                    active:scale-[0.97]"
-                >
-                  Peer mentor
-                </button>
-                <button
-                  onClick={() => router.push("/login?role=counselor")}
-                  className="rounded-full border-2 border-[#0F4F47] bg-transparent px-6 py-2.5
-                    text-[13px] font-bold text-[#0F4F47]
-                    transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
-                    hover:scale-[1.04] hover:bg-[#0F4F47] hover:text-white
-                    active:scale-[0.97]"
-                >
-                  Counselor
-                </button>
+          {/* Hero content */}
+          <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 text-center">
+            <h1 className={`max-w-[800px] text-[clamp(2rem,5.5vw,4rem)] font-extrabold leading-[1.08] text-white
+              transition-all duration-700 delay-200 ${landed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
+              Your Mental Health Journey{" "}
+              <span className="text-[#F5C842]">Starts Here</span>
+            </h1>
+            <p className={`mt-5 max-w-[600px] text-[clamp(15px,1.8vw,18px)] leading-relaxed text-white/70
+              transition-all duration-500 delay-300 ${landed ? "opacity-100" : "opacity-0"}`}>
+              TheraClick connects Ghanaian students with certified counselors and peer mentors — anytime, anywhere, in the moments that matter most.
+            </p>
+            <div className={`mt-10 flex flex-col items-center gap-4 sm:flex-row
+              transition-all duration-500 delay-[400ms] ${landed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+              <button onClick={() => router.push("/signup/student")} className={goldBtn}>
+                Get Started Free
+                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1.5" />
+              </button>
+              <button onClick={() => scrollTo("how-it-works")} className={outlineBtn}>
+                See How It Works
+              </button>
+            </div>
+            <p className={`mt-6 text-[13px] font-medium text-white/40
+              transition-all duration-500 delay-500 ${landed ? "opacity-100" : "opacity-0"}`}>
+              Built for students. Trusted by counselors. Powered by AI.
+            </p>
+          </div>
+
+          {/* Scroll hint */}
+          <div className={`relative z-10 flex justify-center pb-8 transition-all duration-500 delay-700 ${landed ? "opacity-100" : "opacity-0"}`}>
+            <div className="flex h-8 w-5 items-start justify-center rounded-full border-2 border-white/20 p-1">
+              <div className="h-2 w-1 animate-bounce rounded-full bg-white/50" />
+            </div>
+          </div>
+        </section>
+
+        {/* ────────── STATS BAR ────────── */}
+        <section ref={stats.ref} className={`bg-white py-12 md:py-16 ${anim(stats.visible)}`}>
+          <div className="mx-auto grid max-w-5xl grid-cols-2 gap-8 px-6 md:grid-cols-4">
+            {[
+              { value: "500+", label: "Students Supported" },
+              { value: "50+", label: "Certified Counselors" },
+              { value: "200+", label: "Peer Mentors" },
+              { value: "24/7", label: "AI Support Available" },
+            ].map((s) => (
+              <div key={s.label} className="text-center">
+                <p className="text-[clamp(1.8rem,3vw,2.4rem)] font-extrabold text-[#0F4F47]">{s.value}</p>
+                <p className="mt-1 text-[13px] font-medium text-gray-500">{s.label}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ────────── PROBLEM ────────── */}
+        <section ref={problem.ref} className={`bg-[#0F4F47] py-20 md:py-28 ${anim(problem.visible)}`}>
+          <div className="mx-auto max-w-3xl px-6">
+            <p className="text-center text-[13px] font-medium uppercase tracking-[0.25em] text-[#F5C842]/70">Why TheraClick?</p>
+            <h2 className="mt-4 text-center text-[clamp(1.6rem,3.5vw,2.4rem)] font-extrabold leading-tight text-white">
+              Students are struggling in silence.{" "}
+              <span className="text-[#F5C842]">That ends now.</span>
+            </h2>
+            <p className="mx-auto mt-8 max-w-2xl text-center text-[15px] leading-[1.8] text-white/65">
+              1 in 4 university students in Ghana experiences anxiety, depression, or overwhelming stress — yet most never seek help. The stigma is real. The waitlists are long. The campus counselor&apos;s door is often closed.
+            </p>
+            <p className="mx-auto mt-6 max-w-2xl text-center text-[15px] leading-[1.8] text-white/65">
+              TheraClick was built because students deserve better. Better access, better privacy, and better support — exactly when they need it.
+            </p>
+          </div>
+        </section>
+
+        {/* ────────── FEATURES ────────── */}
+        <section id="features" ref={features.ref} className={`bg-white py-20 md:py-28 ${anim(features.visible)}`}>
+          <div className="mx-auto max-w-6xl px-6">
+            <p className="text-center text-[13px] font-medium uppercase tracking-[0.25em] text-[#2BB5A0]">Everything You Need</p>
+            <h2 className="mt-3 text-center text-[clamp(1.6rem,3.5vw,2.4rem)] font-extrabold text-gray-900">
+              One platform. Total support.
+            </h2>
+            <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {[
+                {
+                  icon: Sparkles, title: "AI-Powered Chat",
+                  desc: "Talk to our Gemini-powered AI therapist anytime — day or night. It understands Ghana's unique student pressures, detects crisis signals, and always knows when to connect you with a real human.",
+                },
+                {
+                  icon: BadgeCheck, title: "Certified Counselors",
+                  desc: "Browse verified professional counselors, filter by specialization, check availability, and book sessions that fit your schedule. Real help, made simple.",
+                },
+                {
+                  icon: Users, title: "Peer Mentors",
+                  desc: "Sometimes you just need someone who gets it. Connect with trained peer mentors from your school who've walked the same path.",
+                },
+                {
+                  icon: Phone, title: "Voice & Video Calls",
+                  desc: "No awkward commute. No waiting rooms. Have real, face-to-face counseling sessions from the privacy of your dorm room or anywhere you feel safe.",
+                },
+                {
+                  icon: MessageCircle, title: "Community Forums",
+                  desc: "Join topic rooms on Exam Stress, Anxiety, Relationships, First Year Life, and Self Care. Share, support, and be supported — anonymously if you prefer.",
+                },
+                {
+                  icon: Shield, title: "Your Privacy, Protected",
+                  desc: "Post anonymously. Chat confidentially. TheraClick never shares your identity without your permission. You control your story.",
+                },
+              ].map((card) => (
+                <div key={card.title}
+                  className="group rounded-2xl border border-gray-100 bg-gray-50/50 p-7 transition-all duration-300 hover:border-[#2BB5A0]/20 hover:shadow-lg hover:shadow-[#2BB5A0]/5">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#0F4F47] text-white transition-transform duration-300 group-hover:scale-110">
+                    <card.icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="mt-5 text-[17px] font-bold text-gray-900">{card.title}</h3>
+                  <p className="mt-2 text-[14px] leading-[1.7] text-gray-500">{card.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ────────── HOW IT WORKS ────────── */}
+        <section id="how-it-works" ref={howItWorks.ref} className={`bg-[#F8FAF9] py-20 md:py-28 ${anim(howItWorks.visible)}`}>
+          <div className="mx-auto max-w-5xl px-6">
+            <p className="text-center text-[13px] font-medium uppercase tracking-[0.25em] text-[#2BB5A0]">Simple by Design</p>
+            <h2 className="mt-3 text-center text-[clamp(1.6rem,3.5vw,2.4rem)] font-extrabold text-gray-900">
+              From sign-up to support in under 2 minutes.
+            </h2>
+            <div className="relative mt-16 grid grid-cols-1 gap-14 md:grid-cols-3 md:gap-8">
+              <div className="pointer-events-none absolute left-0 right-0 top-[52px] hidden h-[2px] bg-gradient-to-r from-transparent via-[#2BB5A0]/25 to-transparent md:block" />
+              {[
+                {
+                  step: "01", title: "Create Your Account",
+                  desc: "Sign up as a student in seconds. Choose to use your name or stay completely anonymous — we'll generate a private identity like \"calmzebra42\" so no one knows it's you.",
+                },
+                {
+                  step: "02", title: "Tell Us What You Need",
+                  desc: "Browse counselors by specialization, connect with a peer mentor from your school, or start chatting with our AI — whatever feels right for right now.",
+                },
+                {
+                  step: "03", title: "Get Real Support",
+                  desc: "Book a session, join a live video call, send a voice message, or drop into the community forum. Support fits your schedule, your comfort, and your needs.",
+                },
+              ].map((s) => (
+                <div key={s.step} className="relative flex flex-col items-center text-center">
+                  <div className="relative z-10 flex h-[104px] w-[104px] items-center justify-center rounded-full bg-[#0F4F47] shadow-xl shadow-[#0F4F47]/15">
+                    <span className="text-[28px] font-extrabold text-[#F5C842]">{s.step}</span>
+                  </div>
+                  <h3 className="mt-6 text-[18px] font-bold text-gray-900">{s.title}</h3>
+                  <p className="mt-3 max-w-[320px] text-[14px] leading-[1.7] text-gray-500">{s.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ────────── FOR COUNSELORS & MENTORS ────────── */}
+        <section id="for-pros" ref={forPros.ref} className={`bg-white py-20 md:py-28 ${anim(forPros.visible)}`}>
+          <div className="mx-auto max-w-5xl px-6">
+            <p className="text-center text-[13px] font-medium uppercase tracking-[0.25em] text-[#2BB5A0]">Join the Network</p>
+            <h2 className="mt-3 text-center text-[clamp(1.6rem,3.5vw,2.4rem)] font-extrabold text-gray-900">
+              Make a real difference in students&apos; lives.
+            </h2>
+            <div className="mt-14 grid grid-cols-1 gap-8 md:grid-cols-2">
+              {/* Counselors */}
+              <div className="rounded-2xl border border-gray-100 bg-gray-50/50 p-8">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#0F4F47] text-white">
+                  <BadgeCheck className="h-6 w-6" />
+                </div>
+                <h3 className="mt-5 text-[20px] font-bold text-gray-900">For Certified Counselors</h3>
+                <p className="mt-3 text-[14px] leading-[1.7] text-gray-500">
+                  Expand your reach beyond the physical campus. Manage your availability, accept bookings, and conduct sessions entirely online. TheraClick handles the scheduling so you can focus on what matters — your students.
+                </p>
+                <ul className="mt-6 space-y-3">
+                  {[
+                    "Manage your schedule & availability",
+                    "Real-time messaging with students",
+                    "Voice & video session tools built in",
+                    "Dashboard to track your impact",
+                  ].map((t) => (
+                    <li key={t} className="flex items-start gap-3 text-[14px] text-gray-600">
+                      <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#2BB5A0]" />
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              {/* Peer Mentors */}
+              <div className="rounded-2xl border border-gray-100 bg-gray-50/50 p-8">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#F5C842] text-[#0D1F1D]">
+                  <Users className="h-6 w-6" />
+                </div>
+                <h3 className="mt-5 text-[20px] font-bold text-gray-900">For Peer Mentors</h3>
+                <p className="mt-3 text-[14px] leading-[1.7] text-gray-500">
+                  You don&apos;t need a degree to change someone&apos;s life. If you&apos;ve navigated university stress and want to give back, become a TheraClick peer mentor. We&apos;ll train you, support you, and connect you with students who need your experience.
+                </p>
+                <ul className="mt-6 space-y-3">
+                  {[
+                    "Help students from your own school",
+                    "Structured support and training",
+                    "Flexible, on-your-own-time messaging",
+                    "Build skills that last a lifetime",
+                  ].map((t) => (
+                    <li key={t} className="flex items-start gap-3 text-[14px] text-gray-600">
+                      <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#F5C842]" />
+                      {t}
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
-
-            {/* Admin — barely visible */}
-            <button
-              onClick={() => router.push("/admin/login")}
-              className="mt-8 self-center text-[11px] text-gray-300 transition-colors hover:text-gray-500"
-            >
-              Admin
-            </button>
+            <div className="mt-10 text-center">
+              <button onClick={() => router.push("/role-selection")}
+                className="inline-flex items-center gap-2 text-[15px] font-bold text-[#0F4F47] transition-colors hover:text-[#2BB5A0]">
+                Apply to Join Our Network <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+        </section>
 
-function StatCell({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="flex flex-1 flex-col items-center gap-1">
-      <span className="text-[clamp(1.4rem,2.5vw,1.8rem)] font-extrabold tabular-nums text-[#F5C842]">
-        {value}
-      </span>
-      <span className="whitespace-nowrap text-[0.72rem] uppercase tracking-[0.05em] text-white/65">
-        {label}
-      </span>
+        {/* ────────── AI HIGHLIGHT ────────── */}
+        <section ref={aiSection.ref} className={`bg-[#0F4F47] py-20 md:py-28 ${anim(aiSection.visible)}`}>
+          <div className="mx-auto max-w-4xl px-6">
+            <p className="text-center text-[13px] font-medium uppercase tracking-[0.25em] text-[#F5C842]/70">Meet Your AI Companion</p>
+            <h2 className="mt-3 text-center text-[clamp(1.6rem,3.5vw,2.4rem)] font-extrabold text-white">
+              Always on. Always listening. Always safe.
+            </h2>
+            <p className="mx-auto mt-8 max-w-2xl text-center text-[15px] leading-[1.8] text-white/65">
+              TheraClick&apos;s AI chat is powered by Gemini 2.0 and built specifically for the Ghanaian student experience. It understands the pressure of WASSCE results, KNUST or UG admission stress, family expectations, and the loneliness that can come with a new semester.
+            </p>
+            <p className="mx-auto mt-5 max-w-2xl text-center text-[15px] leading-[1.8] text-white/65">
+              And when things get serious — when the words suggest more than stress — our system detects it and immediately surfaces crisis resources and connects you with a real counselor.
+            </p>
+            <div className="mx-auto mt-10 flex max-w-xl flex-wrap justify-center gap-3">
+              {[
+                "Multi-thread conversations",
+                "Voice input supported",
+                "Crisis detection & escalation",
+                "Auto-named chat threads",
+                "Available 24/7",
+              ].map((pill) => (
+                <span key={pill} className="rounded-full border border-white/15 bg-white/[0.06] px-5 py-2.5 text-[13px] font-medium text-white/75">
+                  {pill}
+                </span>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ────────── FORUMS / COMMUNITY ────────── */}
+        <section id="forums" ref={forums.ref} className={`bg-white py-20 md:py-28 ${anim(forums.visible)}`}>
+          <div className="mx-auto max-w-5xl px-6">
+            <p className="text-center text-[13px] font-medium uppercase tracking-[0.25em] text-[#2BB5A0]">You&apos;re Not Alone</p>
+            <h2 className="mt-3 text-center text-[clamp(1.6rem,3.5vw,2.4rem)] font-extrabold text-gray-900">
+              A community that actually understands.
+            </h2>
+            <p className="mx-auto mt-5 max-w-2xl text-center text-[15px] leading-[1.7] text-gray-500">
+              TheraClick&apos;s forums are a judgment-free space where students talk about the real stuff. Six dedicated rooms cover the topics that matter most to student life.
+            </p>
+            <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+              {[
+                { emoji: "💬", name: "General Support" },
+                { emoji: "📚", name: "Exam Stress" },
+                { emoji: "😟", name: "Anxiety & Overwhelm" },
+                { emoji: "💔", name: "Relationships" },
+                { emoji: "🎓", name: "First Year Struggles" },
+                { emoji: "🌿", name: "Self Care & Wellness" },
+              ].map((room) => (
+                <div key={room.name}
+                  className="flex flex-col items-center rounded-2xl border border-gray-100 bg-gray-50/50 p-5 text-center transition-all duration-300 hover:border-[#2BB5A0]/20 hover:shadow-md">
+                  <span className="text-[28px]">{room.emoji}</span>
+                  <p className="mt-2 text-[13px] font-semibold text-gray-700">{room.name}</p>
+                </div>
+              ))}
+            </div>
+            <p className="mx-auto mt-8 max-w-lg text-center text-[14px] text-gray-400">
+              Post with your name or completely anonymously. React, reply, and support others — or just read and know you&apos;re not the only one feeling this way.
+            </p>
+          </div>
+        </section>
+
+        {/* ────────── TRUST / SAFETY ────────── */}
+        <section ref={trust.ref} className={`bg-[#F8FAF9] py-20 md:py-28 ${anim(trust.visible)}`}>
+          <div className="mx-auto max-w-5xl px-6">
+            <p className="text-center text-[13px] font-medium uppercase tracking-[0.25em] text-[#2BB5A0]">Built Responsibly</p>
+            <h2 className="mt-3 text-center text-[clamp(1.6rem,3.5vw,2.4rem)] font-extrabold text-gray-900">
+              Your safety is our non-negotiable.
+            </h2>
+            <div className="mt-14 grid grid-cols-1 gap-8 md:grid-cols-3">
+              {[
+                {
+                  icon: Lock, title: "Confidential by Default",
+                  desc: "All conversations are private. Anonymous posting means your identity stays yours. We will never expose who you are without your explicit consent.",
+                },
+                {
+                  icon: AlertTriangle, title: "Crisis-Ready",
+                  desc: "Our AI scans for self-harm and crisis language in real time. When detected, it immediately responds with safety resources and escalates to a human counselor — because some things can't wait.",
+                },
+                {
+                  icon: BadgeCheck, title: "Verified Professionals Only",
+                  desc: "Every counselor on TheraClick goes through an approval process. No imposters. No unqualified advice. Just real, vetted mental health professionals.",
+                },
+              ].map((item) => (
+                <div key={item.title} className="rounded-2xl border border-gray-100 bg-white p-7 text-center shadow-sm">
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#0F4F47]/[0.08]">
+                    <item.icon className="h-6 w-6 text-[#0F4F47]" />
+                  </div>
+                  <h3 className="mt-5 text-[17px] font-bold text-gray-900">{item.title}</h3>
+                  <p className="mt-3 text-[14px] leading-[1.7] text-gray-500">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ────────── TESTIMONIALS ────────── */}
+        <section ref={testimonials.ref} className={`bg-white py-20 md:py-28 ${anim(testimonials.visible)}`}>
+          <div className="mx-auto max-w-5xl px-6">
+            <p className="text-center text-[13px] font-medium uppercase tracking-[0.25em] text-[#2BB5A0]">Real Stories</p>
+            <h2 className="mt-3 text-center text-[clamp(1.6rem,3.5vw,2.4rem)] font-extrabold text-gray-900">
+              Students just like you are finding relief.
+            </h2>
+            <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-3">
+              {[
+                {
+                  quote: "I was too embarrassed to walk into the counseling center on campus. TheraClick let me get help without anyone knowing. I didn't realize how much I needed it until I started.",
+                  author: "Level 200 Student, University of Ghana",
+                },
+                {
+                  quote: "Exam season nearly broke me last semester. The AI chat at 2am when I couldn't sleep was exactly what I needed. It felt like someone actually understood.",
+                  author: "Engineering Student, KNUST",
+                },
+                {
+                  quote: "As a peer mentor, this platform makes it so easy to reach students who need me. The messaging and call tools work seamlessly and I can actually track the conversations I need to follow up on.",
+                  author: "Peer Mentor, UCC",
+                },
+              ].map((t, i) => (
+                <div key={i} className="flex flex-col rounded-2xl border border-gray-100 bg-gray-50/50 p-7">
+                  <div className="mb-4 flex gap-1">
+                    {[...Array(5)].map((_, j) => (
+                      <Star key={j} className="h-4 w-4 fill-[#F5C842] text-[#F5C842]" />
+                    ))}
+                  </div>
+                  <p className="flex-1 text-[14px] italic leading-[1.7] text-gray-600">
+                    &ldquo;{t.quote}&rdquo;
+                  </p>
+                  <p className="mt-5 text-[13px] font-semibold text-gray-400">— {t.author}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ────────── FOOTER ────────── */}
+        <footer className="border-t border-white/10 bg-[#0A3C34] py-14">
+          <div className="mx-auto max-w-6xl px-6">
+            {/* Top */}
+            <div className="grid grid-cols-1 gap-10 md:grid-cols-4">
+              {/* Brand */}
+              <div className="md:col-span-1">
+                <div className="flex items-center gap-2">
+                  <BrainMark className="h-8 w-8" />
+                  <span className="text-[16px] font-bold text-white">TheraClick</span>
+                </div>
+                <p className="mt-4 max-w-[240px] text-[13px] leading-relaxed text-white/40">
+                  Mental wellness, made accessible for every Ghanaian student.
+                </p>
+              </div>
+              {/* Links */}
+              <div>
+                <p className="text-[12px] font-semibold uppercase tracking-widest text-white/30">Platform</p>
+                <div className="mt-4 space-y-3">
+                  {[
+                    { label: "Students", href: "/students" },
+                    { label: "Counselors", href: "/counselors" },
+                    { label: "Peer Mentors", href: "/mentors" },
+                    { label: "Partner Portal", href: "/admin/login" },
+                  ].map((l) => (
+                    <button key={l.label} onClick={() => router.push(l.href)}
+                      className="block text-[13px] text-white/50 transition-colors hover:text-white/80">{l.label}</button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="text-[12px] font-semibold uppercase tracking-widest text-white/30">Support</p>
+                <div className="mt-4 space-y-3">
+                  {[
+                    { label: "Help Center", href: "/help" },
+                    { label: "Report an Issue", href: "/report" },
+                    { label: "Contact Us", href: "/contact" },
+                    { label: "Privacy Policy", href: "/privacy" },
+                  ].map((l) => (
+                    <button key={l.label} onClick={() => router.push(l.href)}
+                      className="block text-[13px] text-white/50 transition-colors hover:text-white/80">{l.label}</button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="text-[12px] font-semibold uppercase tracking-widest text-white/30">Community</p>
+                <div className="mt-4 space-y-3">
+                  {[
+                    { label: "Forums", href: "/forums" },
+                    { label: "Blog", href: "/blog" },
+                    { label: "Campus Partners", href: "/partners" },
+                    { label: "About Us", href: "/about" },
+                  ].map((l) => (
+                    <button key={l.label} onClick={() => router.push(l.href)}
+                      className="block text-[13px] text-white/50 transition-colors hover:text-white/80">{l.label}</button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            {/* Bottom */}
+            <div className="mt-12 border-t border-white/[0.06] pt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
+              <p className="text-[12px] text-white/25">
+                &copy; {new Date().getFullYear()} TheraClick. Built with care for Ghana&apos;s student community. 🇬🇭
+              </p>
+              <div className="flex gap-4">
+                <button onClick={() => router.push("/privacy")} className="text-[12px] text-white/25 hover:text-white/50 transition-colors">Privacy Policy</button>
+                <button onClick={() => router.push("/contact")} className="text-[12px] text-white/25 hover:text-white/50 transition-colors">Contact</button>
+              </div>
+            </div>
+          </div>
+        </footer>
+      </div>
     </div>
   );
 }

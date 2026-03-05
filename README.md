@@ -1,4 +1,4 @@
-# Theraklick
+# TheraClick
 
 A student mental health platform focused on Africa (starting with Ghana), providing fast, anonymous, layered mental health support.
 
@@ -108,7 +108,7 @@ npm run dev
 ├── components/
 │   ├── ui/                         # Reusable UI components
 │   ├── BottomNav.tsx               # Mobile bottom navigation
-│   └── Logo.tsx                    # Theraklick logo component
+│   └── Logo.tsx                    # TheraClick logo component
 └── lib/
     └── utils.ts                    # Utility functions
 ```

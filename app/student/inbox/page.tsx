@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { LayoutWrapper } from "@/components/LayoutWrapper";
 import {
@@ -52,7 +52,7 @@ function formatTimestamp(date?: Date): string {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-export default function StudentInboxPage() {
+function StudentInboxPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { profile } = useAuth();
@@ -580,5 +580,21 @@ export default function StudentInboxPage() {
         </div>
       </div>
     </LayoutWrapper>
+  );
+}
+
+export default function StudentInboxPage() {
+  return (
+    <Suspense
+      fallback={
+        <LayoutWrapper>
+          <div className="flex min-h-[40vh] items-center justify-center text-sm text-gray-500">
+            Loading inbox…
+          </div>
+        </LayoutWrapper>
+      }
+    >
+      <StudentInboxPageContent />
+    </Suspense>
   );
 }

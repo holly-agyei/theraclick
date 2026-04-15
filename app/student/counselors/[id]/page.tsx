@@ -54,7 +54,7 @@ export default function CounselorProfilePage() {
   useEffect(() => {
     async function loadCounselor() {
       try {
-        if (db && !counselorId.startsWith("demo-")) {
+        if (db) {
           const docSnap = await getDoc(doc(db, "users", counselorId));
           if (docSnap.exists()) {
             const data = docSnap.data();
@@ -72,6 +72,7 @@ export default function CounselorProfilePage() {
         }
       } catch (e) {
         console.error(e);
+        setCounselor(null);
       } finally {
         setLoading(false);
       }
@@ -81,7 +82,7 @@ export default function CounselorProfilePage() {
 
   useEffect(() => {
     async function loadAvailability() {
-      if (!db || counselorId.startsWith("demo-")) return;
+      if (!db) return;
       try {
         const snap = await getDoc(doc(db, "counselorAvailability", counselorId));
         if (snap.exists()) {

@@ -25,81 +25,6 @@ interface PeerMentor {
   responseTime?: string;
 }
 
-const demoPeerMentors: PeerMentor[] = [
-  {
-    uid: "mentor-1",
-    fullName: "Esi Owusu",
-    specialization: "Academic Stress",
-    about: "I struggled with burnout in Level 200 and came out stronger. Here to help you do the same.",
-    school: "University of Ghana (UG)",
-    level: "Level 300 · Psychology",
-    conversationsCount: 89,
-    isOnline: true,
-    topics: ["Exam stress", "Time management"],
-    responseTime: "Usually replies within 1 hour",
-  },
-  {
-    uid: "mentor-2",
-    fullName: "Yaw Mensah",
-    specialization: "First Year Transition",
-    about: "Final year engineer who remembers how overwhelming Level 100 was. Let me help you settle in.",
-    school: "KNUST",
-    level: "Level 400 · Engineering",
-    conversationsCount: 156,
-    isOnline: true,
-    topics: ["First year life", "Campus navigation"],
-    responseTime: "Usually replies within 30 mins",
-  },
-  {
-    uid: "mentor-3",
-    fullName: "Adwoa Asare",
-    specialization: "Anxiety & Overthinking",
-    about: "Medical student who has learned to manage anxiety. Happy to share what actually works.",
-    school: "University of Cape Coast (UCC)",
-    level: "Level 300 · Medicine",
-    conversationsCount: 203,
-    isOnline: false,
-    topics: ["Anxiety", "Overthinking", "Self-doubt"],
-    responseTime: "Usually replies within 2 hours",
-  },
-  {
-    uid: "mentor-4",
-    fullName: "Kofi Darko",
-    specialization: "Relationships & Social Life",
-    about: "Sometimes you just need someone your age to talk to. No judgment, just real conversation.",
-    school: "Ashesi University",
-    level: "Level 300 · Business",
-    conversationsCount: 67,
-    isOnline: true,
-    topics: ["Relationships", "Social anxiety", "Loneliness"],
-    responseTime: "Usually replies within 1 hour",
-  },
-  {
-    uid: "mentor-5",
-    fullName: "Akua Boateng",
-    specialization: "Study Tips & Motivation",
-    about: "Dean's list student sharing practical study strategies that actually work for Ghanaian universities.",
-    school: "University of Ghana (UG)",
-    level: "Level 400 · Economics",
-    conversationsCount: 142,
-    isOnline: false,
-    topics: ["Study habits", "Motivation", "GPA recovery"],
-    responseTime: "Usually replies within 3 hours",
-  },
-  {
-    uid: "mentor-6",
-    fullName: "Nana Ama Poku",
-    specialization: "Family Pressure",
-    about: "Navigating the 'why aren't you studying medicine?' conversation since Level 100. I get it.",
-    school: "GIMPA",
-    level: "Level 300 · Communications",
-    conversationsCount: 94,
-    isOnline: true,
-    topics: ["Family expectations", "Identity", "Cultural pressure"],
-    responseTime: "Usually replies within 1 hour",
-  },
-];
-
 const specializations = [
   "All",
   "Available Now",
@@ -153,13 +78,14 @@ export default function PeerMentorsPage() {
               } as PeerMentor;
             });
           if (!mounted) return;
-          setMentors(list.length > 0 ? list : demoPeerMentors);
+          setMentors(list);
         } else {
-          setMentors(demoPeerMentors);
+          setMentors([]);
         }
-      } catch {
+      } catch (e) {
+        console.error("Error loading mentors:", e);
         if (!mounted) return;
-        setMentors(demoPeerMentors);
+        setMentors([]);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -286,7 +212,9 @@ export default function PeerMentorsPage() {
 
                     <div className="mt-4 flex items-center justify-center gap-1.5">
                       <h3 className="text-[15px] font-bold text-gray-900 dark:text-gray-100 group-hover:text-[#0F4F47]">{m.fullName}</h3>
-                      <BadgeCheck className="h-4 w-4 shrink-0 text-[#2BB5A0]" title="Verified mentor" />
+                      <span className="inline-flex" title="Verified mentor">
+                        <BadgeCheck className="h-4 w-4 shrink-0 text-[#2BB5A0]" aria-hidden />
+                      </span>
                     </div>
 
                     <div className="mt-1 flex items-center justify-center gap-1 text-[12px] text-gray-500 dark:text-gray-400">

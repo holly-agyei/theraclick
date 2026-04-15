@@ -23,7 +23,6 @@ import {
   AlertTriangle,
   CheckCircle,
   BadgeCheck,
-  Star,
   ChevronRight,
   ExternalLink,
 } from "lucide-react";
@@ -187,10 +186,10 @@ export default function LandingPage() {
         <section ref={stats.ref} className={`bg-white py-12 md:py-16 ${anim(stats.visible)}`}>
           <div className="mx-auto grid max-w-5xl grid-cols-2 gap-8 px-6 md:grid-cols-4">
             {[
-              { value: "500+", label: "Students Supported" },
-              { value: "50+", label: "Certified Counselors" },
-              { value: "200+", label: "Peer Mentors" },
               { value: "24/7", label: "AI Support Available" },
+              { value: "Free", label: "For All Students" },
+              { value: "Private", label: "Anonymous by Default" },
+              { value: "Verified", label: "Certified Counselors" },
             ].map((s) => (
               <div key={s.label} className="text-center">
                 <p className="text-[clamp(1.8rem,3vw,2.4rem)] font-extrabold text-[#0F4F47]">{s.value}</p>
@@ -209,7 +208,7 @@ export default function LandingPage() {
               <span className="text-[#F5C842]">That ends now.</span>
             </h2>
             <p className="mx-auto mt-8 max-w-2xl text-center text-[15px] leading-[1.8] text-white/65">
-              1 in 4 university students in Ghana experiences anxiety, depression, or overwhelming stress — yet most never seek help. The stigma is real. The waitlists are long. The campus counselor&apos;s door is often closed.
+              Too many university students in Ghana experience anxiety, depression, or overwhelming stress — yet most never seek help. The stigma is real. The waitlists are long. The campus counselor&apos;s door is often closed.
             </p>
             <p className="mx-auto mt-6 max-w-2xl text-center text-[15px] leading-[1.8] text-white/65">
               Theraklick was built because students deserve better. Better access, better privacy, and better support — exactly when they need it.
@@ -371,7 +370,7 @@ export default function LandingPage() {
               Always on. Always listening. Always safe.
             </h2>
             <p className="mx-auto mt-8 max-w-2xl text-center text-[15px] leading-[1.8] text-white/65">
-              Theraklick&apos;s AI chat is powered by Gemini 2.0 and built specifically for the Ghanaian student experience. It understands the pressure of WASSCE results, KNUST or UG admission stress, family expectations, and the loneliness that can come with a new semester.
+              Theraklick&apos;s AI chat is powered by Gemini and built specifically for the Ghanaian student experience. It understands the pressure of WASSCE results, KNUST or UG admission stress, family expectations, and the loneliness that can come with a new semester.
             </p>
             <p className="mx-auto mt-5 max-w-2xl text-center text-[15px] leading-[1.8] text-white/65">
               And when things get serious — when the words suggest more than stress — our system detects it and immediately surfaces crisis resources and connects you with a real counselor.
@@ -458,40 +457,24 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ────────── TESTIMONIALS ────────── */}
+        {/* ────────── CTA SECTION ────────── */}
         <section ref={testimonials.ref} className={`bg-white py-20 md:py-28 ${anim(testimonials.visible)}`}>
-          <div className="mx-auto max-w-5xl px-6">
-            <p className="text-center text-[13px] font-medium uppercase tracking-[0.25em] text-[#2BB5A0]">Real Stories</p>
-            <h2 className="mt-3 text-center text-[clamp(1.6rem,3.5vw,2.4rem)] font-extrabold text-gray-900">
-              Students just like you are finding relief.
+          <div className="mx-auto max-w-3xl px-6 text-center">
+            <p className="text-[13px] font-medium uppercase tracking-[0.25em] text-[#2BB5A0]">Take the First Step</p>
+            <h2 className="mt-3 text-[clamp(1.6rem,3.5vw,2.4rem)] font-extrabold text-gray-900">
+              Your wellbeing matters. Start today.
             </h2>
-            <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-3">
-              {[
-                {
-                  quote: "I was too embarrassed to walk into the counseling center on campus. Theraklick let me get help without anyone knowing. I didn't realize how much I needed it until I started.",
-                  author: "Level 200 Student, University of Ghana",
-                },
-                {
-                  quote: "Exam season nearly broke me last semester. The AI chat at 2am when I couldn't sleep was exactly what I needed. It felt like someone actually understood.",
-                  author: "Engineering Student, KNUST",
-                },
-                {
-                  quote: "As a peer mentor, this platform makes it so easy to reach students who need me. The messaging and call tools work seamlessly and I can actually track the conversations I need to follow up on.",
-                  author: "Peer Mentor, UCC",
-                },
-              ].map((t, i) => (
-                <div key={i} className="flex flex-col rounded-2xl border border-gray-100 bg-gray-50/50 p-7">
-                  <div className="mb-4 flex gap-1">
-                    {[...Array(5)].map((_, j) => (
-                      <Star key={j} className="h-4 w-4 fill-[#F5C842] text-[#F5C842]" />
-                    ))}
-                  </div>
-                  <p className="flex-1 text-[14px] italic leading-[1.7] text-gray-600">
-                    &ldquo;{t.quote}&rdquo;
-                  </p>
-                  <p className="mt-5 text-[13px] font-semibold text-gray-400">— {t.author}</p>
-                </div>
-              ))}
+            <p className="mx-auto mt-5 max-w-xl text-[15px] leading-[1.7] text-gray-500">
+              Theraklick is free, private, and built for students like you. Whether you need to talk to an AI companion at 2am or book a session with a certified counselor — support is just a click away.
+            </p>
+            <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+              <button onClick={() => router.push("/signup/student")} className={goldBtn}>
+                Get Started Free
+                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1.5" />
+              </button>
+              <button onClick={() => router.push("/login?role=student")} className="group inline-flex items-center justify-center gap-2 rounded-full border-2 border-gray-200 px-8 py-4 text-[15px] font-semibold text-gray-600 transition-all duration-300 hover:border-gray-300 hover:bg-gray-50 active:scale-[0.97]">
+                Sign In
+              </button>
             </div>
           </div>
         </section>

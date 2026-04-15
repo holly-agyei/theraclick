@@ -47,26 +47,13 @@ interface ForumMessage {
 const REACTION_EMOJIS = ["❤️", "👍", "🙏", "💪", "🤗", "😢", "🔥", "💯"];
 
 const FORUMS: Forum[] = [
-  { id: "general", name: "General", description: "A place for everyone to connect", icon: MessageSquare, emoji: "", color: { bg: "bg-[#0F4F47]/10", text: "text-[#0F4F47]", activeBg: "bg-[#0F4F47]/15" }, memberCount: 342, lastPost: "Welcome! We're all here to support each other.", pinnedMessage: "Welcome to Theraklick forums. Be kind, be anonymous, be yourself." },
-  { id: "exam-stress", name: "Exam Stress", description: "Support through exam season", icon: BookOpen, emoji: "", color: { bg: "bg-orange-100 dark:bg-orange-900/30", text: "text-orange-600", activeBg: "bg-orange-100 dark:bg-orange-900/40" }, memberCount: 189, lastPost: "Finals week is here. How is everyone coping?", pinnedMessage: "Exam season tips from our counselors — take breaks, sleep well, and ask for help early." },
-  { id: "anxiety-support", name: "Anxiety Support", description: "A safe space to share", icon: Leaf, emoji: "", color: { bg: "bg-sky-100 dark:bg-sky-900/30", text: "text-sky-600", activeBg: "bg-sky-100 dark:bg-sky-900/40" }, memberCount: 156, lastPost: "Breathing exercises that actually help.", pinnedMessage: "If you're in crisis, please reach out to a counselor immediately. You're not alone." },
-  { id: "relationships", name: "Relationships", description: "Navigate friendships and family", icon: Heart, emoji: "", color: { bg: "bg-rose-100 dark:bg-rose-900/30", text: "text-rose-500", activeBg: "bg-rose-100 dark:bg-rose-900/40" }, memberCount: 98, lastPost: "How do you set boundaries with people you love?", pinnedMessage: "Respect everyone's experiences. What works for one person may not work for another." },
-  { id: "first-year", name: "First Year Life", description: "For freshers navigating uni", icon: GraduationCap, emoji: "", color: { bg: "bg-violet-100 dark:bg-violet-900/30", text: "text-violet-600", activeBg: "bg-violet-100 dark:bg-violet-900/40" }, memberCount: 234, lastPost: "Anyone else feeling lost in their first semester?", pinnedMessage: "Every senior was once a confused fresher. You belong here." },
-  { id: "self-care", name: "Self Care Corner", description: "Tips for taking care of yourself", icon: Shield, emoji: "", color: { bg: "bg-emerald-100 dark:bg-emerald-900/30", text: "text-emerald-600", activeBg: "bg-emerald-100 dark:bg-emerald-900/40" }, memberCount: 178, lastPost: "Small daily habits that changed my wellbeing.", pinnedMessage: "Self care isn't selfish — it's survival. Share what helps you recharge." },
+  { id: "general", name: "General", description: "A place for everyone to connect", icon: MessageSquare, emoji: "", color: { bg: "bg-[#0F4F47]/10", text: "text-[#0F4F47]", activeBg: "bg-[#0F4F47]/15" }, memberCount: 0, pinnedMessage: "Welcome to Theraklick forums. Be kind, be anonymous, be yourself." },
+  { id: "exam-stress", name: "Exam Stress", description: "Support through exam season", icon: BookOpen, emoji: "", color: { bg: "bg-orange-100 dark:bg-orange-900/30", text: "text-orange-600", activeBg: "bg-orange-100 dark:bg-orange-900/40" }, memberCount: 0, pinnedMessage: "Exam season tips from our counselors — take breaks, sleep well, and ask for help early." },
+  { id: "anxiety-support", name: "Anxiety Support", description: "A safe space to share", icon: Leaf, emoji: "", color: { bg: "bg-sky-100 dark:bg-sky-900/30", text: "text-sky-600", activeBg: "bg-sky-100 dark:bg-sky-900/40" }, memberCount: 0, pinnedMessage: "If you're in crisis, please reach out to a counselor immediately. You're not alone." },
+  { id: "relationships", name: "Relationships", description: "Navigate friendships and family", icon: Heart, emoji: "", color: { bg: "bg-rose-100 dark:bg-rose-900/30", text: "text-rose-500", activeBg: "bg-rose-100 dark:bg-rose-900/40" }, memberCount: 0, pinnedMessage: "Respect everyone's experiences. What works for one person may not work for another." },
+  { id: "first-year", name: "First Year Life", description: "For freshers navigating uni", icon: GraduationCap, emoji: "", color: { bg: "bg-violet-100 dark:bg-violet-900/30", text: "text-violet-600", activeBg: "bg-violet-100 dark:bg-violet-900/40" }, memberCount: 0, pinnedMessage: "Every senior was once a confused fresher. You belong here." },
+  { id: "self-care", name: "Self Care Corner", description: "Tips for taking care of yourself", icon: Shield, emoji: "", color: { bg: "bg-emerald-100 dark:bg-emerald-900/30", text: "text-emerald-600", activeBg: "bg-emerald-100 dark:bg-emerald-900/40" }, memberCount: 0, pinnedMessage: "Self care isn't selfish — it's survival. Share what helps you recharge." },
 ];
-
-const DEMO_MESSAGES: Record<string, ForumMessage[]> = {
-  general: [
-    { id: "1", text: "Hey everyone! Just joined Theraklick. Feeling a bit overwhelmed but hoping to find some support here.", senderId: "user1", senderName: "Anonymous Owl", senderRole: "student", createdAt: new Date(Date.now() - 3600000 * 2), reactions: { "❤️": ["user2", "user3"], "🤗": ["user4"] }, isAnonymous: true, threadCount: 2 },
-    { id: "2", text: "Welcome! You're in the right place. We're all here to support each other.\n\nWhat's been on your mind lately?", senderId: "user2", senderName: "Peaceful Bear", senderRole: "student", createdAt: new Date(Date.now() - 3600000 * 1.5), reactions: { "👍": ["user1"] }, isAnonymous: true, replyTo: { id: "1", text: "Hey everyone! Just joined Theraklick...", senderName: "Anonymous Owl" } },
-    { id: "3", text: "Same here! Just started my second year and the pressure is real. But talking about it helps a lot.", senderId: "user3", senderName: "Brave Lion", senderRole: "student", createdAt: new Date(Date.now() - 3600000), reactions: { "💪": ["user1", "user2"] }, isAnonymous: true },
-    { id: "4", text: "Remember, it's completely normal to feel overwhelmed when you're adjusting. Take things one day at a time. My DMs are always open if anyone needs to talk.", senderId: "counselor1", senderName: "Calm River", senderRole: "counselor", createdAt: new Date(Date.now() - 1800000), reactions: { "❤️": ["user1", "user2", "user3"], "🙏": ["user1"] }, isAnonymous: true },
-  ],
-  "exam-stress": [
-    { id: "1", text: "Finals week is really getting to me. Anyone else feeling completely unprepared?", senderId: "user5", senderName: "Tired Phoenix", senderRole: "student", createdAt: new Date(Date.now() - 7200000), reactions: { "🤗": ["user9"] }, isAnonymous: true, threadCount: 5 },
-    { id: "2", text: "You got this! Remember: one exam at a time. What subject is stressing you most?", senderId: "user6", senderName: "Calm Eagle", senderRole: "peer-mentor", createdAt: new Date(Date.now() - 3600000), reactions: { "❤️": ["user5"] }, isAnonymous: true, replyTo: { id: "1", text: "Finals week is really getting to me...", senderName: "Tired Phoenix" } },
-  ],
-};
 
 function getInitials(name: string) {
   return name.split(" ").map((w) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
@@ -158,7 +145,7 @@ export default function ForumsPage() {
       const unsub = onSnapshot(q, (snap) => {
         if (!mounted) return;
         if (snap.empty) {
-          setMessages(DEMO_MESSAGES[selectedForum.id] || []);
+          setMessages([]);
         } else {
           setMessages(snap.docs.map((d) => ({
             id: d.id, ...d.data(),
@@ -167,10 +154,10 @@ export default function ForumsPage() {
             isAnonymous: d.data().isAnonymous ?? true,
           })) as ForumMessage[]);
         }
-      }, () => { if (mounted) setMessages(DEMO_MESSAGES[selectedForum.id] || []); });
+      }, () => { if (mounted) setMessages([]); });
       return () => { mounted = false; unsub(); };
     } else {
-      setMessages(DEMO_MESSAGES[selectedForum.id] || []);
+      setMessages([]);
     }
   }, [selectedForum]);
 

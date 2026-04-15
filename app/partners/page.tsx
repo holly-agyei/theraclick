@@ -7,22 +7,13 @@ import { BrainMark } from "@/components/Logo";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
-const partnerSchools = [
-  "University of Ghana (UG)",
-  "KNUST",
-  "University of Cape Coast (UCC)",
-  "University of Education, Winneba (UEW)",
-  "University for Development Studies (UDS)",
-  "Ashesi University",
-  "GIMPA",
-  "Central University",
-];
+const partnerSchools: string[] = [];
 
 const benefits = [
   { icon: Users, title: "Bulk Student Access", desc: "Give your entire student body free access to counseling, AI wellness tools, and peer mentoring." },
   { icon: Shield, title: "Professional Network", desc: "Connect your campus counselors with our verified network for collaboration and overflow support." },
   { icon: BarChart3, title: "Wellness Analytics", desc: "Anonymized reports showing student wellness trends, peak stress periods, and resource utilization." },
-  { icon: GraduationCap, title: "Student Success", desc: "Research shows students with mental health support have 23% higher retention and better academic outcomes." },
+  { icon: GraduationCap, title: "Student Success", desc: "Mental health support is linked to improved retention rates and stronger academic outcomes for students." },
 ];
 
 export default function CampusPartnersPage() {
@@ -80,16 +71,18 @@ export default function CampusPartnersPage() {
         </p>
 
         {/* Current partners */}
-        <div className="mt-12">
-          <h2 className="text-[18px] font-bold text-gray-900">Partner Institutions</h2>
-          <div className="mt-4 flex flex-wrap gap-3">
-            {partnerSchools.map((s) => (
-              <span key={s} className="rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-[13px] font-medium text-gray-600">
-                🎓 {s}
-              </span>
-            ))}
+        {partnerSchools.length > 0 && (
+          <div className="mt-12">
+            <h2 className="text-[18px] font-bold text-gray-900">Partner Institutions</h2>
+            <div className="mt-4 flex flex-wrap gap-3">
+              {partnerSchools.map((s) => (
+                <span key={s} className="rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-[13px] font-medium text-gray-600">
+                  🎓 {s}
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Benefits */}
         <div className="mt-14">

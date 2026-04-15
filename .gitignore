@@ -25,12 +25,20 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# local env files
-.env*.local
+# local env files — never commit secrets
 .env
+.env*.local
+.env.development
+.env.production
+.env.production.local
+.env.test.local
 
 # vercel
 .vercel
+
+# credentials
+*credentials*.json
+*-firebase-adminsdk-*.json
 
 # typescript
 *.tsbuildinfo

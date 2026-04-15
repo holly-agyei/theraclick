@@ -32,7 +32,7 @@ export default function PeerMentorProfilePage() {
   useEffect(() => {
     async function loadMentor() {
       try {
-        if (db && !mentorId.startsWith("mentor-")) {
+        if (db) {
           const docSnap = await getDoc(doc(db, "users", mentorId));
           if (docSnap.exists()) {
             const data = docSnap.data();
@@ -50,6 +50,7 @@ export default function PeerMentorProfilePage() {
         }
       } catch (e) {
         console.error(e);
+        setMentor(null);
       } finally {
         setLoading(false);
       }

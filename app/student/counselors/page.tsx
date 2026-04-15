@@ -23,75 +23,6 @@ interface Counselor {
   yearsExperience?: number;
 }
 
-const demoCounselors: Counselor[] = [
-  {
-    uid: "demo-1",
-    fullName: "Dr. Akosua Mensah",
-    specialization: "Anxiety & Stress Management",
-    about: "Specializes in helping students manage academic stress and anxiety through evidence-based techniques.",
-    sessionsCompleted: 342,
-    isOnline: true,
-    availability: ["Today at 3:00 PM", "Wed 9-5", "Fri 9-12"],
-    rating: 4.9,
-    yearsExperience: 8,
-  },
-  {
-    uid: "demo-2",
-    fullName: "Dr. Kwame Asante",
-    specialization: "Depression & Mood Disorders",
-    about: "Passionate about supporting young people through difficult times with a trauma-informed approach.",
-    sessionsCompleted: 256,
-    isOnline: false,
-    availability: ["Tomorrow at 10:00 AM", "Thu 10-6"],
-    rating: 4.8,
-    yearsExperience: 6,
-  },
-  {
-    uid: "demo-3",
-    fullName: "Dr. Ama Boateng",
-    specialization: "Relationships & Family",
-    about: "Expert in relationship counseling and family dynamics. Creating safe spaces for growth and healing.",
-    sessionsCompleted: 189,
-    isOnline: true,
-    availability: ["Today at 5:00 PM", "Wed 2-8", "Sat 10-2"],
-    rating: 4.7,
-    yearsExperience: 5,
-  },
-  {
-    uid: "demo-4",
-    fullName: "Dr. Kofi Adjei",
-    specialization: "Academic Performance",
-    about: "Helping students overcome procrastination, test anxiety, and build healthy study habits.",
-    sessionsCompleted: 421,
-    isOnline: false,
-    availability: [],
-    rating: 4.9,
-    yearsExperience: 10,
-  },
-  {
-    uid: "demo-5",
-    fullName: "Dr. Efua Owusu",
-    specialization: "Self Esteem & Identity",
-    about: "Focused on helping students build confidence and navigate identity challenges in university life.",
-    sessionsCompleted: 164,
-    isOnline: true,
-    availability: ["Today at 1:00 PM", "Tue 9-3"],
-    rating: 4.6,
-    yearsExperience: 4,
-  },
-  {
-    uid: "demo-6",
-    fullName: "Dr. Nana Osei",
-    specialization: "Grief & Loss",
-    about: "Supporting students through loss, life transitions, and finding meaning in difficult experiences.",
-    sessionsCompleted: 198,
-    isOnline: false,
-    availability: ["Fri at 11:00 AM"],
-    rating: 4.8,
-    yearsExperience: 7,
-  },
-];
-
 const specializations = [
   "All",
   "Available Now",
@@ -145,13 +76,14 @@ export default function CounselorsPage() {
             });
 
           if (!mounted) return;
-          setCounselors(list.length > 0 ? list : demoCounselors);
+          setCounselors(list);
         } else {
-          setCounselors(demoCounselors);
+          setCounselors([]);
         }
-      } catch {
+      } catch (e) {
+        console.error("Error loading counselors:", e);
         if (!mounted) return;
-        setCounselors(demoCounselors);
+        setCounselors([]);
       } finally {
         if (mounted) setLoading(false);
       }

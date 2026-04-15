@@ -38,7 +38,7 @@ const insightCards = [
   {
     label: "Sleep",
     title: "Your Sleep Score Matters",
-    body: "Students who sleep 7+ hours score 10% higher on exams. Quality sleep is a study strategy.",
+    body: "Students who sleep 7+ hours perform better academically. Quality sleep is a study strategy.",
     href: "https://www.sleepfoundation.org/sleep-hygiene",
     icon: Moon,
     accent: "text-blue-600",
@@ -56,7 +56,7 @@ const insightCards = [
   {
     label: "Connection",
     title: "Reach Out Today",
-    body: "Loneliness increases stress hormones by 20%. Even a 5-minute conversation helps.",
+    body: "Loneliness increases stress. Even a 5-minute conversation with someone you trust can help.",
     href: null,
     icon: Heart,
     accent: "text-pink-600",
@@ -74,7 +74,7 @@ const insightCards = [
   {
     label: "Mindfulness",
     title: "5-Minute Body Scan",
-    body: "A 5-minute body scan reduces stress perception by 23%, even during exams.",
+    body: "A 5-minute body scan can noticeably reduce stress, even during exams. Try it before your next study session.",
     href: null,
     icon: Wind,
     accent: "text-teal-600",

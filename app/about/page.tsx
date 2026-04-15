@@ -42,7 +42,7 @@ export default function AboutPage() {
           <section>
             <h2 className="text-[20px] font-bold text-gray-900">The Problem We&apos;re Solving</h2>
             <p className="mt-3">
-              Research shows that 1 in 4 university students in Ghana experiences anxiety, depression, or overwhelming stress. Yet most never seek help. Campus counseling centers are understaffed. Students fear being judged. The cultural expectation to &ldquo;just push through&rdquo; is strong.
+              Too many university students in Ghana experience anxiety, depression, or overwhelming stress — yet most never seek help. Campus counseling centers are understaffed. Students fear being judged. The cultural expectation to &ldquo;just push through&rdquo; is strong.
             </p>
             <p className="mt-3">
               Theraklick bridges this gap by combining professional counseling, trained peer support, and AI-powered wellness tools into one private, accessible, and completely free platform.

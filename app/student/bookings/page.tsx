@@ -126,10 +126,11 @@ export default function StudentBookingsPage() {
           return !isNaN(end.getTime()) && end < now;
         });
 
-        if (stale.length > 0) {
+        if (stale.length > 0 && db) {
+          const fs = db;
           await Promise.all(
             stale.map((b) =>
-              updateDoc(doc(db, "bookings", b.id), { status: "completed", completedAt: new Date() }).catch(() => {})
+              updateDoc(doc(fs, "bookings", b.id), { status: "completed", completedAt: new Date() }).catch(() => {})
             )
           );
           stale.forEach((b) => { b.status = "completed"; });

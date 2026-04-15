@@ -93,6 +93,14 @@ npm run dev
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+## Production hosting
+
+- **Secrets**: Never commit `.env.local`, `.env`, or `serviceAccountKey.json`. They are listed in `.gitignore`. Use your host’s environment-variable UI (e.g. Vercel → Project → Settings → Environment Variables).
+- **Template**: Copy [`env.example`](./env.example) and create variables on the host with the same names. Set `NEXT_PUBLIC_APP_URL` to your public site URL (e.g. `https://your-domain.com`).
+- **Server keys**: `GEMINI_API_KEY`, `ADMIN_API_KEY`, and Firebase Admin (`FIREBASE_ADMIN_*` or a mounted JSON path via `SERVICE_ACCOUNT_KEY_PATH`) must be set on the server only—do not prefix them with `NEXT_PUBLIC_`.
+- **Email & cron** (optional): set `SMTP_*` vars for `/api/notifications/email`; set `CRON_SECRET` and `FIREBASE_SERVICE_ACCOUNT` (JSON string) for `/api/cron/session-reminders` if you use an external cron (see `env.example`).
+- **Build**: `npm run build` then `npm start`, or connect the repo to Vercel and deploy; run a production build locally before pushing.
+
 ## Project Structure
 
 ```
@@ -121,8 +129,8 @@ npm run dev
 - ✅ Student dashboard
 - ✅ AI chat (Next.js API route + safe fallback)
 - ✅ Chat history persistence (Firestore when configured; local fallback in demo mode)
-- ✅ Forums UI (static data)
-- ✅ Booking UI (static data)
+- ✅ Forums (Firestore when configured)
+- ✅ Booking via counselor profiles
 - ✅ Mobile-first responsive design
 - ✅ Bottom navigation for mobile
 

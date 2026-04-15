@@ -36,7 +36,6 @@ export function PWAInstallPrompt() {
   const [mode, setMode] = useState<"chrome" | "ios" | "generic">("generic");
   const [installable, setInstallable] = useState(false);
   const [shareHint, setShareHint] = useState<string | null>(null);
-  const [webShareAvailable, setWebShareAvailable] = useState(false);
   const [copyDone, setCopyDone] = useState(false);
   const deferredRef = useRef<BeforeInstallPromptEvent | null>(null);
 
@@ -44,10 +43,6 @@ export function PWAInstallPrompt() {
 
   useEffect(() => {
     setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    setWebShareAvailable(typeof navigator !== "undefined" && typeof navigator.share === "function");
   }, []);
 
   const setMinimized = useCallback((min: boolean) => {
@@ -142,28 +137,8 @@ export function PWAInstallPrompt() {
     setMinimized(true);
   };
 
-  const onIosOpenShare = async () => {
-    setShareHint(null);
-    setCopyDone(false);
-    if (typeof navigator === "undefined" || !navigator.share) {
-      setShareHint(
-        "Use Safari’s Share button in the toolbar (square with arrow up), then Add to Home Screen."
-      );
-      return;
-    }
-    try {
-      await navigator.share({
-        title: "Theraklick",
-        text: "Open the Share menu, then look for Add to Home Screen (in Safari’s toolbar menu).",
-        url: window.location.href,
-      });
-    } catch (err) {
-      if ((err as Error)?.name === "AbortError") return;
-      setShareHint("Use Safari’s toolbar Share icon, then Add to Home Screen.");
-    }
-  };
-
   const onCopyLink = async () => {
+    setShareHint(null);
     setCopyDone(false);
     try {
       await navigator.clipboard.writeText(window.location.href);
@@ -230,32 +205,37 @@ export function PWAInstallPrompt() {
             <p className="text-[15px] font-bold text-gray-900 dark:text-white">Add Theraklick to your phone</p>
             {mode === "ios" && (
               <>
-                <p className="mt-1 text-[13px] leading-relaxed text-gray-600 dark:text-gray-400">
-                  On iPhone this uses <span className="font-semibold text-gray-800 dark:text-gray-200">Safari’s menu</span>
-                  : tap <span className="font-semibold text-gray-900 dark:text-white">Share</span> in the{" "}
-                  <span className="font-semibold">bottom or top bar</span> (square with arrow ↑), scroll down, then{" "}
-                  <span className="font-semibold text-gray-900 dark:text-white">Add to Home Screen</span>.
+                <p className="mt-2 rounded-lg bg-amber-50 p-2.5 text-[12px] leading-snug text-amber-950 dark:bg-amber-950/40 dark:text-amber-100">
+                  <strong className="font-semibold">Important:</strong> any “share this page” button inside a website only
+                  sends the link to WhatsApp, Messages, etc. It does <strong>not</strong> show{" "}
+                  <strong>Add to Home Screen</strong>. That option exists only in{" "}
+                  <strong>Safari’s own toolbar</strong> (the browser chrome), not inside our page.
                 </p>
-                {webShareAvailable ? (
-                  <button
-                    type="button"
-                    onClick={() => void onIosOpenShare()}
-                    className="mt-3 flex w-full min-h-[48px] items-center justify-center gap-2 rounded-xl bg-[#0F4F47] px-4 py-3 text-[15px] font-semibold text-white active:bg-[#0c4540] dark:bg-[#2BB5A0] dark:text-[#0D1F1D] dark:active:bg-[#48c9b8]"
-                  >
-                    <Share2 className="h-5 w-5 shrink-0" aria-hidden />
-                    Open Share sheet
-                  </button>
-                ) : null}
+                <ol className="mt-3 list-decimal space-y-2 pl-4 text-[13px] leading-relaxed text-gray-600 dark:text-gray-400">
+                  <li>
+                    Make sure you are in <strong className="text-gray-900 dark:text-gray-200">Safari</strong> (blue/white
+                    compass icon), not Chrome or an in-app browser.
+                  </li>
+                  <li>
+                    Tap the <strong className="text-gray-900 dark:text-gray-200">Share</strong> icon in Safari’s{" "}
+                    <strong>bottom bar</strong> (small square with an arrow pointing up — it is part of Safari’s UI, above
+                    the home indicator).
+                  </li>
+                  <li>
+                    Scroll the gray sheet and tap <strong className="text-gray-900 dark:text-gray-200">Add to Home Screen</strong>.
+                  </li>
+                </ol>
                 <button
                   type="button"
                   onClick={() => void onCopyLink()}
-                  className="mt-2 flex w-full min-h-[44px] items-center justify-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-[14px] font-medium text-gray-800 active:bg-gray-100 dark:border-white/10 dark:bg-white/5 dark:text-gray-100 dark:active:bg-white/10"
+                  className="mt-3 flex w-full min-h-[48px] items-center justify-center gap-2 rounded-xl bg-[#0F4F47] px-4 py-3 text-[15px] font-semibold text-white active:bg-[#0c4540] dark:bg-[#2BB5A0] dark:text-[#0D1F1D] dark:active:bg-[#48c9b8]"
                 >
-                  <Link2 className="h-4 w-4 shrink-0" aria-hidden />
-                  {copyDone ? "Link copied — paste in Safari" : "Copy link (open in Safari)"}
+                  <Link2 className="h-5 w-5 shrink-0" aria-hidden />
+                  {copyDone ? "Copied — now paste in Safari’s address bar" : "Copy link — paste in Safari if needed"}
                 </button>
                 <p className="mt-2 text-[11px] leading-snug text-gray-500 dark:text-gray-500">
-                  In Instagram / TikTok / Chrome? Use <strong>Copy link</strong> then paste in <strong>Safari</strong> — Add to Home Screen only works in Safari on iPhone.
+                  Opened this link from Instagram / TikTok / Messages? Copy the link, open <strong>Safari</strong>, paste
+                  into the address bar, go to the site, then use Safari’s <strong>Share → Add to Home Screen</strong>.
                 </p>
                 {shareHint ? (
                   <p className="mt-2 text-[12px] leading-relaxed text-amber-800 dark:text-amber-200/90">{shareHint}</p>

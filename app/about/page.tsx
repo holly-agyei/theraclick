@@ -13,7 +13,7 @@ export default function AboutPage() {
         <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
           <button onClick={() => router.push("/")} className="flex items-center gap-2">
             <BrainMark className="h-8 w-8" />
-            <span className="text-lg font-bold text-gray-900">TheraClick</span>
+            <span className="text-lg font-bold text-gray-900">Theraklick</span>
           </button>
           <button onClick={() => router.back()} className="flex items-center gap-1.5 text-[13px] text-gray-500 hover:text-gray-900">
             <ArrowLeft className="h-4 w-4" /> Back
@@ -32,7 +32,7 @@ export default function AboutPage() {
           <section>
             <h2 className="text-[20px] font-bold text-gray-900">Our Story</h2>
             <p className="mt-3">
-              TheraClick was born from a simple observation: too many university students in Ghana are struggling with their mental health, and too few are getting help. The stigma, the long waitlists, the lack of accessible resources — it all adds up to a system that fails the people who need it most.
+              Theraklick was born from a simple observation: too many university students in Ghana are struggling with their mental health, and too few are getting help. The stigma, the long waitlists, the lack of accessible resources — it all adds up to a system that fails the people who need it most.
             </p>
             <p className="mt-3">
               We set out to build something different. A platform that meets students where they are — on their phones, in their dorms, between lectures, at 2am during exam season. A place where getting support isn&apos;t a sign of weakness, but a sign of strength.
@@ -45,7 +45,7 @@ export default function AboutPage() {
               Research shows that 1 in 4 university students in Ghana experiences anxiety, depression, or overwhelming stress. Yet most never seek help. Campus counseling centers are understaffed. Students fear being judged. The cultural expectation to &ldquo;just push through&rdquo; is strong.
             </p>
             <p className="mt-3">
-              TheraClick bridges this gap by combining professional counseling, trained peer support, and AI-powered wellness tools into one private, accessible, and completely free platform.
+              Theraklick bridges this gap by combining professional counseling, trained peer support, and AI-powered wellness tools into one private, accessible, and completely free platform.
             </p>
           </section>
         </div>
@@ -75,10 +75,10 @@ export default function AboutPage() {
         <div className="mt-16">
           <h2 className="text-[20px] font-bold text-gray-900">Built in Ghana, for Ghana</h2>
           <p className="mt-3 text-[15px] leading-[1.8] text-gray-600">
-            TheraClick is built by a team that understands the Ghanaian student experience firsthand. We&apos;re not importing a foreign wellness model — we&apos;re building one that respects our culture, our communities, and our unique challenges.
+            Theraklick is built by a team that understands the Ghanaian student experience firsthand. We&apos;re not importing a foreign wellness model — we&apos;re building one that respects our culture, our communities, and our unique challenges.
           </p>
           <p className="mt-3 text-[15px] leading-[1.8] text-gray-600">
-            Based in Accra, we work closely with university counseling departments, student organizations, and mental health professionals to ensure TheraClick delivers real, meaningful support.
+            Based in Accra, we work closely with university counseling departments, student organizations, and mental health professionals to ensure Theraklick delivers real, meaningful support.
           </p>
         </div>
 

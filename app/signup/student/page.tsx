@@ -234,7 +234,7 @@ export default function StudentSignupPage() {
             Create account
           </h1>
           <p className={`mt-2 text-sm text-[#6B8C89] ${s(330)}`}>
-            Join TheraClick for calm, private support.
+            Join Theraklick for calm, private support.
           </p>
 
           {/* Anonymous mode callout */}

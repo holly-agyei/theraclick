@@ -9,7 +9,7 @@ const posts = [
     slug: "burnout-before-finals",
     title: "5 Signs You're Burning Out Before Finals",
     excerpt: "That constant exhaustion isn't laziness. Here are the warning signs of academic burnout — and what to do before it's too late.",
-    author: "TheraClick Team",
+    author: "Theraklick Team",
     date: "March 2026",
     readTime: "5 min read",
     category: "Wellness",
@@ -21,14 +21,14 @@ const posts = [
       "**3. You're withdrawing from friends.** Burnout makes social interaction feel like a chore. If you've been dodging calls, canceling plans, or eating alone more often, take note.",
       "**4. Your body is acting up.** Headaches, stomach problems, chest tightness, frequent colds — burnout shows up physically too. Don't ignore what your body is telling you.",
       "**5. You feel like you're failing at everything.** Even when you're doing okay objectively, burnout convinces you it's not enough. The self-doubt becomes overwhelming.",
-      "**What to do:** Take a real break (not scrolling through TikTok — an actual rest). Talk to someone. If your campus has a counseling center, use it. Or try TheraClick — our AI chat is available 24/7, and you can connect with a counselor whenever you're ready.",
+      "**What to do:** Take a real break (not scrolling through TikTok — an actual rest). Talk to someone. If your campus has a counseling center, use it. Or try Theraklick — our AI chat is available 24/7, and you can connect with a counselor whenever you're ready.",
     ],
   },
   {
     slug: "talking-to-parents-about-mental-health",
     title: "How to Talk to Your Parents About Mental Health in Ghana",
     excerpt: "\"I'm not crazy, I just need to talk to someone.\" How to start the hardest conversation in a Ghanaian household.",
-    author: "TheraClick Team",
+    author: "Theraklick Team",
     date: "March 2026",
     readTime: "7 min read",
     category: "Culture",
@@ -39,26 +39,26 @@ const posts = [
       "**Use a trusted intermediary.** Sometimes it's easier if an older sibling, aunt, or family friend helps you bring it up. Not everyone has to fight this battle alone.",
       "**Share resources.** Send them an article or a short video about student mental health in Ghana. Sometimes seeing that other families are having this conversation makes it feel less foreign.",
       "**Set boundaries with love.** \"I appreciate your advice, but I also need to talk to a professional. It doesn't mean your support isn't enough — it means I'm taking this seriously.\"",
-      "**And if they don't understand?** That's okay. You can still get help. Platforms like TheraClick give you anonymous, confidential access to counselors — no parental permission needed.",
+      "**And if they don't understand?** That's okay. You can still get help. Platforms like Theraklick give you anonymous, confidential access to counselors — no parental permission needed.",
     ],
   },
   {
     slug: "what-happens-in-counseling",
     title: "What Actually Happens in a Counseling Session",
-    excerpt: "It's not a movie scene with a leather couch and a notepad. Here's what a real session looks like on TheraClick.",
-    author: "TheraClick Team",
+    excerpt: "It's not a movie scene with a leather couch and a notepad. Here's what a real session looks like on Theraklick.",
+    author: "Theraklick Team",
     date: "February 2026",
     readTime: "4 min read",
     category: "Getting Started",
     content: [
       "A lot of students avoid counseling because they don't know what to expect. Will I have to talk about my childhood? Will they judge me? What if I cry?",
       "Let's clear the air.",
-      "**First, you choose your counselor.** On TheraClick, you browse available counselors, see their specializations (anxiety, relationships, academic stress, etc.), and pick the one that feels right.",
+      "**First, you choose your counselor.** On Theraklick, you browse available counselors, see their specializations (anxiety, relationships, academic stress, etc.), and pick the one that feels right.",
       "**You book a session.** Pick a date and time that works for you. Sessions happen via text chat, voice call, or video call — whatever you're comfortable with.",
       "**The session starts with a check-in.** Your counselor will ask how you're doing and what brought you to counseling. There's no script — the conversation flows naturally.",
       "**You talk. They listen.** A good counselor doesn't tell you what to do. They help you explore your own thoughts, understand patterns, and develop strategies that work for YOUR life.",
       "**It's confidential.** Nothing you say leaves the session. If you're using anonymous mode, the counselor doesn't even know your real name.",
-      "**It's free.** On TheraClick, there's no charge for students. No hidden costs. No subscriptions.",
+      "**It's free.** On Theraklick, there's no charge for students. No hidden costs. No subscriptions.",
       "**And yes, it's okay to cry.** It's okay to be nervous. It's okay to not have the words. Your counselor has seen it all — and they're there to help, not judge.",
     ],
   },
@@ -66,7 +66,7 @@ const posts = [
     slug: "not-weak-for-asking-help",
     title: "You're Not Weak for Asking for Help",
     excerpt: "The strongest thing you can do is admit you need support. Let's talk about why so many Ghanaian students struggle with this.",
-    author: "TheraClick Team",
+    author: "Theraklick Team",
     date: "February 2026",
     readTime: "6 min read",
     category: "Mindset",
@@ -75,7 +75,7 @@ const posts = [
       "If you grew up hearing these things, you're not alone. In Ghanaian culture, strength is valued above almost everything else. And somewhere along the way, asking for help became synonymous with weakness.",
       "**But here's the truth:** ignoring a problem doesn't make you strong. It makes you exhausted.",
       "Think about it this way: if you had a broken bone, would you just \"push through it\"? Of course not. You'd go to a hospital. Your mental health deserves the same care.",
-      "**The stigma is real, but it's changing.** More Ghanaian students are talking about anxiety, depression, and burnout than ever before. Student organizations are hosting mental health weeks. Platforms like TheraClick exist specifically for this moment.",
+      "**The stigma is real, but it's changing.** More Ghanaian students are talking about anxiety, depression, and burnout than ever before. Student organizations are hosting mental health weeks. Platforms like Theraklick exist specifically for this moment.",
       "**Asking for help is a skill.** It requires self-awareness, courage, and humility. Those are strengths, not weaknesses.",
       "**You don't have to hit rock bottom.** You don't need to be in crisis to talk to someone. Sometimes you just need a space to think out loud. That's what counselors and peer mentors are for.",
       "**Start small.** You don't have to book a full session today. Just open the AI chat. Write one sentence about how you're feeling. That's already a brave first step.",
@@ -92,7 +92,7 @@ export default function BlogPage() {
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <button onClick={() => router.push("/")} className="flex items-center gap-2">
             <BrainMark className="h-8 w-8" />
-            <span className="text-lg font-bold text-gray-900">TheraClick</span>
+            <span className="text-lg font-bold text-gray-900">Theraklick</span>
           </button>
           <button onClick={() => router.back()} className="flex items-center gap-1.5 text-[13px] text-gray-500 hover:text-gray-900">
             <ArrowLeft className="h-4 w-4" /> Back

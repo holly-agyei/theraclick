@@ -60,7 +60,7 @@ export default function ContactPage() {
         <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
           <button onClick={() => router.push("/")} className="flex items-center gap-2">
             <BrainMark className="h-8 w-8" />
-            <span className="text-lg font-bold text-gray-900">TheraClick</span>
+            <span className="text-lg font-bold text-gray-900">Theraklick</span>
           </button>
           <button onClick={() => router.back()} className="flex items-center gap-1.5 text-[13px] text-gray-500 hover:text-gray-900">
             <ArrowLeft className="h-4 w-4" /> Back
@@ -82,7 +82,7 @@ export default function ContactPage() {
               </div>
               <div>
                 <p className="text-[14px] font-semibold text-gray-900">Email</p>
-                <a href="mailto:support@theraclick.app" className="text-[14px] text-[#2BB5A0] underline">support@theraclick.app</a>
+                <a href="mailto:support@theraklick.app" className="text-[14px] text-[#2BB5A0] underline">support@theraklick.app</a>
               </div>
             </div>
             <div className="flex items-start gap-4">

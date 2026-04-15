@@ -128,7 +128,7 @@ export default function LandingPage() {
             transition-all duration-500 delay-100 ${landed ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"}`}>
             <div className="flex items-center gap-2.5">
               <BrainMark className="h-9 w-9" />
-              <span className="text-lg font-bold tracking-tight text-white">TheraClick</span>
+              <span className="text-lg font-bold tracking-tight text-white">Theraklick</span>
             </div>
             <div className="hidden items-center gap-8 md:flex">
               <button onClick={() => scrollTo("features")} className="text-[13px] font-medium text-white/70 transition-colors hover:text-white">Features</button>
@@ -157,7 +157,7 @@ export default function LandingPage() {
             </h1>
             <p className={`mt-5 max-w-[600px] text-[clamp(15px,1.8vw,18px)] leading-relaxed text-white/70
               transition-all duration-500 delay-300 ${landed ? "opacity-100" : "opacity-0"}`}>
-              TheraClick connects Ghanaian students with certified counselors and peer mentors — anytime, anywhere, in the moments that matter most.
+              Theraklick connects Ghanaian students with certified counselors and peer mentors — anytime, anywhere, in the moments that matter most.
             </p>
             <div className={`mt-10 flex flex-col items-center gap-4 sm:flex-row
               transition-all duration-500 delay-[400ms] ${landed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
@@ -203,7 +203,7 @@ export default function LandingPage() {
         {/* ────────── PROBLEM ────────── */}
         <section ref={problem.ref} className={`bg-[#0F4F47] py-20 md:py-28 ${anim(problem.visible)}`}>
           <div className="mx-auto max-w-3xl px-6">
-            <p className="text-center text-[13px] font-medium uppercase tracking-[0.25em] text-[#F5C842]/70">Why TheraClick?</p>
+            <p className="text-center text-[13px] font-medium uppercase tracking-[0.25em] text-[#F5C842]/70">Why Theraklick?</p>
             <h2 className="mt-4 text-center text-[clamp(1.6rem,3.5vw,2.4rem)] font-extrabold leading-tight text-white">
               Students are struggling in silence.{" "}
               <span className="text-[#F5C842]">That ends now.</span>
@@ -212,7 +212,7 @@ export default function LandingPage() {
               1 in 4 university students in Ghana experiences anxiety, depression, or overwhelming stress — yet most never seek help. The stigma is real. The waitlists are long. The campus counselor&apos;s door is often closed.
             </p>
             <p className="mx-auto mt-6 max-w-2xl text-center text-[15px] leading-[1.8] text-white/65">
-              TheraClick was built because students deserve better. Better access, better privacy, and better support — exactly when they need it.
+              Theraklick was built because students deserve better. Better access, better privacy, and better support — exactly when they need it.
             </p>
           </div>
         </section>
@@ -248,7 +248,7 @@ export default function LandingPage() {
                 },
                 {
                   icon: Shield, title: "Your Privacy, Protected",
-                  desc: "Post anonymously. Chat confidentially. TheraClick never shares your identity without your permission. You control your story.",
+                  desc: "Post anonymously. Chat confidentially. Theraklick never shares your identity without your permission. You control your story.",
                 },
               ].map((card) => (
                 <div key={card.title}
@@ -314,7 +314,7 @@ export default function LandingPage() {
                 </div>
                 <h3 className="mt-5 text-[20px] font-bold text-gray-900">For Certified Counselors</h3>
                 <p className="mt-3 text-[14px] leading-[1.7] text-gray-500">
-                  Expand your reach beyond the physical campus. Manage your availability, accept bookings, and conduct sessions entirely online. TheraClick handles the scheduling so you can focus on what matters — your students.
+                  Expand your reach beyond the physical campus. Manage your availability, accept bookings, and conduct sessions entirely online. Theraklick handles the scheduling so you can focus on what matters — your students.
                 </p>
                 <ul className="mt-6 space-y-3">
                   {[
@@ -337,7 +337,7 @@ export default function LandingPage() {
                 </div>
                 <h3 className="mt-5 text-[20px] font-bold text-gray-900">For Peer Mentors</h3>
                 <p className="mt-3 text-[14px] leading-[1.7] text-gray-500">
-                  You don&apos;t need a degree to change someone&apos;s life. If you&apos;ve navigated university stress and want to give back, become a TheraClick peer mentor. We&apos;ll train you, support you, and connect you with students who need your experience.
+                  You don&apos;t need a degree to change someone&apos;s life. If you&apos;ve navigated university stress and want to give back, become a Theraklick peer mentor. We&apos;ll train you, support you, and connect you with students who need your experience.
                 </p>
                 <ul className="mt-6 space-y-3">
                   {[
@@ -371,7 +371,7 @@ export default function LandingPage() {
               Always on. Always listening. Always safe.
             </h2>
             <p className="mx-auto mt-8 max-w-2xl text-center text-[15px] leading-[1.8] text-white/65">
-              TheraClick&apos;s AI chat is powered by Gemini 2.0 and built specifically for the Ghanaian student experience. It understands the pressure of WASSCE results, KNUST or UG admission stress, family expectations, and the loneliness that can come with a new semester.
+              Theraklick&apos;s AI chat is powered by Gemini 2.0 and built specifically for the Ghanaian student experience. It understands the pressure of WASSCE results, KNUST or UG admission stress, family expectations, and the loneliness that can come with a new semester.
             </p>
             <p className="mx-auto mt-5 max-w-2xl text-center text-[15px] leading-[1.8] text-white/65">
               And when things get serious — when the words suggest more than stress — our system detects it and immediately surfaces crisis resources and connects you with a real counselor.
@@ -400,7 +400,7 @@ export default function LandingPage() {
               A community that actually understands.
             </h2>
             <p className="mx-auto mt-5 max-w-2xl text-center text-[15px] leading-[1.7] text-gray-500">
-              TheraClick&apos;s forums are a judgment-free space where students talk about the real stuff. Six dedicated rooms cover the topics that matter most to student life.
+              Theraklick&apos;s forums are a judgment-free space where students talk about the real stuff. Six dedicated rooms cover the topics that matter most to student life.
             </p>
             <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
               {[
@@ -443,7 +443,7 @@ export default function LandingPage() {
                 },
                 {
                   icon: BadgeCheck, title: "Verified Professionals Only",
-                  desc: "Every counselor on TheraClick goes through an approval process. No imposters. No unqualified advice. Just real, vetted mental health professionals.",
+                  desc: "Every counselor on Theraklick goes through an approval process. No imposters. No unqualified advice. Just real, vetted mental health professionals.",
                 },
               ].map((item) => (
                 <div key={item.title} className="rounded-2xl border border-gray-100 bg-white p-7 text-center shadow-sm">
@@ -468,7 +468,7 @@ export default function LandingPage() {
             <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-3">
               {[
                 {
-                  quote: "I was too embarrassed to walk into the counseling center on campus. TheraClick let me get help without anyone knowing. I didn't realize how much I needed it until I started.",
+                  quote: "I was too embarrassed to walk into the counseling center on campus. Theraklick let me get help without anyone knowing. I didn't realize how much I needed it until I started.",
                   author: "Level 200 Student, University of Ghana",
                 },
                 {
@@ -505,7 +505,7 @@ export default function LandingPage() {
               <div className="md:col-span-1">
                 <div className="flex items-center gap-2">
                   <BrainMark className="h-8 w-8" />
-                  <span className="text-[16px] font-bold text-white">TheraClick</span>
+                  <span className="text-[16px] font-bold text-white">Theraklick</span>
                 </div>
                 <p className="mt-4 max-w-[240px] text-[13px] leading-relaxed text-white/40">
                   Mental wellness, made accessible for every Ghanaian student.
@@ -558,7 +558,7 @@ export default function LandingPage() {
             {/* Bottom */}
             <div className="mt-12 border-t border-white/[0.06] pt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
               <p className="text-[12px] text-white/25">
-                &copy; {new Date().getFullYear()} TheraClick. Built with care for Ghana&apos;s student community. 🇬🇭
+                &copy; {new Date().getFullYear()} Theraklick. Built with care for Ghana&apos;s student community. 🇬🇭
               </p>
               <div className="flex gap-4">
                 <button onClick={() => router.push("/privacy")} className="text-[12px] text-white/25 hover:text-white/50 transition-colors">Privacy Policy</button>

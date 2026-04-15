@@ -72,7 +72,7 @@ export default function ReportIssuePage() {
         <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
           <button onClick={() => router.push("/")} className="flex items-center gap-2">
             <BrainMark className="h-8 w-8" />
-            <span className="text-lg font-bold text-gray-900">TheraClick</span>
+            <span className="text-lg font-bold text-gray-900">Theraklick</span>
           </button>
           <button onClick={() => router.back()} className="flex items-center gap-1.5 text-[13px] text-gray-500 hover:text-gray-900">
             <ArrowLeft className="h-4 w-4" /> Back
@@ -83,7 +83,7 @@ export default function ReportIssuePage() {
       <div className="mx-auto max-w-xl px-6 py-16">
         <p className="text-[13px] font-medium uppercase tracking-[0.2em] text-[#2BB5A0]">Support</p>
         <h1 className="mt-2 text-[32px] font-extrabold text-gray-900">Report an Issue</h1>
-        <p className="mt-2 text-[15px] text-gray-500">Help us improve TheraClick by reporting bugs, safety concerns, or suggesting features.</p>
+        <p className="mt-2 text-[15px] text-gray-500">Help us improve Theraklick by reporting bugs, safety concerns, or suggesting features.</p>
 
         <form onSubmit={handleSubmit} className="mt-10 space-y-6">
           {/* Issue type */}

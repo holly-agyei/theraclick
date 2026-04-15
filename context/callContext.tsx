@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect, useRef, useCallb
 import { WebRTCCallManager, CallStatus, CallType } from "@/lib/webrtc";
 import { useAuth } from "./auth";
 import { db } from "@/lib/firebase";
-import { collection, query, where, onSnapshot, doc, getDoc, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, query, where, onSnapshot, doc, getDoc, addDoc, setDoc, serverTimestamp } from "firebase/firestore";
 
 interface CallContextValue {
   // Call state
@@ -56,6 +56,11 @@ async function writeCallEventToChat(
   if (!db) return;
   try {
     const chatId = [myUid, otherUserId].sort().join("_");
+    const label = type === "video" ? "Video call" : "Voice call";
+    const durStr = durationSeconds != null ? ` · ${durationSeconds}s` : "";
+    const statusLabel = status === "missed" ? " · Missed" : status === "rejected" ? " · Declined" : durStr;
+    const callSummary = `${label}${statusLabel}`;
+
     await addDoc(collection(db, "directMessages", chatId, "messages"), {
       text: "",
       senderId: myUid,
@@ -66,6 +71,14 @@ async function writeCallEventToChat(
       callStatus: status,
       ...(durationSeconds != null && { callDuration: durationSeconds }),
     });
+
+    await setDoc(doc(db, "directMessages", chatId), {
+      participants: [myUid, otherUserId],
+      lastMessage: callSummary,
+      lastMessageTime: serverTimestamp(),
+      lastMessageSender: myUid,
+      updatedAt: serverTimestamp(),
+    }, { merge: true });
   } catch (e) {
     console.error("Failed to write call event:", e);
   }

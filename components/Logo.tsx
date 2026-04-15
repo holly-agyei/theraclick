@@ -1,5 +1,5 @@
 /**
- * TheraClick brand logo — actual logo image + optional wordmark.
+ * Theraklick brand logo — actual logo image + optional wordmark.
  *
  * Single source of truth for the brand mark. Change it here,
  * it updates everywhere (sidebar, splash, auth screens).
@@ -26,7 +26,7 @@ export function Logo({ className = "", size = "default", iconOnly }: LogoProps) 
     <div className={`flex items-center gap-2 ${className}`}>
       <Image
         src="/images/theraklick-logo.png"
-        alt="TheraClick"
+        alt="Theraklick"
         width={s.img}
         height={s.img}
         className="shrink-0 object-contain"
@@ -34,7 +34,7 @@ export function Logo({ className = "", size = "default", iconOnly }: LogoProps) 
       />
       {!iconOnly && (
         <span className={`${s.text} font-bold tracking-tight`}>
-          TheraClick
+          Theraklick
         </span>
       )}
     </div>
@@ -48,7 +48,7 @@ export function BrainMark({ className = "" }: { className?: string }) {
   return (
     <Image
       src="/images/theraklick-logo.png"
-      alt="TheraClick"
+      alt="Theraklick"
       width={80}
       height={80}
       className={`object-contain ${className}`}

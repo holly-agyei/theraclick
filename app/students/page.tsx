@@ -22,7 +22,7 @@ export default function StudentsPage() {
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <button onClick={() => router.push("/")} className="flex items-center gap-2">
             <BrainMark className="h-8 w-8" />
-            <span className="text-lg font-bold text-gray-900">TheraClick</span>
+            <span className="text-lg font-bold text-gray-900">Theraklick</span>
           </button>
           <button onClick={() => router.back()} className="flex items-center gap-1.5 text-[13px] text-gray-500 hover:text-gray-900">
             <ArrowLeft className="h-4 w-4" /> Back

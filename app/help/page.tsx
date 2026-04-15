@@ -15,15 +15,15 @@ const faqs = [
       },
       {
         q: "How do I verify my email?",
-        a: "After signing up, we send a verification email to your registered address. Click the verification link in that email, then return to TheraClick and sign in. If you didn't receive it, you can request a new verification email from the sign-in page.",
+        a: "After signing up, we send a verification email to your registered address. Click the verification link in that email, then return to Theraklick and sign in. If you didn't receive it, you can request a new verification email from the sign-in page.",
       },
       {
         q: "Can I change my email address?",
-        a: "Currently, email changes require contacting our support team at support@theraclick.app. We'll verify your identity and update your email within 24 hours.",
+        a: "Currently, email changes require contacting our support team at support@theraklick.app. We'll verify your identity and update your email within 24 hours.",
       },
       {
         q: "How do I delete my account?",
-        a: "Send a deletion request to support@theraclick.app from your registered email. We will remove your account, profile, messages, and all associated data within 30 days.",
+        a: "Send a deletion request to support@theraklick.app from your registered email. We will remove your account, profile, messages, and all associated data within 30 days.",
       },
     ],
   },
@@ -40,7 +40,7 @@ const faqs = [
       },
       {
         q: "Are sessions really free?",
-        a: "Yes. TheraClick is completely free for students. There are no hidden costs, subscriptions, or premium tiers. Counselors volunteer their time or are supported through campus partnerships.",
+        a: "Yes. Theraklick is completely free for students. There are no hidden costs, subscriptions, or premium tiers. Counselors volunteer their time or are supported through campus partnerships.",
       },
     ],
   },
@@ -66,7 +66,7 @@ const faqs = [
     questions: [
       {
         q: "How does the AI chat work?",
-        a: "TheraClick's AI chat is powered by Gemini 2.0. It's trained to understand the unique pressures Ghanaian students face — academic stress, family expectations, financial pressure, and more. You can start multiple conversation threads, use voice input, and chat 24/7. The AI provides supportive guidance and, when needed, suggests connecting with a human counselor.",
+        a: "Theraklick's AI chat is powered by Gemini 2.0. It's trained to understand the unique pressures Ghanaian students face — academic stress, family expectations, financial pressure, and more. You can start multiple conversation threads, use voice input, and chat 24/7. The AI provides supportive guidance and, when needed, suggests connecting with a human counselor.",
       },
       {
         q: "Is the AI chat confidential?",
@@ -83,7 +83,7 @@ const faqs = [
     questions: [
       {
         q: "How do voice and video calls work?",
-        a: "Calls on TheraClick are peer-to-peer using WebRTC technology. When you're chatting with a counselor or peer mentor, tap the phone or video icon to start a call. The other person will receive an incoming call notification with the option to accept or decline.",
+        a: "Calls on Theraklick are peer-to-peer using WebRTC technology. When you're chatting with a counselor or peer mentor, tap the phone or video icon to start a call. The other person will receive an incoming call notification with the option to accept or decline.",
       },
       {
         q: "Are calls recorded?",
@@ -147,7 +147,7 @@ export default function HelpCenterPage() {
         <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
           <button onClick={() => router.push("/")} className="flex items-center gap-2">
             <BrainMark className="h-8 w-8" />
-            <span className="text-lg font-bold text-gray-900">TheraClick</span>
+            <span className="text-lg font-bold text-gray-900">Theraklick</span>
           </button>
           <button onClick={() => router.back()} className="flex items-center gap-1.5 text-[13px] text-gray-500 hover:text-gray-900">
             <ArrowLeft className="h-4 w-4" /> Back
@@ -158,7 +158,7 @@ export default function HelpCenterPage() {
       <div className="mx-auto max-w-3xl px-6 py-16">
         <p className="text-[13px] font-medium uppercase tracking-[0.2em] text-[#2BB5A0]">Support</p>
         <h1 className="mt-2 text-[32px] font-extrabold text-gray-900 md:text-[40px]">Help Center</h1>
-        <p className="mt-2 text-[15px] text-gray-500">Find answers to common questions about TheraClick.</p>
+        <p className="mt-2 text-[15px] text-gray-500">Find answers to common questions about Theraklick.</p>
 
         {/* Search */}
         <div className="relative mt-8">

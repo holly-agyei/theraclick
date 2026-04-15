@@ -7,7 +7,7 @@ import { BrainMark } from "@/components/Logo";
 const posts: Record<string, { title: string; author: string; date: string; readTime: string; category: string; content: string[] }> = {
   "burnout-before-finals": {
     title: "5 Signs You're Burning Out Before Finals",
-    author: "TheraClick Team",
+    author: "Theraklick Team",
     date: "March 2026",
     readTime: "5 min read",
     category: "Wellness",
@@ -25,12 +25,12 @@ const posts: Record<string, { title: string; author: string; date: string; readT
       "## 5. You feel like you're failing at everything",
       "Even when you're doing okay objectively, burnout convinces you it's not enough. The self-doubt becomes overwhelming.",
       "## What to do",
-      "Take a real break (not scrolling through TikTok — an actual rest). Talk to someone. If your campus has a counseling center, use it. Or try TheraClick — our AI chat is available 24/7, and you can connect with a counselor whenever you're ready.",
+      "Take a real break (not scrolling through TikTok — an actual rest). Talk to someone. If your campus has a counseling center, use it. Or try Theraklick — our AI chat is available 24/7, and you can connect with a counselor whenever you're ready.",
     ],
   },
   "talking-to-parents-about-mental-health": {
     title: "How to Talk to Your Parents About Mental Health in Ghana",
-    author: "TheraClick Team",
+    author: "Theraklick Team",
     date: "March 2026",
     readTime: "7 min read",
     category: "Culture",
@@ -46,12 +46,12 @@ const posts: Record<string, { title: string; author: string; date: string; readT
       "## Set boundaries with love",
       "\"I appreciate your advice, but I also need to talk to a professional. It doesn't mean your support isn't enough — it means I'm taking this seriously.\"",
       "## And if they don't understand?",
-      "That's okay. You can still get help. Platforms like TheraClick give you anonymous, confidential access to counselors — no parental permission needed.",
+      "That's okay. You can still get help. Platforms like Theraklick give you anonymous, confidential access to counselors — no parental permission needed.",
     ],
   },
   "what-happens-in-counseling": {
     title: "What Actually Happens in a Counseling Session",
-    author: "TheraClick Team",
+    author: "Theraklick Team",
     date: "February 2026",
     readTime: "4 min read",
     category: "Getting Started",
@@ -59,7 +59,7 @@ const posts: Record<string, { title: string; author: string; date: string; readT
       "A lot of students avoid counseling because they don't know what to expect. Will I have to talk about my childhood? Will they judge me? What if I cry?",
       "Let's clear the air.",
       "## First, you choose your counselor",
-      "On TheraClick, you browse available counselors, see their specializations (anxiety, relationships, academic stress, etc.), and pick the one that feels right.",
+      "On Theraklick, you browse available counselors, see their specializations (anxiety, relationships, academic stress, etc.), and pick the one that feels right.",
       "## You book a session",
       "Pick a date and time that works for you. Sessions happen via text chat, voice call, or video call — whatever you're comfortable with.",
       "## The session starts with a check-in",
@@ -69,14 +69,14 @@ const posts: Record<string, { title: string; author: string; date: string; readT
       "## It's confidential",
       "Nothing you say leaves the session. If you're using anonymous mode, the counselor doesn't even know your real name.",
       "## It's free",
-      "On TheraClick, there's no charge for students. No hidden costs. No subscriptions.",
+      "On Theraklick, there's no charge for students. No hidden costs. No subscriptions.",
       "## And yes, it's okay to cry",
       "It's okay to be nervous. It's okay to not have the words. Your counselor has seen it all — and they're there to help, not judge.",
     ],
   },
   "not-weak-for-asking-help": {
     title: "You're Not Weak for Asking for Help",
-    author: "TheraClick Team",
+    author: "Theraklick Team",
     date: "February 2026",
     readTime: "6 min read",
     category: "Mindset",
@@ -87,7 +87,7 @@ const posts: Record<string, { title: string; author: string; date: string; readT
       "Ignoring a problem doesn't make you strong. It makes you exhausted.",
       "Think about it this way: if you had a broken bone, would you just \"push through it\"? Of course not. You'd go to a hospital. Your mental health deserves the same care.",
       "## The stigma is real, but it's changing",
-      "More Ghanaian students are talking about anxiety, depression, and burnout than ever before. Student organizations are hosting mental health weeks. Platforms like TheraClick exist specifically for this moment.",
+      "More Ghanaian students are talking about anxiety, depression, and burnout than ever before. Student organizations are hosting mental health weeks. Platforms like Theraklick exist specifically for this moment.",
       "## Asking for help is a skill",
       "It requires self-awareness, courage, and humility. Those are strengths, not weaknesses.",
       "## You don't have to hit rock bottom",
@@ -123,7 +123,7 @@ export default function BlogArticlePage() {
         <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-4">
           <button onClick={() => router.push("/")} className="flex items-center gap-2">
             <BrainMark className="h-8 w-8" />
-            <span className="text-lg font-bold text-gray-900">TheraClick</span>
+            <span className="text-lg font-bold text-gray-900">Theraklick</span>
           </button>
           <button onClick={() => router.push("/blog")} className="flex items-center gap-1.5 text-[13px] text-gray-500 hover:text-gray-900">
             <ArrowLeft className="h-4 w-4" /> All Articles
@@ -152,7 +152,7 @@ export default function BlogArticlePage() {
         {/* CTA */}
         <div className="mt-14 rounded-2xl bg-[#0F4F47] p-8 text-center">
           <h3 className="text-[18px] font-bold text-white">Need someone to talk to?</h3>
-          <p className="mt-2 text-[14px] text-white/60">TheraClick gives you 24/7 access to AI chat, certified counselors, and peer mentors — all free.</p>
+          <p className="mt-2 text-[14px] text-white/60">Theraklick gives you 24/7 access to AI chat, certified counselors, and peer mentors — all free.</p>
           <button onClick={() => router.push("/signup/student")}
             className="group mt-5 inline-flex items-center gap-2 rounded-full bg-[#F5C842] px-6 py-3 text-[14px] font-bold text-[#0D1F1D] hover:bg-[#FFD95A]">
             Get Started Free <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

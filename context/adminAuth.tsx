@@ -19,7 +19,7 @@ interface AdminAuthContextValue {
 
 const AdminAuthContext = createContext<AdminAuthContextValue | undefined>(undefined);
 
-const ADMIN_SESSION_KEY = "theraclick.admin.session";
+const ADMIN_SESSION_KEY = "theraklick.admin.session";
 
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();

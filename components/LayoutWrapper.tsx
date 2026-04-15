@@ -58,7 +58,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
                   style={{ animationDuration: "1s" }}
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Image src="/images/theraklick-logo.png" alt="TheraClick" width={24} height={24} className="object-contain" />
+                  <Image src="/images/theraklick-logo.png" alt="Theraklick" width={24} height={24} className="object-contain" />
                 </div>
               </div>
               <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Preparing your safe space...</p>
@@ -71,10 +71,10 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
       </main>
       <BottomNav />
 
-      {/* Globe watermark — bottom-right corner accent */}
-      <div className="pointer-events-none fixed bottom-6 right-6 z-40 hidden opacity-[0.20] dark:opacity-[0.30] md:block">
+      {/* Globe watermark — bottom-right, fully visible */}
+      <div className="pointer-events-none fixed -bottom-16 -right-16 z-40 hidden opacity-[0.12] dark:opacity-[0.20] md:block">
         <InteractiveGlobe
-          size={240}
+          size={320}
           dotColor="rgba(22, 163, 74, ALPHA)"
           arcColor="rgba(22, 163, 74, 0.4)"
           markerColor="rgba(34, 197, 94, 0.8)"

@@ -7,7 +7,7 @@ import { CallUI } from "@/components/CallUI";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "TheraClick - Mental Health Support for Students",
+  title: "Theraklick - Mental Health Support for Students",
   description: "Fast, anonymous, layered mental health support for students",
 };
 

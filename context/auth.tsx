@@ -12,7 +12,7 @@ import {
   updateProfile as fbUpdateProfile,
   User,
 } from "firebase/auth";
-import { doc, getDoc, serverTimestamp, setDoc, onSnapshot } from "firebase/firestore";
+import { doc, getDoc, serverTimestamp, setDoc, updateDoc, onSnapshot } from "firebase/firestore";
 
 export type UserRole = "student" | "peer-mentor" | "counselor";
 export type AccountStatus = "active" | "pending" | "disabled";
@@ -76,7 +76,7 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-const LS_KEY = "theraclick.session.v1";
+const LS_KEY = "theraklick.session.v1";
 type LocalSession = {
   uid: string;
   role: UserRole | null;
@@ -265,7 +265,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 console.error("Profile listener error:", error);
               });
             }
+            // Presence: mark user as online
+            if (db) {
+              const userRef = doc(db, "users", u.uid);
+              updateDoc(userRef, { isOnline: true, lastSeen: serverTimestamp() }).catch(() => {});
+
+              const setOffline = () => {
+                updateDoc(userRef, { isOnline: false, lastSeen: serverTimestamp() }).catch(() => {});
+              };
+              const handleVisibility = () => {
+                if (document.visibilityState === "hidden") setOffline();
+                else updateDoc(userRef, { isOnline: true, lastSeen: serverTimestamp() }).catch(() => {});
+              };
+
+              window.addEventListener("beforeunload", setOffline);
+              document.addEventListener("visibilitychange", handleVisibility);
+
+              // Store cleanup refs
+              (window as any).__theraklick_presence_cleanup = () => {
+                window.removeEventListener("beforeunload", setOffline);
+                document.removeEventListener("visibilitychange", handleVisibility);
+              };
+            }
           } else {
+            // User signed out — clean up presence listeners
+            if ((window as any).__theraklick_presence_cleanup) {
+              (window as any).__theraklick_presence_cleanup();
+              delete (window as any).__theraklick_presence_cleanup;
+            }
             if (unsubProfile) {
               unsubProfile();
               unsubProfile = null;
@@ -289,6 +316,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       if (unsubAuth) unsubAuth();
       if (unsubProfile) unsubProfile();
+      if ((window as any).__theraklick_presence_cleanup) {
+        (window as any).__theraklick_presence_cleanup();
+      }
     };
   }, [isFirebaseBacked]);
 
@@ -375,6 +405,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Send verification email, then sign out
     await sendEmailVerification(cred.user);
+
+    // Send "application received" confirmation email via SMTP (non-blocking)
+    try {
+      const roleLabel = input.role === "counselor" ? "Counselor" : "Peer Mentor";
+      const origin = window.location.origin;
+
+      // Notify the applicant
+      fetch("/api/notifications/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: input.email.trim(),
+          type: "application_received",
+          subject: `Your ${roleLabel} application has been received`,
+          studentName: input.fullName.trim(),
+          body: `Thank you for applying to be a ${roleLabel} on Theraklick! We've received your application and our team is reviewing it.\n\nYou'll receive an email once a decision has been made. This usually takes 1-3 business days.\n\nThank you for wanting to make a difference!`,
+          ctaText: "Check Status",
+          ctaUrl: `${origin}/pending-approval`,
+        }),
+      });
+
+      // Notify admin about the new application
+      fetch("/api/notifications/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: process.env.NEXT_PUBLIC_ADMIN_EMAIL || "kelvinoppongacheampong456@gmail.com",
+          type: "application_received",
+          subject: `New ${roleLabel} Application: ${input.fullName.trim()}`,
+          body: `A new ${roleLabel} application has been submitted.\n\nName: ${input.fullName.trim()}\nEmail: ${input.email.trim()}\nSpecialization: ${input.specialization.trim()}\n\nPlease review and approve or reject this application in the admin panel.`,
+          ctaText: "Review Application",
+          ctaUrl: `${origin}/admin/users`,
+        }),
+      });
+    } catch {
+      // Non-blocking — application still succeeds if email fails
+    }
+
     await fbSignOut(auth);
   };
 
@@ -407,7 +475,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
-      if (isFirebaseBacked && auth) {
+      if (isFirebaseBacked && auth && db && user) {
+        await updateDoc(doc(db, "users", user.uid), { isOnline: false, lastSeen: serverTimestamp() }).catch(() => {});
         await fbSignOut(auth);
       }
     } finally {

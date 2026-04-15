@@ -1,15 +1,41 @@
 "use client";
 
-/**
- * APPLY AS PEER MENTOR — teal/white split, same design system.
- */
-
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/auth";
-import { HeartHandshake, Loader2 } from "lucide-react";
+import { HeartHandshake, Loader2, Eye, EyeOff, ChevronDown } from "lucide-react";
 import { AuthLeftPanel } from "@/components/AuthLeftPanel";
+
+const FOCUS_AREAS = [
+  "Exam Stress",
+  "Peer Coaching",
+  "Time Management",
+  "Campus Adjustment",
+  "Social Anxiety",
+  "Homesickness",
+  "Study Skills",
+  "Relationship Guidance",
+  "Career & Internships",
+  "General Support",
+  "Other",
+];
+
+function getPasswordStrength(pw: string): { score: number; label: string; color: string } {
+  if (!pw) return { score: 0, label: "", color: "bg-gray-200" };
+  let score = 0;
+  if (pw.length >= 6) score++;
+  if (pw.length >= 8) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+  if (score <= 1) return { score: 1, label: "Weak", color: "bg-red-400" };
+  if (score === 2) return { score: 2, label: "Fair", color: "bg-orange-400" };
+  if (score === 3) return { score: 3, label: "Good", color: "bg-yellow-400" };
+  if (score === 4) return { score: 4, label: "Strong", color: "bg-green-400" };
+  return { score: 5, label: "Very strong", color: "bg-green-600" };
+}
 
 export default function PeerMentorApplyPage() {
   const router = useRouter();
@@ -18,13 +44,18 @@ export default function PeerMentorApplyPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [specialization, setSpecialization] = useState("");
+  const [school, setSchool] = useState("");
   const [about, setAbout] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [entered, setEntered] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+
+  const pwStrength = getPasswordStrength(password);
 
   useEffect(() => {
     setHydrated(true);
@@ -41,8 +72,9 @@ export default function PeerMentorApplyPage() {
     try {
       await applyForRole({ role: "peer-mentor", fullName, email, specialization, about, password });
       router.push("/verify-email");
-    } catch (err: any) {
-      setError(err?.message || "Could not submit. Please try again.");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Could not submit. Please try again.";
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
@@ -54,7 +86,8 @@ export default function PeerMentorApplyPage() {
     specialization.trim().length > 0 &&
     about.trim().length > 0 &&
     password.length >= 6 &&
-    password === confirmPassword;
+    password === confirmPassword &&
+    agreedToTerms;
 
   const s = (ms: number) =>
     `transition-all duration-500 delay-[${ms}ms] ${entered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`;
@@ -66,7 +99,6 @@ export default function PeerMentorApplyPage() {
         headline={"Help others\nthrive."}
       />
 
-      {/* ── White card ── */}
       <div
         className={`auth-right-panel relative z-10 flex flex-1 flex-col -mt-6 rounded-t-[28px] bg-white px-6 py-6
           shadow-2xl shadow-black/5
@@ -77,21 +109,21 @@ export default function PeerMentorApplyPage() {
             : "translate-y-[60px] opacity-0 lg:translate-y-0 lg:translate-x-[60px]"}`}
       >
         <div className="mx-auto w-full max-w-md flex-1 overflow-y-auto">
-          <div className={`mb-4 inline-flex items-center gap-2 rounded-full border border-[#2BB5A0]/20
-            bg-[#2BB5A0]/5 px-4 py-2 ${s(200)}`}>
-            <HeartHandshake className="h-4 w-4 text-[#2BB5A0]" />
-            <span className="text-sm font-medium text-[#1A7A6E]">Peer Mentor</span>
+          <div className={`mb-4 inline-flex items-center gap-2 rounded-full border border-[#7C3AED]/20
+            bg-[#7C3AED]/5 px-4 py-2 ${s(200)}`}>
+            <HeartHandshake className="h-4 w-4 text-[#7C3AED]" />
+            <span className="text-sm font-medium text-[#6D28D9]">Peer Mentor</span>
           </div>
 
           <h1 className={`text-2xl font-bold tracking-tight text-[#0D1F1D] lg:text-3xl ${s(280)}`}>
-            Apply as Mentor
+            Apply as Peer Mentor
           </h1>
           <p className={`mt-2 text-sm text-[#6B8C89] ${s(330)}`}>
-            Requires admin approval. Uses your real identity.
+            Support fellow students through shared experience. Requires approval.
           </p>
 
           {hydrated && !isFirebaseBacked && (
-            <div className="mt-4 rounded-xl border border-[#F5C842]/30 bg-[#F5C842]/10#F5C842]/5 p-3">
+            <div className="mt-4 rounded-xl border border-[#F5C842]/30 bg-[#F5C842]/10 p-3">
               <p className="text-sm font-semibold text-[#E8A800]">Demo mode</p>
               <p className="mt-1 text-xs text-[#E8A800]/70">Add Firebase keys to enable applications.</p>
             </div>
@@ -104,36 +136,89 @@ export default function PeerMentorApplyPage() {
                 placeholder="Kwame Asare" className="tk-input" />
             </div>
 
-            <div className={s(430)}>
-              <label className="mb-1.5 block text-sm font-semibold text-[#2BB5A0]">Email</label>
-              <input value={email} onChange={(e) => setEmail(e.target.value)}
-                type="email" placeholder="kwame@example.com" className="tk-input" />
+            <div className={`grid gap-4 sm:grid-cols-2 ${s(430)}`}>
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-[#2BB5A0]">Email</label>
+                <input value={email} onChange={(e) => setEmail(e.target.value)}
+                  type="email" placeholder="kwame@example.com" className="tk-input" />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-[#2BB5A0]">
+                  School <span className="font-normal text-[#6B8C89]">(optional)</span>
+                </label>
+                <input value={school} onChange={(e) => setSchool(e.target.value)}
+                  placeholder="e.g. UG, KNUST" className="tk-input" />
+              </div>
             </div>
 
             <div className={s(480)}>
-              <label className="mb-1.5 block text-sm font-semibold text-[#2BB5A0]">Specialization</label>
-              <input value={specialization} onChange={(e) => setSpecialization(e.target.value)}
-                placeholder="Exam stress, peer coaching" className="tk-input" />
+              <label className="mb-1.5 block text-sm font-semibold text-[#2BB5A0]">Focus area</label>
+              <div className="relative">
+                <select value={specialization} onChange={(e) => setSpecialization(e.target.value)}
+                  className="tk-input appearance-none pr-10">
+                  <option value="" disabled>Select your focus</option>
+                  {FOCUS_AREAS.map((a) => <option key={a} value={a}>{a}</option>)}
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              </div>
             </div>
 
             <div className={s(530)}>
               <label className="mb-1.5 block text-sm font-semibold text-[#2BB5A0]">About you</label>
               <textarea value={about} onChange={(e) => setAbout(e.target.value)}
-                placeholder="Experience, availability, why you want to help..."
+                placeholder="Your experience, what motivates you to help, availability..."
                 rows={3} className="tk-input resize-none" />
             </div>
 
             <div className={`grid gap-4 sm:grid-cols-2 ${s(580)}`}>
               <div>
                 <label className="mb-1.5 block text-sm font-semibold text-[#2BB5A0]">Password</label>
-                <input value={password} onChange={(e) => setPassword(e.target.value)}
-                  type="password" placeholder="••••••••" className="tk-input" />
+                <div className="relative">
+                  <input value={password} onChange={(e) => setPassword(e.target.value)}
+                    type={showPassword ? "text" : "password"} placeholder="••••••••"
+                    className="tk-input pr-10" />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                {password.length > 0 && (
+                  <div className="mt-2">
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <div key={i} className={`h-1.5 flex-1 rounded-full transition-colors ${i <= pwStrength.score ? pwStrength.color : "bg-gray-200"}`} />
+                      ))}
+                    </div>
+                    <p className={`mt-1 text-[11px] font-medium ${
+                      pwStrength.score <= 1 ? "text-red-500" :
+                      pwStrength.score <= 2 ? "text-orange-500" :
+                      pwStrength.score <= 3 ? "text-yellow-600" : "text-green-600"
+                    }`}>{pwStrength.label}</p>
+                  </div>
+                )}
               </div>
               <div>
                 <label className="mb-1.5 block text-sm font-semibold text-[#2BB5A0]">Confirm</label>
                 <input value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
-                  type="password" placeholder="••••••••" className="tk-input" />
+                  type={showPassword ? "text" : "password"} placeholder="••••••••" className="tk-input" />
+                {confirmPassword && password !== confirmPassword && (
+                  <p className="mt-1 text-[11px] font-medium text-red-500">Passwords don&apos;t match</p>
+                )}
               </div>
+            </div>
+
+            {/* Terms checkbox */}
+            <div className={`flex items-start gap-3 ${s(620)}`}>
+              <input type="checkbox" id="terms" checked={agreedToTerms}
+                onChange={(e) => setAgreedToTerms(e.target.checked)}
+                className="mt-1 h-4 w-4 shrink-0 rounded border-gray-300 text-[#0F4F47] accent-[#0F4F47] cursor-pointer" />
+              <label htmlFor="terms" className="text-[13px] leading-[1.5] text-[#6B8C89] cursor-pointer">
+                I agree to the{" "}
+                <Link href="/privacy" className="font-semibold text-[#2BB5A0] underline underline-offset-2" target="_blank">
+                  Privacy Policy
+                </Link>{" "}
+                and Peer Mentor Guidelines
+              </label>
             </div>
 
             {error && (
@@ -142,9 +227,9 @@ export default function PeerMentorApplyPage() {
               </div>
             )}
 
-            <div className={`pt-1 ${s(630)}`}>
+            <div className={`pt-1 ${s(660)}`}>
               <button type="submit" disabled={!isFirebaseBacked || isLoading || !isFormValid}
-                className="tk-btn-gold">
+                className="tk-btn-primary">
                 {isLoading ? (
                   <span className="flex items-center justify-center gap-2">
                     <Loader2 className="h-5 w-5 animate-spin" /> Submitting…
@@ -154,7 +239,7 @@ export default function PeerMentorApplyPage() {
             </div>
           </form>
 
-          <p className={`mt-6 text-center text-sm text-[#6B8C89] ${s(680)}`}>
+          <p className={`mt-6 text-center text-sm text-[#6B8C89] ${s(700)}`}>
             Already applied?{" "}
             <Link href="/login?role=peer-mentor" className="font-semibold text-[#2BB5A0] hover:underline">
               Sign in

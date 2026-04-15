@@ -27,7 +27,7 @@ export type AiThread = {
   updatedAt: number;
 };
 
-const LS_PREFIX = "theraclick.aiThread.v1";
+const LS_PREFIX = "theraklick.aiThread.v1";
 
 function lsKey(uid: string, threadId: string) {
   return `${LS_PREFIX}.${uid}.${threadId}`;

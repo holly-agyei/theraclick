@@ -64,7 +64,7 @@ export default function CampusPartnersPage() {
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <button onClick={() => router.push("/")} className="flex items-center gap-2">
             <BrainMark className="h-8 w-8" />
-            <span className="text-lg font-bold text-gray-900">TheraClick</span>
+            <span className="text-lg font-bold text-gray-900">Theraklick</span>
           </button>
           <button onClick={() => router.back()} className="flex items-center gap-1.5 text-[13px] text-gray-500 hover:text-gray-900">
             <ArrowLeft className="h-4 w-4" /> Back
@@ -93,7 +93,7 @@ export default function CampusPartnersPage() {
 
         {/* Benefits */}
         <div className="mt-14">
-          <h2 className="text-[18px] font-bold text-gray-900">Why Partner With TheraClick?</h2>
+          <h2 className="text-[18px] font-bold text-gray-900">Why Partner With Theraklick?</h2>
           <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
             {benefits.map((b) => (
               <div key={b.title} className="rounded-2xl border border-gray-100 bg-gray-50/50 p-6">
@@ -118,7 +118,7 @@ export default function CampusPartnersPage() {
           ) : (
             <>
               <h2 className="text-[20px] font-bold text-gray-900">Partner With Us</h2>
-              <p className="mt-2 text-[14px] text-gray-500">Fill out the form below and our team will reach out to discuss how TheraClick can support your institution.</p>
+              <p className="mt-2 text-[14px] text-gray-500">Fill out the form below and our team will reach out to discuss how Theraklick can support your institution.</p>
               <form onSubmit={handleSubmit} className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div>
                   <label className="mb-2 block text-[14px] font-semibold text-gray-700">Institution Name</label>

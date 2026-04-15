@@ -158,6 +158,8 @@ There’s a starter rules file at `firestore.rules` that locks all user data to 
 Peer Mentors and Counselors are created with `status=pending` and must be approved.
 
 - **Admin UI**: visit `/admin` and paste your `ADMIN_API_KEY`.
+- **Admin dashboard login** (`/admin/login`): uses the Firestore `admins` collection (username + bcrypt password), not Firebase Auth. Create or reset the first account locally with Firebase Admin credentials in `.env.local`, then set `ADMIN_SEED_USERNAME` and `ADMIN_SEED_PASSWORD` (see `env.example`) and run `node scripts/create-admin.js`. Sign in at `/admin/login` with that username and password.
+
 - **API**:
   - `GET /api/admin/pending`
   - `POST /api/admin/users/:uid/approve`

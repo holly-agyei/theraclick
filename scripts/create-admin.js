@@ -42,10 +42,19 @@ async function main() {
     initializeApp({ credential });
     const db = getFirestore();
 
-    // Create admin account with provided credentials
-    const username = "adminuser";
-    const password = "Marvelouse@05955";
-    const email = "";
+    // Create admin from .env.local (never commit real values)
+    const username = (process.env.ADMIN_SEED_USERNAME || "").trim().toLowerCase();
+    const password = process.env.ADMIN_SEED_PASSWORD || "";
+    const email = (process.env.ADMIN_SEED_EMAIL || "").trim();
+
+    if (!username || !password) {
+      console.error("\n❌ Set ADMIN_SEED_USERNAME and ADMIN_SEED_PASSWORD in .env.local");
+      console.error("   Example (then run this script again):");
+      console.error('   ADMIN_SEED_USERNAME=youradmin');
+      console.error("   ADMIN_SEED_PASSWORD='a-long-random-password'");
+      console.error("   ADMIN_SEED_EMAIL=you@example.com   # optional\n");
+      process.exit(1);
+    }
 
     console.log("\n🔐 Creating Admin Account...");
     console.log(`Username: ${username}`);

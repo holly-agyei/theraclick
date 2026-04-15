@@ -14,7 +14,7 @@ export default function PrivacyPolicyPage() {
         <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
           <button onClick={() => router.push("/")} className="flex items-center gap-2">
             <BrainMark className="h-8 w-8" />
-            <span className="text-lg font-bold text-gray-900">TheraClick</span>
+            <span className="text-lg font-bold text-gray-900">Theraklick</span>
           </button>
           <button onClick={() => router.back()} className="flex items-center gap-1.5 text-[13px] text-gray-500 hover:text-gray-900">
             <ArrowLeft className="h-4 w-4" /> Back
@@ -31,7 +31,7 @@ export default function PrivacyPolicyPage() {
           <section>
             <h2 className="text-[20px] font-bold text-gray-900">1. Introduction</h2>
             <p className="mt-3">
-              TheraClick (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;) is a mental wellness platform built for Ghanaian university students. We take your privacy extremely seriously. This policy explains what data we collect, how we use it, and your rights regarding your personal information.
+              Theraklick (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;) is a mental wellness platform built for Ghanaian university students. We take your privacy extremely seriously. This policy explains what data we collect, how we use it, and your rights regarding your personal information.
             </p>
           </section>
 
@@ -57,7 +57,7 @@ export default function PrivacyPolicyPage() {
           <section>
             <h2 className="text-[20px] font-bold text-gray-900">4. Anonymous Mode</h2>
             <p className="mt-3">
-              TheraClick offers an <strong>anonymous mode</strong> for students. When enabled, your real name is replaced with a randomly generated identity (e.g., &ldquo;calmzebra42&rdquo;) across the platform. Counselors and peer mentors will only see your anonymous name. Your real identity remains hidden and is never shared without your explicit consent.
+              Theraklick offers an <strong>anonymous mode</strong> for students. When enabled, your real name is replaced with a randomly generated identity (e.g., &ldquo;calmzebra42&rdquo;) across the platform. Counselors and peer mentors will only see your anonymous name. Your real identity remains hidden and is never shared without your explicit consent.
             </p>
           </section>
 
@@ -98,7 +98,7 @@ export default function PrivacyPolicyPage() {
           <section>
             <h2 className="text-[20px] font-bold text-gray-900">8. Account Deletion</h2>
             <p className="mt-3">
-              You can request complete account deletion by emailing <a href="mailto:support@theraclick.app" className="text-[#2BB5A0] underline">support@theraclick.app</a>. Upon request, we will delete your account, profile data, message history, and all associated records within 30 days. Some anonymized, aggregated data may be retained for platform improvement purposes.
+              You can request complete account deletion by emailing <a href="mailto:support@theraklick.app" className="text-[#2BB5A0] underline">support@theraklick.app</a>. Upon request, we will delete your account, profile data, message history, and all associated records within 30 days. Some anonymized, aggregated data may be retained for platform improvement purposes.
             </p>
           </section>
 
@@ -112,7 +112,7 @@ export default function PrivacyPolicyPage() {
           <section>
             <h2 className="text-[20px] font-bold text-gray-900">10. Changes to This Policy</h2>
             <p className="mt-3">
-              We may update this policy from time to time. We will notify you of significant changes via email or an in-app notification. Continued use of TheraClick after changes constitutes acceptance of the updated policy.
+              We may update this policy from time to time. We will notify you of significant changes via email or an in-app notification. Continued use of Theraklick after changes constitutes acceptance of the updated policy.
             </p>
           </section>
 
@@ -123,7 +123,7 @@ export default function PrivacyPolicyPage() {
             </p>
             <p className="mt-2">
               <strong>Email:</strong>{" "}
-              <a href="mailto:support@theraclick.app" className="text-[#2BB5A0] underline">support@theraclick.app</a>
+              <a href="mailto:support@theraklick.app" className="text-[#2BB5A0] underline">support@theraklick.app</a>
             </p>
             <p className="mt-1">
               <strong>Location:</strong> Accra, Ghana

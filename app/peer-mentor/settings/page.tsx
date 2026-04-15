@@ -388,7 +388,7 @@ export default function PeerMentorSettingsPage() {
             </div>
 
             <p className="mt-8 text-center text-xs text-gray-400 dark:text-gray-400">
-              TheraClick v1.0
+              Theraklick v1.0
             </p>
           </div>
         </div>

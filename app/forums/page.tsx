@@ -22,7 +22,7 @@ export default function ForumsPreviewPage() {
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <button onClick={() => router.push("/")} className="flex items-center gap-2">
             <BrainMark className="h-8 w-8" />
-            <span className="text-lg font-bold text-gray-900">TheraClick</span>
+            <span className="text-lg font-bold text-gray-900">Theraklick</span>
           </button>
           <button onClick={() => router.back()} className="flex items-center gap-1.5 text-[13px] text-gray-500 hover:text-gray-900">
             <ArrowLeft className="h-4 w-4" /> Back
@@ -85,7 +85,7 @@ export default function ForumsPreviewPage() {
           <p className="mt-2 text-[14px] text-white/60">Create a free account and start connecting with students who understand.</p>
           <button onClick={() => router.push("/signup/student")}
             className="group mt-6 inline-flex items-center gap-2 rounded-full bg-[#F5C842] px-8 py-3.5 text-[15px] font-bold text-[#0D1F1D] transition-all hover:bg-[#FFD95A]">
-            Join TheraClick <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            Join Theraklick <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </button>
         </div>
       </div>

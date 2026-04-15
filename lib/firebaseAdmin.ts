@@ -9,6 +9,19 @@ function requireEnv(name: string) {
   return v;
 }
 
+/** Vercel / hosts often store the key as one line with `\n`; some pastes include wrapping quotes or real newlines. */
+function normalizePrivateKeyEnv(raw: string): string {
+  let k = raw.trim();
+  if ((k.startsWith('"') && k.endsWith('"')) || (k.startsWith("'") && k.endsWith("'"))) {
+    k = k.slice(1, -1).trim();
+  }
+  k = k.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+  if (k.includes("\\n")) {
+    k = k.replace(/\\n/g, "\n");
+  }
+  return k;
+}
+
 export function adminDb() {
   if (getApps().length === 0) {
     let credential;
@@ -24,7 +37,7 @@ export function adminDb() {
       // Fallback to environment variables
       const projectId = requireEnv("FIREBASE_ADMIN_PROJECT_ID");
       const clientEmail = requireEnv("FIREBASE_ADMIN_CLIENT_EMAIL");
-      const privateKey = requireEnv("FIREBASE_ADMIN_PRIVATE_KEY").replace(/\\n/g, "\n");
+      const privateKey = normalizePrivateKeyEnv(requireEnv("FIREBASE_ADMIN_PRIVATE_KEY"));
 
       credential = cert({ projectId, clientEmail, privateKey });
     }

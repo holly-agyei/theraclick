@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import { X, Download, Share2, Smartphone } from "lucide-react";
-
-const STORAGE_KEY = "theraklick_pwa_install_dismissed";
-const COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000;
+import { createPortal } from "react-dom";
+import { usePathname } from "next/navigation";
+import { Download, Share2, Smartphone, ChevronDown, ChevronUp, Link2 } from "lucide-react";
 
 function isStandalone(): boolean {
   if (typeof window === "undefined") return false;
@@ -24,58 +23,54 @@ function isMobileViewport(): boolean {
   return window.matchMedia("(max-width: 768px)").matches;
 }
 
-function wasDismissedRecently(): boolean {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return false;
-    const t = Number.parseInt(raw, 10);
-    if (Number.isNaN(t)) return false;
-    return Date.now() - t < COOLDOWN_MS;
-  } catch {
-    return false;
-  }
-}
-
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 };
 
 export function PWAInstallPrompt() {
-  const [visible, setVisible] = useState(false);
-  const [mode, setMode] = useState<"chrome" | "ios" | "generic" | null>(null);
+  const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+  const [eligible, setEligible] = useState(false);
+  const [expanded, setExpanded] = useState(true);
+  const [mode, setMode] = useState<"chrome" | "ios" | "generic">("generic");
   const [installable, setInstallable] = useState(false);
   const [shareHint, setShareHint] = useState<string | null>(null);
   const [webShareAvailable, setWebShareAvailable] = useState(false);
+  const [copyDone, setCopyDone] = useState(false);
   const deferredRef = useRef<BeforeInstallPromptEvent | null>(null);
 
-  useEffect(() => {
-    setWebShareAvailable(typeof navigator.share === "function");
-  }, []);
+  const needsNavClearance = /^\/(student|counselor|peer-mentor)(\/|$)/.test(pathname ?? "");
 
-  const dismiss = useCallback(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, String(Date.now()));
-    } catch {
-      /* ignore */
-    }
-    deferredRef.current = null;
-    setInstallable(false);
-    setMode(null);
-    setVisible(false);
-    setShareHint(null);
+  useEffect(() => {
+    setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (!isMobileViewport()) return;
-    if (isStandalone()) return;
-    if (wasDismissedRecently()) return;
+    setWebShareAvailable(typeof navigator !== "undefined" && typeof navigator.share === "function");
+  }, []);
 
-    if ("serviceWorker" in navigator) {
-      void navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(() => {});
-    }
+  const setMinimized = useCallback((min: boolean) => {
+    setExpanded(!min);
+  }, []);
 
-    let iosTimer: ReturnType<typeof setTimeout> | undefined;
+  useEffect(() => {
+    setExpanded(true);
+  }, [pathname]);
+
+  useEffect(() => {
+    const onVis = () => {
+      if (document.visibilityState !== "visible") return;
+      if (!isMobileViewport() || isStandalone()) return;
+      setExpanded(true);
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     let androidFallbackTimer: ReturnType<typeof setTimeout> | undefined;
 
     const onBip = (e: Event) => {
@@ -84,38 +79,56 @@ export function PWAInstallPrompt() {
       deferredRef.current = ev;
       setInstallable(true);
       setMode("chrome");
-      setVisible(true);
       if (androidFallbackTimer) {
         clearTimeout(androidFallbackTimer);
         androidFallbackTimer = undefined;
       }
     };
-    window.addEventListener("beforeinstallprompt", onBip);
 
-    if (isIos()) {
-      iosTimer = setTimeout(() => {
-        if (isStandalone()) return;
-        if (wasDismissedRecently()) return;
-        setMode("ios");
-        setVisible(true);
-      }, 2200);
-    } else {
-      androidFallbackTimer = setTimeout(() => {
-        if (isStandalone()) return;
-        if (wasDismissedRecently()) return;
-        if (deferredRef.current) return;
-        if (!isMobileViewport()) return;
-        setMode("generic");
-        setVisible(true);
-      }, 4500);
-    }
+    const sync = () => {
+      if (!isMobileViewport() || isStandalone()) {
+        setEligible(false);
+        window.removeEventListener("beforeinstallprompt", onBip);
+        if (androidFallbackTimer) {
+          clearTimeout(androidFallbackTimer);
+          androidFallbackTimer = undefined;
+        }
+        return;
+      }
 
-    return () => {
+      setEligible(true);
+      setMode((prev) => {
+        if (deferredRef.current || prev === "chrome") return "chrome";
+        return isIos() ? "ios" : "generic";
+      });
+
+      if ("serviceWorker" in navigator) {
+        void navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(() => {});
+      }
+
       window.removeEventListener("beforeinstallprompt", onBip);
-      if (iosTimer) clearTimeout(iosTimer);
+      window.addEventListener("beforeinstallprompt", onBip);
+
+      if (!isIos()) {
+        if (androidFallbackTimer) clearTimeout(androidFallbackTimer);
+        androidFallbackTimer = setTimeout(() => {
+          if (isStandalone()) return;
+          if (deferredRef.current) return;
+          if (!isMobileViewport()) return;
+          setMode((m) => (m === "chrome" ? "chrome" : "generic"));
+        }, 1200);
+      }
+    };
+
+    sync();
+    const mq = window.matchMedia("(max-width: 768px)");
+    mq.addEventListener("change", sync);
+    return () => {
+      mq.removeEventListener("change", sync);
+      window.removeEventListener("beforeinstallprompt", onBip);
       if (androidFallbackTimer) clearTimeout(androidFallbackTimer);
     };
-  }, []);
+  }, [mounted]);
 
   const onInstall = async () => {
     const d = deferredRef.current;
@@ -126,70 +139,123 @@ export function PWAInstallPrompt() {
     } catch {
       /* user dismissed native sheet */
     }
-    dismiss();
+    setMinimized(true);
   };
 
   const onIosOpenShare = async () => {
     setShareHint(null);
+    setCopyDone(false);
     if (typeof navigator === "undefined" || !navigator.share) {
       setShareHint(
-        "Use Safari’s own Share button in the toolbar (bottom or top): square with an arrow pointing up. Then choose Add to Home Screen."
+        "Use Safari’s Share button in the toolbar (square with arrow up), then Add to Home Screen."
       );
       return;
     }
     try {
       await navigator.share({
         title: "Theraklick",
-        text: "Add Theraklick to your home screen from the next menu if you see it — or go back and use Safari’s Share → Add to Home Screen.",
+        text: "Open the Share menu, then look for Add to Home Screen (in Safari’s toolbar menu).",
         url: window.location.href,
       });
     } catch (err) {
       if ((err as Error)?.name === "AbortError") return;
-      setShareHint(
-        "Use Safari’s Share button in the browser toolbar, then Add to Home Screen. (Apple doesn’t let websites open that menu automatically.)"
-      );
+      setShareHint("Use Safari’s toolbar Share icon, then Add to Home Screen.");
     }
   };
 
-  if (!visible || isStandalone()) return null;
+  const onCopyLink = async () => {
+    setCopyDone(false);
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopyDone(true);
+    } catch {
+      setShareHint("Long-press the address bar to copy the link, then open it in Safari.");
+    }
+  };
 
-  const Icon = mode === "ios" ? Share2 : mode === "chrome" ? Download : Smartphone;
+  if (!mounted || !eligible || isStandalone()) return null;
 
-  return (
-    <div
-      className="fixed bottom-0 left-0 right-0 z-[9999] flex justify-center p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
-      role="dialog"
-      aria-label="Install app"
+  const bottomOffset = needsNavClearance
+    ? "calc(4.25rem + env(safe-area-inset-bottom, 0px))"
+    : "max(12px, env(safe-area-inset-bottom, 0px))";
+
+  const shellZ = 100050;
+
+  const collapsedBar = (
+    <button
+      type="button"
+      onClick={() => setMinimized(false)}
+      className="flex w-full max-w-lg items-center justify-center gap-2 rounded-t-2xl border border-b-0 border-[#0F4F47]/25 bg-[#0F4F47] py-2.5 pl-4 pr-4 text-[13px] font-semibold text-white shadow-lg touch-manipulation dark:border-[#2BB5A0]/40 dark:bg-[#0a3d36]"
+      style={{
+        position: "fixed",
+        left: "50%",
+        transform: "translateX(-50%)",
+        right: "auto",
+        width: "min(100% - 1.5rem, 32rem)",
+        bottom: bottomOffset,
+        zIndex: shellZ,
+      }}
     >
-      <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-[#0F4F47]/20 bg-white shadow-xl dark:border-white/10 dark:bg-gray-900">
+      <ChevronUp className="h-4 w-4 shrink-0 opacity-90" aria-hidden />
+      Add Theraklick to your phone
+    </button>
+  );
+
+  const expandedCard = (
+    <div
+      className="flex w-full max-w-lg justify-center px-3 pt-0 touch-manipulation"
+      style={{
+        position: "fixed",
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: "min(100%, 36rem)",
+        bottom: bottomOffset,
+        zIndex: shellZ,
+      }}
+      role="dialog"
+      aria-label="Install Theraklick on your phone"
+    >
+      <div className="w-full overflow-hidden rounded-2xl border border-[#0F4F47]/20 bg-white shadow-2xl dark:border-white/10 dark:bg-gray-900">
         <div className="flex items-start gap-3 p-4">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#0F4F47]/10 text-[#0F4F47] dark:bg-[#2BB5A0]/20 dark:text-[#7BD8CA]">
-            <Icon className="h-5 w-5" aria-hidden />
+            {mode === "ios" ? (
+              <Share2 className="h-5 w-5" aria-hidden />
+            ) : mode === "chrome" ? (
+              <Download className="h-5 w-5" aria-hidden />
+            ) : (
+              <Smartphone className="h-5 w-5" aria-hidden />
+            )}
           </div>
           <div className="min-w-0 flex-1 pt-0.5">
             <p className="text-[15px] font-bold text-gray-900 dark:text-white">Add Theraklick to your phone</p>
             {mode === "ios" && (
               <>
                 <p className="mt-1 text-[13px] leading-relaxed text-gray-600 dark:text-gray-400">
-                  Apple only allows this from <span className="font-semibold text-gray-800 dark:text-gray-200">Safari’s toolbar</span>
-                  — not from this page. Tap the{" "}
-                  <span className="font-semibold text-gray-900 dark:text-white">Share</span> icon there (square with an arrow{" "}
-                  <span className="whitespace-nowrap">↑</span>
-                  ), scroll the list, then tap{" "}
+                  On iPhone this uses <span className="font-semibold text-gray-800 dark:text-gray-200">Safari’s menu</span>
+                  : tap <span className="font-semibold text-gray-900 dark:text-white">Share</span> in the{" "}
+                  <span className="font-semibold">bottom or top bar</span> (square with arrow ↑), scroll down, then{" "}
                   <span className="font-semibold text-gray-900 dark:text-white">Add to Home Screen</span>.
                 </p>
                 {webShareAvailable ? (
                   <button
                     type="button"
                     onClick={() => void onIosOpenShare()}
-                    className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[#0F4F47] py-2.5 text-[14px] font-semibold text-white transition-colors active:scale-[0.99] hover:bg-[#0a3d36] dark:bg-[#2BB5A0] dark:text-[#0D1F1D] dark:hover:bg-[#5ad4c4]"
+                    className="mt-3 flex w-full min-h-[48px] items-center justify-center gap-2 rounded-xl bg-[#0F4F47] px-4 py-3 text-[15px] font-semibold text-white active:bg-[#0c4540] dark:bg-[#2BB5A0] dark:text-[#0D1F1D] dark:active:bg-[#48c9b8]"
                   >
-                    <Share2 className="h-4 w-4 shrink-0" aria-hidden />
+                    <Share2 className="h-5 w-5 shrink-0" aria-hidden />
                     Open Share sheet
                   </button>
                 ) : null}
+                <button
+                  type="button"
+                  onClick={() => void onCopyLink()}
+                  className="mt-2 flex w-full min-h-[44px] items-center justify-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-[14px] font-medium text-gray-800 active:bg-gray-100 dark:border-white/10 dark:bg-white/5 dark:text-gray-100 dark:active:bg-white/10"
+                >
+                  <Link2 className="h-4 w-4 shrink-0" aria-hidden />
+                  {copyDone ? "Link copied — paste in Safari" : "Copy link (open in Safari)"}
+                </button>
                 <p className="mt-2 text-[11px] leading-snug text-gray-500 dark:text-gray-500">
-                  If you’re in Chrome or an in-app browser, open this site in <strong>Safari</strong> first — Add to Home Screen only works there on iPhone.
+                  In Instagram / TikTok / Chrome? Use <strong>Copy link</strong> then paste in <strong>Safari</strong> — Add to Home Screen only works in Safari on iPhone.
                 </p>
                 {shareHint ? (
                   <p className="mt-2 text-[12px] leading-relaxed text-amber-800 dark:text-amber-200/90">{shareHint}</p>
@@ -198,9 +264,8 @@ export function PWAInstallPrompt() {
             )}
             {mode === "generic" && (
               <p className="mt-1 text-[13px] leading-relaxed text-gray-600 dark:text-gray-400">
-                Open your browser menu (often <span className="font-semibold">⋮</span> or{" "}
-                <span className="font-semibold">Install</span>) and choose{" "}
-                <span className="font-semibold text-gray-900 dark:text-white">Add to Home screen</span> or{" "}
+                Open the browser menu (<span className="font-semibold">⋮</span> or <span className="font-semibold">Install</span>
+                ), then <span className="font-semibold text-gray-900 dark:text-white">Add to Home screen</span> or{" "}
                 <span className="font-semibold text-gray-900 dark:text-white">Install app</span>.
               </p>
             )}
@@ -212,7 +277,7 @@ export function PWAInstallPrompt() {
                 <button
                   type="button"
                   onClick={() => void onInstall()}
-                  className="mt-3 w-full rounded-xl bg-[#0F4F47] py-2.5 text-[14px] font-semibold text-white transition-colors hover:bg-[#0a3d36] active:scale-[0.99] dark:bg-[#2BB5A0] dark:text-[#0D1F1D] dark:hover:bg-[#5ad4c4]"
+                  className="mt-3 w-full min-h-[48px] rounded-xl bg-[#0F4F47] px-4 py-3 text-[15px] font-semibold text-white active:bg-[#0c4540] dark:bg-[#2BB5A0] dark:text-[#0D1F1D] dark:active:bg-[#48c9b8]"
                 >
                   Install app
                 </button>
@@ -221,14 +286,17 @@ export function PWAInstallPrompt() {
           </div>
           <button
             type="button"
-            onClick={dismiss}
-            className="shrink-0 rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 active:bg-gray-200 dark:hover:bg-white/10 dark:hover:text-white"
-            aria-label="Dismiss"
+            onClick={() => setMinimized(true)}
+            className="shrink-0 rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-800 active:bg-gray-200 dark:hover:bg-white/10 dark:hover:text-white"
+            aria-label="Minimize install hint"
           >
-            <X className="h-5 w-5" />
+            <ChevronDown className="h-5 w-5" aria-hidden />
           </button>
         </div>
       </div>
     </div>
   );
+
+  const node = expanded ? expandedCard : collapsedBar;
+  return createPortal(node, document.body);
 }

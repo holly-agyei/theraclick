@@ -168,6 +168,34 @@ export default function LandingPage() {
                 See How It Works
               </button>
             </div>
+            <div
+              className={`mt-8 flex max-w-xl flex-wrap items-center justify-center gap-x-5 gap-y-2.5 px-2
+              transition-all duration-500 delay-[450ms] ${landed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+            >
+              <button
+                type="button"
+                onClick={() => router.push("/apply/peer-mentor")}
+                className="text-[13px] font-semibold text-[#B8F0E8]/90 underline-offset-4 transition-colors hover:text-white hover:underline"
+              >
+                Apply as peer mentor
+              </button>
+              <span className="hidden h-3 w-px bg-white/25 sm:block" aria-hidden />
+              <button
+                type="button"
+                onClick={() => router.push("/apply/counselor")}
+                className="text-[13px] font-semibold text-[#B8F0E8]/90 underline-offset-4 transition-colors hover:text-white hover:underline"
+              >
+                Apply as counselor
+              </button>
+              <span className="hidden h-3 w-px bg-white/25 sm:block" aria-hidden />
+              <button
+                type="button"
+                onClick={() => router.push("/admin/login")}
+                className="text-[13px] font-medium text-white/55 underline-offset-4 transition-colors hover:text-white/90 hover:underline"
+              >
+                Login as admin
+              </button>
+            </div>
             <p className={`mt-6 text-[13px] font-medium text-white/40
               transition-all duration-500 delay-500 ${landed ? "opacity-100" : "opacity-0"}`}>
               Built for students. Trusted by counselors. Powered by AI.

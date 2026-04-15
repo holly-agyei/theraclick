@@ -6,6 +6,7 @@ import { useAuth } from "@/context/auth";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Image from "next/image";
+import { THERAKLICK_LOGO_SRC } from "@/components/Logo";
 import { InteractiveGlobe } from "@/components/ui/interactive-globe";
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
@@ -58,7 +59,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
                   style={{ animationDuration: "1s" }}
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Image src="/images/theraklick-logo.png" alt="Theraklick" width={24} height={24} className="object-contain" />
+                  <Image src={THERAKLICK_LOGO_SRC} alt="Theraklick" width={24} height={24} unoptimized className="bg-transparent object-contain" />
                 </div>
               </div>
               <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Preparing your safe space...</p>

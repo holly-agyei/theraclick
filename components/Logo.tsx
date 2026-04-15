@@ -7,6 +7,9 @@
 
 import Image from "next/image";
 
+/** Bump when replacing the file so browsers and CDNs fetch the new asset. */
+export const THERAKLICK_LOGO_SRC = "/images/theraklick-logo.png?v=2";
+
 interface LogoProps {
   className?: string;
   size?: "sm" | "default" | "lg";
@@ -25,11 +28,12 @@ export function Logo({ className = "", size = "default", iconOnly }: LogoProps) 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       <Image
-        src="/images/theraklick-logo.png"
+        src={THERAKLICK_LOGO_SRC}
         alt="Theraklick"
         width={s.img}
         height={s.img}
-        className="shrink-0 object-contain"
+        unoptimized
+        className="shrink-0 bg-transparent object-contain"
         priority
       />
       {!iconOnly && (
@@ -47,11 +51,12 @@ export function Logo({ className = "", size = "default", iconOnly }: LogoProps) 
 export function BrainMark({ className = "" }: { className?: string }) {
   return (
     <Image
-      src="/images/theraklick-logo.png"
+      src={THERAKLICK_LOGO_SRC}
       alt="Theraklick"
       width={80}
       height={80}
-      className={`object-contain ${className}`}
+      unoptimized
+      className={`bg-transparent object-contain ${className}`}
       priority
     />
   );

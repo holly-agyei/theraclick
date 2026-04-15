@@ -17,6 +17,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
+import { THERAKLICK_LOGO_SRC } from "@/components/Logo";
 import { InteractiveGlobe } from "@/components/ui/interactive-globe";
 
 /* ── Feature Slides (not testimonials — app isn't launched yet) ── */
@@ -172,7 +173,7 @@ export function AuthLeftPanel({
                   : "opacity-0 -translate-y-5"
               }`}
           >
-            <Image src="/images/theraklick-logo.png" alt="Theraklick" width={40} height={40} className="shrink-0 object-contain" />
+            <Image src={THERAKLICK_LOGO_SRC} alt="Theraklick" width={40} height={40} unoptimized className="shrink-0 bg-transparent object-contain" />
             <span className="text-xl font-bold tracking-tight text-white">
               Theraklick
             </span>
@@ -232,7 +233,7 @@ export function AuthLeftPanel({
         {/* ─── Mobile: compact brand + tagline (row layout) ─── */}
         <div className="flex flex-1 items-end justify-between lg:hidden">
             <div className="flex items-center gap-2">
-              <Image src="/images/theraklick-logo.png" alt="Theraklick" width={28} height={28} className="shrink-0 object-contain" />
+              <Image src={THERAKLICK_LOGO_SRC} alt="Theraklick" width={28} height={28} unoptimized className="shrink-0 bg-transparent object-contain" />
               <span className="text-base font-bold text-white">Theraklick</span>
             </div>
           <p className="text-right text-[1.1rem] font-bold leading-tight text-white">
